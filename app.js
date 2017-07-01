@@ -271,23 +271,31 @@ console.log(login.user,login.pass,'test');
 
 var loggedIn = false;
 app.get('/', function(req, res) {
-  res.sendFile(__dirname + '/index.html');
+	
+	console.log('loggedin req',req.session.userInfo.user, req.session.userInfo.password);
+	if(req.session.userInfo.user=== login.user && req.session.userInfo.password === login.pass){
+		res.sendFile(__dirname + '/admin.html');
+
+	} else {
+		res.sendFile(__dirname + '/index.html');
+	}
 });
 
 app.post('/', function(req,res){
 	console.log('req',req.body);
 	if(req.body.login=== login.user && login.pass ){
-		req.session.user = req.body;
-		res.redirect('/loggedin');
+		req.session.userInfo = req.body;
+		res.redirect('/');
 
 	} else {
 		res.send('Access denied');
 	}
 });
 
+/*
 
 app.get('/loggedin', function(req,res){
-	console.log('loggedin req',req.session.user);
+	console.log('loggedin req',req.session.userInfo.user, req.session.userInfo.password);
 	  console.log('Cookies: ', req.cookies)
 	if(loggedIn){
 		res.sendFile(__dirname + '/admin.html');
@@ -295,6 +303,7 @@ app.get('/loggedin', function(req,res){
 		res.send('Access denied');
 	}
 });
+*/
 
 
 var sockets = {};
