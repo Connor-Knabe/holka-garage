@@ -16,7 +16,12 @@ var cookieParser = require('cookie-parser');
 var spawn = require('child_process').spawn;
 var proc;
 var port = 3000;
-var debugMode = false;
+var debugMode = true;
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+logger.level = 'debug';
+
+
 
 app.use(cookieParser());
 
@@ -31,33 +36,35 @@ var garageSensor = new Gpio(21, 'in','both');
 var garageSwitch = new Gpio(24, 'in','both');
 
 
+
+
 var hasSent = false;
 
 garageSensor.watch(function(err, value) {
    if (value==1 && !hasSent){
        hasSent = true;
-       console.log(new Date(),"Garge door opened");
-       sendMessage(twilioLoginInfo.toNumbers,"Garage opened");
+       logger.info('Garge door opened');
+       sendMessage(twilioLoginInfo.toNumbers,'Garage opened');
    } else {
        hasSent = false;
-       console.log(new Date(),"Garge door closed");
-       sendMessage(twilioLoginInfo.toNumbers,"Garage closed");
+       logger.info('Garge door closed');
+       sendMessage(twilioLoginInfo.toNumbers,'Garage closed');
    }
 });
 
-sendMessage(twilioLoginInfo.toNumbers,"Garage closed");
+sendMessage(twilioLoginInfo.toNumbers,'Garage closed');
 
 
 
 function sendMessage(numbers, msgContent){
-    console.log('numbers',numbers);
+    logger.info('Sending text message containing', msgContent);
     if(numbers) {
 		for (var i = 0; i < numbers.length; i++) {
             if(numbers[i].email){
                 sendEmail(numbers[i],msgContent);
             }
             if(numbers[i].number){
-                console.log("number",numbers[i].number);
+                console.log('number',numbers[i].number);
                 sendText(numbers[i],msgContent);
             }
 		}
@@ -73,13 +80,13 @@ function sendText(alertInfo, msgContent){
             // mediaUrl:'http://24.217.217.94:3000/cam2.jpg'
         }, function(err, message) {
             if(err){
-                console.error(new Date(), ' Error sending text message for message: ', message, '\nFor error: ', err);
+                logger.error(new Date(), ' Error sending text message for message: ', message, '\nFor error: ', err);
             } else {
-                console.log(new Date(),' Text sent: ', msgContent);
+                logger.info(new Date(),' Text sent: ', msgContent);
             }
         });
     } else {
-        console.log('not sending text in debug mode',msgContent);
+        logger.info('Not sending text in debug mode. Message contains:',msgContent);
     }
 }
 
@@ -100,12 +107,12 @@ function sendEmail(alertInfo, msgContent){
     if(!debugMode){
         transporter.sendMail(mailOptions, function(error, info){
             if(error){
-                return console.log(error);
+                return logger.error(error);
             }
-            console.log(new Date(),' Email sent: ', msgContent);
+            logger.info(new Date(),' Email sent: ', msgContent);
         });
     } else {
-        console.log(new Date(), 'not sending email in debug mode', msgContent);
+        logger.info(new Date(), 'not sending email in debug mode', msgContent);
     }
 }
 
@@ -126,8 +133,7 @@ app.get('/', function(req, res) {
 	    };
 		res.cookie('holkaCookie', login.secretCookie, options);
 
-		console.log('cookies',req.cookies.holkaCookie);
-// 		cookies.forEach(console.log);
+		logger.info('cookies',req.cookies.holkaCookie);
 		res.sendFile(__dirname + '/admin.html');
 	} else {
 		res.sendFile(__dirname + '/index.html');
@@ -135,7 +141,6 @@ app.get('/', function(req, res) {
 });
 
 app.post('/', function(req,res){
-	console.log('req',req.body);
 	if(req.body.username === login.username && req.body.password === login.password ){
 		req.session.userInfo = req.body;
 		res.redirect('/');
@@ -144,18 +149,49 @@ app.post('/', function(req,res){
 	}
 });
 
+function garageIsOpen(){
+    var isOpen = (garageSensor.readSync()==1) ? true :  false;
+    return isOpen;
+}
+
+app.post('/openOrCloseGarage', function(req,res){
+    var garageStatus = 'opening';
+    if(auth(req)){
+        if(req.body && req.body.shouldOpen && !garageIsOpen()){
+            openOrCloseGarage();
+        } else if(req.body && req.body.shouldClose && garageIsOpen()){
+            openOrCloseGarage();
+            garageStatus = 'closing';
+        }
+        var msg = garageStatus+' garage via button';
+        sendMessage(numbers,msg);
+        logger.info(msg);
+    } else {
+        res.status(401);
+        res.send('not auth');
+        var securityMsg = 'SECURITY: tried to open garage via post without being authenticated!!';
+        sendMessage(numbers,securityMsg);
+        logger.fatal(securityMsg,'Ip address is: ',req.headers['x-forwaded-for'],'or: ',req.connection.remoteAddress);
+    }
+});
+
+var garageTimeout;
+function toggleGarageDoor(){
+    clearTimeout(garageTimeout);
+    garageSwitch.writeSync(1);
+
+    garageTimeout = setTimeout(function(){
+        garageSwitch.writeSync(0);
+    },1000);
+}
+
 var sockets = {};
-
 io.on('connection', function(socket) {
-
   sockets[socket.id] = socket;
-  console.log("Total clients connected : ", Object.keys(sockets).length);
-
+  logger.info('Total clients connected : ', Object.keys(sockets).length);
   io.sockets.emit('clients', Object.keys(sockets).length);
-
   socket.on('disconnect', function() {
     delete sockets[socket.id];
-
     // no more sockets, kill the stream
     if (Object.keys(sockets).length === 0) {
       app.set('watchingFile', false);
@@ -163,15 +199,13 @@ io.on('connection', function(socket) {
       fs.unwatchFile('./stream/image_stream.jpg');
     }
   });
-
   socket.on('start-stream', function() {
     startStreaming(io);
   });
-
 });
 
 http.listen(port, function() {
-  console.log('listening on *:',port);
+  logger.info('listening on *:',port);
 });
 
 function stopStreaming() {
@@ -185,14 +219,12 @@ function stopStreaming() {
 
 app.get('/stream/image_stream.jpg',function(req,res){
     if(auth(req)){
-
-        console.log("req",req.headers['x-forwaded-for'],req.connection.remoteAddress);
+        logger.debug('req',req.headers['x-forwaded-for'],req.connection.remoteAddress);
         fs.readFile('./stream/image_stream.jpg', function(err, data) {
           if (err) throw err; // Fail if the file can't be read.
             res.writeHead(200, {'Content-Type': 'image/jpeg'});
             res.end(data); // Send the file data to the browser.
         });
-        console.log('ye');
     } else{
         res.status(401);
         res.send('not auth');
@@ -200,36 +232,21 @@ app.get('/stream/image_stream.jpg',function(req,res){
 
 });
 
-
 function startStreaming(io) {
-
     if (app.get('watchingFile')) {
         io.sockets.emit('liveStream', '/stream/image_stream.jpg?_t=' + (Math.random() * 100000));
         return;
     }
-
-    var timeStamp = new Date();
-
-    var timeArr = [];
-
-    timeArr.push(timeStamp);
-
-    var args = ["-w", "1200", "-h", "900", "-vf", "-hf", "-o", "./stream/image_stream.jpg", "-t", "999999999", "-tl", "3000", "-ex","night"];
+    var args = ['-w', '1200', '-h', '900', '-vf', '-hf', '-o', './stream/image_stream.jpg', '-t', '999999999', '-tl', '3000', '-ex','night'];
     proc = spawn('raspistill', args);
-
-    console.log('Watching for changes...');
-
+    logger.debug('Watching for changes...');
     app.set('watchingFile', true);
-
     fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
     io.sockets.emit('liveStream', '/stream/image_stream.jpg?_t=' + (Math.random() * 100000));
-
-    fs.stat("./stream/image_stream.jpg", function(err, stats){
+    fs.stat('./stream/image_stream.jpg', function(err, stats){
         var mtime = new Date(stats.mtime);
-        console.log(mtime.toString());
     	io.sockets.emit('liveStreamDate', mtime.toString());
     });
-
 });
 
 }
