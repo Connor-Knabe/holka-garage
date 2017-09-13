@@ -14,14 +14,14 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
 var spawn = require('child_process').spawn;
+
 var proc;
 var port = 3000;
-var debugMode = true;
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 logger.level = 'debug';
-
-
+var debugMode = true;
+var hoursToWaitBeforeNextSecurityAlert = 2;
 
 app.use(cookieParser());
 
@@ -34,10 +34,9 @@ app.use(session({
 
 var garageSensor = new Gpio(21, 'in','both');
 var garageSwitch = new Gpio(24, 'in','both');
-
-
-
-
+var garageTimeout;
+var securityMsgTimeout = null;
+var shouldSendSecurityAlert = true;
 var hasSent = false;
 
 garageSensor.watch(function(err, value) {
@@ -52,12 +51,8 @@ garageSensor.watch(function(err, value) {
    }
 });
 
-sendMessage(twilioLoginInfo.toNumbers,'Garage closed');
-
-
-
+// sendMessage(twilioLoginInfo.toNumbers,'Garage closed');
 function sendMessage(numbers, msgContent){
-    logger.info('Sending text message containing', msgContent);
     if(numbers) {
 		for (var i = 0; i < numbers.length; i++) {
             if(numbers[i].email){
@@ -116,17 +111,19 @@ function sendEmail(alertInfo, msgContent){
     }
 }
 
-app.use('/', express.static(path.join(__dirname, 'stream')));
+app.use('/', express.static(path.join(__dirname, 'js')));
 // app.use(bodyParser.urlencoded())
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
 
 function auth(req){
-    return (req.session && req.session.userInfo && req.session.userInfo.username === login.username) || req.cookies.holkaCookie === login.secretCookie;
+    var authenticated = (req.session && req.session.userInfo && req.session.userInfo.username === login.username) && req.cookies.holkaCookie === login.secretCookie;
+    logger.debug('isauth', authenticated);
+    return authenticated;
 }
 app.get('/', function(req, res) {
-	if(auth){
+	if(auth(req)){
 	    var options = {
 	        maxAge: 1000 * 60* 60 * 24  * 180,
 	        httpOnly: true
@@ -155,34 +152,48 @@ function garageIsOpen(){
 }
 
 app.post('/openOrCloseGarage', function(req,res){
-    var garageStatus = 'opening';
+    var garageStatus = null;
+    logger.debug('body',req.body);
     if(auth(req)){
-        if(req.body && req.body.shouldOpen && !garageIsOpen()){
-            openOrCloseGarage();
-        } else if(req.body && req.body.shouldClose && garageIsOpen()){
-            openOrCloseGarage();
+        if(req.body && req.body.garageSwitch == 'open' && !garageIsOpen()){
+            toggleGarageDoor();
+             garageStatus = 'opening';
+        } else if(req.body && req.body.garageSwitch == 'close' && garageIsOpen()){
+            toggleGarageDoor();
             garageStatus = 'closing';
         }
         var msg = garageStatus+' garage via button';
-        sendMessage(numbers,msg);
+        if(garageStatus){
+            sendMessage(twilioLoginInfo.toNumbers,msg);
+        }
         logger.info(msg);
+        res.send('auth');
     } else {
+        var securityMsg = 'SECURITY: tried to open garage via post without being authenticated!!';
+        clearTimeout(securityMsgTimeout);
+
+        securityMsgTimeout = setTimeout(function(){
+            shouldSendSecurityAlert = true;
+        },hoursToWaitBeforeNextSecurityAlert*60*60*10000);
+
+        if(shouldSendSecurityAlert){
+            sendMessage(twilioLoginInfo.toNumbers,securityMsg);
+            shouldSendSecurityAlert = false;
+        }
+        logger.fatal(securityMsg,'Ip address is: ',req.headers['x-forwaded-for'],'or: ',req.connection.remoteAddress);
         res.status(401);
         res.send('not auth');
-        var securityMsg = 'SECURITY: tried to open garage via post without being authenticated!!';
-        sendMessage(numbers,securityMsg);
-        logger.fatal(securityMsg,'Ip address is: ',req.headers['x-forwaded-for'],'or: ',req.connection.remoteAddress);
     }
 });
 
-var garageTimeout;
 function toggleGarageDoor(){
     clearTimeout(garageTimeout);
-    garageSwitch.writeSync(1);
-
-    garageTimeout = setTimeout(function(){
-        garageSwitch.writeSync(0);
-    },1000);
+    if(!debugMode){
+        garageSwitch.writeSync(1);
+        garageTimeout = setTimeout(function(){
+            garageSwitch.writeSync(0);
+        },1000);
+    }
 }
 
 var sockets = {};
@@ -219,13 +230,13 @@ function stopStreaming() {
 
 app.get('/stream/image_stream.jpg',function(req,res){
     if(auth(req)){
-        logger.debug('req',req.headers['x-forwaded-for'],req.connection.remoteAddress);
         fs.readFile('./stream/image_stream.jpg', function(err, data) {
           if (err) throw err; // Fail if the file can't be read.
             res.writeHead(200, {'Content-Type': 'image/jpeg'});
             res.end(data); // Send the file data to the browser.
         });
     } else{
+        logger.fatal('Unauthorized request for image_stream.jpg',req.headers['x-forwaded-for'],req.connection.remoteAddress);
         res.status(401);
         res.send('not auth');
     }
