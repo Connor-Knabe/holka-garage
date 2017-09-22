@@ -232,50 +232,21 @@ app.use(bodyParser.urlencoded({
 }));
 
 
-
-// Authenticator
-/*
-app.use(function(req, res, next) {
-    var auth;
-
-    // check whether an autorization header was send    
-    if (req.headers.authorization) {
-      // only accepting basic auth, so:
-      // * cut the starting "Basic " from the header
-      // * decode the base64 encoded username:password
-      // * split the string at the colon
-      // -> should result in an array
-      auth = new Buffer(req.headers.authorization.substring(6), 'base64').toString().split(':');
-    }
-
-    // checks if:
-    // * auth array exists 
-    // * first value matches the expected user 
-    // * second value the expected password
-console.log(login.user,login.pass,'test');
-    if (!auth || auth[0] !== login.user || auth[1] !== login.pass) {
-        // any of the tests failed
-        // send an Basic Auth request (HTTP Code: 401 Unauthorized)
-        res.statusCode = 401;
-        // MyRealmName can be changed to anything, will be prompted to the user
-        res.setHeader('WWW-Authenticate', 'Basic realm="MyRealmName"');
-        // this will displayed in the browser when authorization is cancelled
-        res.end('Unauthorized');
-    } else {
-        // continue with processing, user was authenticated
-        next();
-    }
-});
-*/
-
-
-var loggedIn = false;
 app.get('/', function(req, res) {
-	
-	console.log('loggedin req',req.session.userInfo.user, req.session.userInfo.password);
-	if(req.session.userInfo.user=== login.user && req.session.userInfo.password === login.pass){
-		res.sendFile(__dirname + '/admin.html');
+	if((req.session && req.session.userInfo && req.session.userInfo.username === login.username && req.session.userInfo.password === login.password) || req.cookies.holkaCookie === login.secretCookie){
+		
 
+	    var options = {
+	        maxAge: 1000 * 60* 60 * 24  * 180, 
+	        httpOnly: true
+	    }
+			
+		res.cookie('holkaCookie', login.secretCookie, options)
+
+		
+		console.log('cookies',req.cookies.holkaCookie);
+// 		cookies.forEach(console.log);
+		res.sendFile(__dirname + '/admin.html');
 	} else {
 		res.sendFile(__dirname + '/index.html');
 	}
@@ -283,28 +254,13 @@ app.get('/', function(req, res) {
 
 app.post('/', function(req,res){
 	console.log('req',req.body);
-	if(req.body.login=== login.user && login.pass ){
+	if(req.body.username === login.username && req.body.password === login.password ){
 		req.session.userInfo = req.body;
 		res.redirect('/');
-
 	} else {
-		res.send('Access denied');
+		res.send('Access denied wrong username/password');
 	}
 });
-
-/*
-
-app.get('/loggedin', function(req,res){
-	console.log('loggedin req',req.session.userInfo.user, req.session.userInfo.password);
-	  console.log('Cookies: ', req.cookies)
-	if(loggedIn){
-		res.sendFile(__dirname + '/admin.html');
-	} else {
-		res.send('Access denied');
-	}
-});
-*/
-
 
 var sockets = {};
 
@@ -426,11 +382,14 @@ var app = express();
 var http = require('http').Server(app);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 http.listen(8080, function() {
   console.log('listening on *:8080');
 });
 >>>>>>> 46047b9... Init
+=======
+>>>>>>> 700b3c9... New login
 
 app.get('/', function(req, res) {
 	res.send('200');
@@ -443,23 +402,6 @@ garageSensor.watch(function(err, val){
 */
 <<<<<<< HEAD
 =======
-
-/*
-request('http://www.google.com', function (error, response, body) {
-  console.log('error:', error); // Print the error if one occurred
-  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-  console.log('body:', body); // Print the HTML for the Google homepage.
-});
-*/
-
-
-/*
-
-var serverTwo = require('http').createServer(app);
-serverTwo.listen(8080, function(){
-	console.log('listening on 80');
-})
-*/
 
 
 
