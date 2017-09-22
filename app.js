@@ -44,7 +44,12 @@ var cookieParser = require('cookie-parser');
 var spawn = require('child_process').spawn;
 var proc;
 var port = 3000;
-var debugMode = false;
+var debugMode = true;
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+logger.level = 'debug';
+
+
 
 app.use(cookieParser());
 >>>>>>> ee556a5... adding twilio
@@ -67,12 +72,18 @@ var shouldSendSecurityAlert = true;
 =======
 
 
+<<<<<<< HEAD
 >>>>>>> 6edde25... Changing security for image
+=======
+
+
+>>>>>>> 54b6e6d... Adding logic to open garage via post route
 var hasSent = false;
 
 garageSensor.watch(function(err, value) {
    if (value==1 && !hasSent){
        hasSent = true;
+<<<<<<< HEAD
 <<<<<<< HEAD
        logger.info('Garge door opened');
        sendMessage(twilioLoginInfo.toNumbers,'Garage opened');
@@ -88,20 +99,28 @@ function sendMessage(numbers, msgContent){
 =======
        console.log(new Date(),"Garge door opened");
        sendMessage(twilioLoginInfo.toNumbers,"Garage opened");
+=======
+       logger.info('Garge door opened');
+       sendMessage(twilioLoginInfo.toNumbers,'Garage opened');
+>>>>>>> 54b6e6d... Adding logic to open garage via post route
    } else {
        hasSent = false;
-       console.log(new Date(),"Garge door closed");
-       sendMessage(twilioLoginInfo.toNumbers,"Garage closed");
+       logger.info('Garge door closed');
+       sendMessage(twilioLoginInfo.toNumbers,'Garage closed');
    }
 });
 
-sendMessage(twilioLoginInfo.toNumbers,"Garage closed");
+sendMessage(twilioLoginInfo.toNumbers,'Garage closed');
 
 
 
 function sendMessage(numbers, msgContent){
+<<<<<<< HEAD
     console.log('numbers',numbers);
 >>>>>>> 6edde25... Changing security for image
+=======
+    logger.info('Sending text message containing', msgContent);
+>>>>>>> 54b6e6d... Adding logic to open garage via post route
     if(numbers) {
 		for (var i = 0; i < numbers.length; i++) {
             if(numbers[i].email){
@@ -109,10 +128,14 @@ function sendMessage(numbers, msgContent){
             }
             if(numbers[i].number){
 <<<<<<< HEAD
+<<<<<<< HEAD
                 console.log('number',numbers[i].number);
 =======
                 console.log("number",numbers[i].number);
 >>>>>>> 6edde25... Changing security for image
+=======
+                console.log('number',numbers[i].number);
+>>>>>>> 54b6e6d... Adding logic to open garage via post route
                 sendText(numbers[i],msgContent);
             }
 		}
@@ -129,6 +152,7 @@ function sendText(alertInfo, msgContent){
         }, function(err, message) {
             if(err){
 <<<<<<< HEAD
+<<<<<<< HEAD
                 logger.error(new Date(), ' Error sending text message for message: ', message, '\nFor error: ', err);
             } else {
                 logger.info(new Date(),' Text sent: ', msgContent);
@@ -138,13 +162,20 @@ function sendText(alertInfo, msgContent){
         logger.info('Not sending text in debug mode. Message contains:',msgContent);
 =======
                 console.error(new Date(), ' Error sending text message for message: ', message, '\nFor error: ', err);
+=======
+                logger.error(new Date(), ' Error sending text message for message: ', message, '\nFor error: ', err);
+>>>>>>> 54b6e6d... Adding logic to open garage via post route
             } else {
-                console.log(new Date(),' Text sent: ', msgContent);
+                logger.info(new Date(),' Text sent: ', msgContent);
             }
         });
     } else {
+<<<<<<< HEAD
         console.log('not sending text in debug mode',msgContent);
 >>>>>>> 6edde25... Changing security for image
+=======
+        logger.info('Not sending text in debug mode. Message contains:',msgContent);
+>>>>>>> 54b6e6d... Adding logic to open garage via post route
     }
 }
 
@@ -165,6 +196,7 @@ function sendEmail(alertInfo, msgContent){
     if(!debugMode){
         transporter.sendMail(mailOptions, function(error, info){
             if(error){
+<<<<<<< HEAD
 <<<<<<< HEAD
                 return logger.error(error);
             }
@@ -314,11 +346,14 @@ function sendMessage(numbers, msgContent){
 
 =======
                 return console.log(error);
+=======
+                return logger.error(error);
+>>>>>>> 54b6e6d... Adding logic to open garage via post route
             }
-            console.log(new Date(),' Email sent: ', msgContent);
+            logger.info(new Date(),' Email sent: ', msgContent);
         });
     } else {
-        console.log(new Date(), 'not sending email in debug mode', msgContent);
+        logger.info(new Date(), 'not sending email in debug mode', msgContent);
     }
 }
 
@@ -340,8 +375,7 @@ app.get('/', function(req, res) {
 	    };
 		res.cookie('holkaCookie', login.secretCookie, options);
 
-		console.log('cookies',req.cookies.holkaCookie);
-// 		cookies.forEach(console.log);
+		logger.info('cookies',req.cookies.holkaCookie);
 		res.sendFile(__dirname + '/admin.html');
 	} else {
 		res.sendFile(__dirname + '/index.html');
@@ -349,7 +383,6 @@ app.get('/', function(req, res) {
 });
 
 app.post('/', function(req,res){
-	console.log('req',req.body);
 	if(req.body.username === login.username && req.body.password === login.password ){
 		req.session.userInfo = req.body;
 		res.redirect('/');
@@ -358,18 +391,49 @@ app.post('/', function(req,res){
 	}
 });
 
+function garageIsOpen(){
+    var isOpen = (garageSensor.readSync()==1) ? true :  false;
+    return isOpen;
+}
+
+app.post('/openOrCloseGarage', function(req,res){
+    var garageStatus = 'opening';
+    if(auth(req)){
+        if(req.body && req.body.shouldOpen && !garageIsOpen()){
+            openOrCloseGarage();
+        } else if(req.body && req.body.shouldClose && garageIsOpen()){
+            openOrCloseGarage();
+            garageStatus = 'closing';
+        }
+        var msg = garageStatus+' garage via button';
+        sendMessage(numbers,msg);
+        logger.info(msg);
+    } else {
+        res.status(401);
+        res.send('not auth');
+        var securityMsg = 'SECURITY: tried to open garage via post without being authenticated!!';
+        sendMessage(numbers,securityMsg);
+        logger.fatal(securityMsg,'Ip address is: ',req.headers['x-forwaded-for'],'or: ',req.connection.remoteAddress);
+    }
+});
+
+var garageTimeout;
+function toggleGarageDoor(){
+    clearTimeout(garageTimeout);
+    garageSwitch.writeSync(1);
+
+    garageTimeout = setTimeout(function(){
+        garageSwitch.writeSync(0);
+    },1000);
+}
+
 var sockets = {};
-
 io.on('connection', function(socket) {
-
   sockets[socket.id] = socket;
-  console.log("Total clients connected : ", Object.keys(sockets).length);
-
+  logger.info('Total clients connected : ', Object.keys(sockets).length);
   io.sockets.emit('clients', Object.keys(sockets).length);
-
   socket.on('disconnect', function() {
     delete sockets[socket.id];
-
     // no more sockets, kill the stream
 <<<<<<< HEAD
     if (Object.keys(sockets).length == 0) {
@@ -382,6 +446,7 @@ io.on('connection', function(socket) {
       fs.unwatchFile('./stream/image_stream.jpg');
     }
   });
+<<<<<<< HEAD
 <<<<<<< HEAD
   socket.on('start-stream', function() {
     startStreaming(io);
@@ -396,14 +461,15 @@ function stopStreaming() {
   if (Object.keys(sockets).length === 0) {
 =======
 
+=======
+>>>>>>> 54b6e6d... Adding logic to open garage via post route
   socket.on('start-stream', function() {
     startStreaming(io);
   });
-
 });
 
 http.listen(port, function() {
-  console.log('listening on *:',port);
+  logger.info('listening on *:',port);
 });
 
 function stopStreaming() {
@@ -428,19 +494,26 @@ app.get('/stream/image_stream.jpg',function(req,res){
 
 app.get('/stream/image_stream.jpg',function(req,res){
     if(auth(req)){
+<<<<<<< HEAD
 
         console.log("req",req.headers['x-forwaded-for'],req.connection.remoteAddress);
 >>>>>>> 6edde25... Changing security for image
+=======
+        logger.debug('req',req.headers['x-forwaded-for'],req.connection.remoteAddress);
+>>>>>>> 54b6e6d... Adding logic to open garage via post route
         fs.readFile('./stream/image_stream.jpg', function(err, data) {
           if (err) throw err; // Fail if the file can't be read.
             res.writeHead(200, {'Content-Type': 'image/jpeg'});
             res.end(data); // Send the file data to the browser.
         });
 <<<<<<< HEAD
+<<<<<<< HEAD
     } else{
         logger.fatal('Unauthorized request for image_stream.jpg',req.headers['x-forwaded-for'],req.connection.remoteAddress);
 =======
         console.log('ye');
+=======
+>>>>>>> 54b6e6d... Adding logic to open garage via post route
     } else{
 >>>>>>> 6edde25... Changing security for image
         res.status(401);
@@ -449,6 +522,7 @@ app.get('/stream/image_stream.jpg',function(req,res){
 
 });
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 function startStreaming(io) {
     if (app.get('watchingFile')) {
@@ -470,34 +544,24 @@ function startStreaming(io) {
 =======
 
 >>>>>>> 6edde25... Changing security for image
+=======
+>>>>>>> 54b6e6d... Adding logic to open garage via post route
 function startStreaming(io) {
-
     if (app.get('watchingFile')) {
         io.sockets.emit('liveStream', '/stream/image_stream.jpg?_t=' + (Math.random() * 100000));
         return;
     }
-
-    var timeStamp = new Date();
-
-    var timeArr = [];
-
-    timeArr.push(timeStamp);
-
-    var args = ["-w", "1200", "-h", "900", "-vf", "-hf", "-o", "./stream/image_stream.jpg", "-t", "999999999", "-tl", "3000", "-ex","night"];
+    var args = ['-w', '1200', '-h', '900', '-vf', '-hf', '-o', './stream/image_stream.jpg', '-t', '999999999', '-tl', '3000', '-ex','night'];
     proc = spawn('raspistill', args);
-
-    console.log('Watching for changes...');
-
+    logger.debug('Watching for changes...');
     app.set('watchingFile', true);
-
     fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
     io.sockets.emit('liveStream', '/stream/image_stream.jpg?_t=' + (Math.random() * 100000));
-
-    fs.stat("./stream/image_stream.jpg", function(err, stats){
+    fs.stat('./stream/image_stream.jpg', function(err, stats){
         var mtime = new Date(stats.mtime);
-        console.log(mtime.toString());
     	io.sockets.emit('liveStreamDate', mtime.toString());
     });
+<<<<<<< HEAD
 
 <<<<<<< HEAD
   app.set('watchingFile', true);
@@ -515,6 +579,8 @@ function startStreaming(io) {
   })
 >>>>>>> 46047b9... Init
 =======
+=======
+>>>>>>> 54b6e6d... Adding logic to open garage via post route
 });
 >>>>>>> ee556a5... adding twilio
 
