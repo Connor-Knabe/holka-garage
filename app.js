@@ -19,7 +19,7 @@ var cookieParser = require('cookie-parser');
 var spawn = require('child_process').spawn;
 
 var proc;
-var port = 3000;
+var port = 80;
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 logger.level = 'debug';
@@ -380,13 +380,7 @@ function auth(req){
 }
 app.get('/', function(req, res) {
 	if(auth(req)){
-	    var options = {
-	        maxAge: 1000 * 60* 60 * 24  * 180,
-	        httpOnly: true
-	    };
-		res.cookie('holkaCookie', login.secretCookie, options);
 
-		logger.info('cookies',req.cookies.holkaCookie);
 		res.sendFile(__dirname + '/admin.html');
 	} else {
 		res.sendFile(__dirname + '/index.html');
@@ -396,6 +390,13 @@ app.get('/', function(req, res) {
 app.post('/', function(req,res){
 	if(req.body.username === login.username && req.body.password === login.password ){
 		req.session.userInfo = req.body;
+		var options = {
+	        maxAge: 1000 * 60* 60 * 24  * 180,
+	        httpOnly: true
+	    };
+		res.cookie('holkaCookie', login.secretCookie, options);
+
+		logger.info('cookies',req.cookies.holkaCookie);
 		res.redirect('/');
 	} else {
 		res.send('Access denied wrong username/password');
