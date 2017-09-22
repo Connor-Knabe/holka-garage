@@ -33,8 +33,9 @@ app.use(session({
 }));
 
 var motionSensor = new Gpio(15, 'in','both');
-var garageSensor = new Gpio(26, 'in','both');
-var garageSwitch = new Gpio(14, 'in','both');
+var garageSensor = new Gpio(20, 'in','both');
+var garageSwitch = new Gpio(21, 'out');
+
 
 var garageTimeout;
 var securityMsgTimeout = null;
@@ -57,6 +58,7 @@ garageSensor.watch(function(err, value) {
 */
 
 sendMessage(twilioLoginInfo.toNumbers,'Garage test closed');
+
 
 
 motionSensor.watch(function(err, value) {
@@ -139,9 +141,16 @@ app.use(bodyParser.urlencoded({
 
 function auth(req){
     var authenticated = (req && req.cookies && (req.cookies.holkaCookie === login.secretCookie));
-    logger.debug('isauth', authenticated);
     return authenticated;
 }
+
+function vpnAuth(req){
+	var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	var isOnVpn = ip===login.vpnIp;
+	
+    return isOnVpn;	
+}
+
 app.get('/', function(req, res) {
 	if(auth(req)){
 		res.sendFile(__dirname + '/admin.html');
@@ -171,10 +180,11 @@ function garageIsOpen(){
     return isOpen;
 }
 
+
 app.post('/openOrCloseGarage', function(req,res){
     var garageStatus = null;
     logger.debug('body',req.body);
-    if(auth(req)){
+    if(auth(req) && vpnAuth(req)){
         if(req.body && req.body.garageSwitch == 'open' && !garageIsOpen()){
             toggleGarageDoor();
              garageStatus = 'opening';
@@ -208,7 +218,7 @@ app.post('/openOrCloseGarage', function(req,res){
 
 function toggleGarageDoor(){
     clearTimeout(garageTimeout);
-    if(!debugMode){
+    if(debugMode){
         garageSwitch.writeSync(1);
         garageTimeout = setTimeout(function(){
             garageSwitch.writeSync(0);
