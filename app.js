@@ -8,6 +8,7 @@ var Gpio = require('onoff').Gpio;
 var request = require('request');
 var login = require('./login.js');
 <<<<<<< HEAD
+<<<<<<< HEAD
 var twilioLoginInfo = require('./settings/twilioLoginInfo.js');
 var twilio = require('twilio');
 var client = twilio(twilioLoginInfo.TWILIO_ACCOUNT_SID, twilioLoginInfo.TWILIO_AUTH_TOKEN);
@@ -25,12 +26,20 @@ var debugMode = true;
 var hoursToWaitBeforeNextSecurityAlert = 2;
 
 app.use(cookieParser());
+=======
+var bodyParser = require('body-parser')
+var session = require('express-session')
+var cookieParser = require('cookie-parser')
+
+app.use(cookieParser())
+>>>>>>> fc55780... Attempting new logic to secure site
 
 app.use(session({
   secret: login.secret,
   resave: false,
   saveUninitialized: true,
   cookie: { secure: false }
+<<<<<<< HEAD
 }));
 
 var garageSensor = new Gpio(21, 'in','both');
@@ -208,14 +217,24 @@ io.on('connection', function(socket) {
     if (Object.keys(sockets).length === 0) {
 =======
 
+=======
+}))
+>>>>>>> fc55780... Attempting new logic to secure site
 // var garageSensor = new Gpio(14, 'in');
 
 var spawn = require('child_process').spawn;
 var proc;
 
 app.use('/', express.static(path.join(__dirname, 'stream')));
+// app.use(bodyParser.urlencoded())
+app.use(bodyParser.urlencoded({
+	extended: true
+}));
+
+
 
 // Authenticator
+/*
 app.use(function(req, res, next) {
     var auth;
 
@@ -247,11 +266,36 @@ console.log(login.user,login.pass,'test');
         next();
     }
 });
+*/
 
 
+var loggedIn = false;
 app.get('/', function(req, res) {
   res.sendFile(__dirname + '/index.html');
 });
+
+app.post('/', function(req,res){
+	console.log('req',req.body);
+	if(req.body.login=== login.user && login.pass ){
+		req.session.user = req.body;
+		res.redirect('/loggedin');
+
+	} else {
+		res.send('Access denied');
+	}
+});
+
+
+app.get('/loggedin', function(req,res){
+	console.log('loggedin req',req.session.user);
+	  console.log('Cookies: ', req.cookies)
+	if(loggedIn){
+		res.sendFile(__dirname + '/admin.html');
+	} else {
+		res.send('Access denied');
+	}
+});
+
 
 var sockets = {};
 
