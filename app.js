@@ -7,6 +7,7 @@ var path = require('path');
 var Gpio = require('onoff').Gpio;
 var request = require('request');
 var login = require('./login.js');
+<<<<<<< HEAD
 var twilioLoginInfo = require('./settings/twilioLoginInfo.js');
 var twilio = require('twilio');
 var client = twilio(twilioLoginInfo.TWILIO_ACCOUNT_SID, twilioLoginInfo.TWILIO_AUTH_TOKEN);
@@ -205,11 +206,74 @@ io.on('connection', function(socket) {
     delete sockets[socket.id];
     // no more sockets, kill the stream
     if (Object.keys(sockets).length === 0) {
+=======
+
+// var garageSensor = new Gpio(14, 'in');
+
+var spawn = require('child_process').spawn;
+var proc;
+
+app.use('/', express.static(path.join(__dirname, 'stream')));
+
+// Authenticator
+app.use(function(req, res, next) {
+    var auth;
+
+    // check whether an autorization header was send    
+    if (req.headers.authorization) {
+      // only accepting basic auth, so:
+      // * cut the starting "Basic " from the header
+      // * decode the base64 encoded username:password
+      // * split the string at the colon
+      // -> should result in an array
+      auth = new Buffer(req.headers.authorization.substring(6), 'base64').toString().split(':');
+    }
+
+    // checks if:
+    // * auth array exists 
+    // * first value matches the expected user 
+    // * second value the expected password
+console.log(login.user,login.pass,'test');
+    if (!auth || auth[0] !== login.user || auth[1] !== login.pass) {
+        // any of the tests failed
+        // send an Basic Auth request (HTTP Code: 401 Unauthorized)
+        res.statusCode = 401;
+        // MyRealmName can be changed to anything, will be prompted to the user
+        res.setHeader('WWW-Authenticate', 'Basic realm="MyRealmName"');
+        // this will displayed in the browser when authorization is cancelled
+        res.end('Unauthorized');
+    } else {
+        // continue with processing, user was authenticated
+        next();
+    }
+});
+
+
+app.get('/', function(req, res) {
+  res.sendFile(__dirname + '/index.html');
+});
+
+var sockets = {};
+
+io.on('connection', function(socket) {
+
+  sockets[socket.id] = socket;
+  console.log("Total clients connected : ", Object.keys(sockets).length);
+
+  io.sockets.emit('clients', Object.keys(sockets).length);
+
+  socket.on('disconnect', function() {
+    delete sockets[socket.id];
+
+    // no more sockets, kill the stream
+    if (Object.keys(sockets).length == 0) {
+>>>>>>> 46047b9... Init
       app.set('watchingFile', false);
       if (proc) proc.kill();
       fs.unwatchFile('./stream/image_stream.jpg');
     }
   });
+<<<<<<< HEAD
   socket.on('start-stream', function() {
     startStreaming(io);
   });
@@ -221,12 +285,28 @@ http.listen(port, function() {
 
 function stopStreaming() {
   if (Object.keys(sockets).length === 0) {
+=======
+
+  socket.on('start-stream', function() {
+    startStreaming(io);
+  });
+
+});
+
+http.listen(3000, function() {
+  console.log('listening on *:3000');
+});
+
+function stopStreaming() {
+  if (Object.keys(sockets).length == 0) {
+>>>>>>> 46047b9... Init
     app.set('watchingFile', false);
     if (proc) proc.kill();
     fs.unwatchFile('./stream/image_stream.jpg');
   }
 }
 
+<<<<<<< HEAD
 
 app.get('/stream/image_stream.jpg',function(req,res){
     if(auth(req)){
@@ -259,12 +339,45 @@ function startStreaming(io) {
     	io.sockets.emit('liveStreamDate', mtime.toString());
     });
 });
+=======
+function startStreaming(io) {
+
+  if (app.get('watchingFile')) {
+    io.sockets.emit('liveStream', 'image_stream.jpg?_t=' + (Math.random() * 100000));
+    return;
+  }
+
+  var args = ["-w", "640", "-h", "480", "-vf", "-hf", "-o", "./stream/image_stream.jpg", "-t", "999999999", "-tl", "100"];
+  proc = spawn('raspistill', args);
+
+  console.log('Watching for changes...');
+
+  app.set('watchingFile', true);
+
+  fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
+    io.sockets.emit('liveStream', 'image_stream.jpg?_t=' + (Math.random() * 100000));
+    
+    fs.stat("./stream/image_stream.jpg", function(err, stats){
+	    var mtime = new Date(stats.mtime);
+	    console.log(mtime.toString());
+		io.sockets.emit('liveStreamDate', mtime.toString());
+
+	});
+
+  })
+>>>>>>> 46047b9... Init
 
 }
 
 var app = express();
 var http = require('http').Server(app);
 
+<<<<<<< HEAD
+=======
+http.listen(8080, function() {
+  console.log('listening on *:8080');
+});
+>>>>>>> 46047b9... Init
 
 app.get('/', function(req, res) {
 	res.send('200');
@@ -275,3 +388,26 @@ garageSensor.watch(function(err, val){
 	console.log('val',val);
 });
 */
+<<<<<<< HEAD
+=======
+
+/*
+request('http://www.google.com', function (error, response, body) {
+  console.log('error:', error); // Print the error if one occurred
+  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+  console.log('body:', body); // Print the HTML for the Google homepage.
+});
+*/
+
+
+/*
+
+var serverTwo = require('http').createServer(app);
+serverTwo.listen(8080, function(){
+	console.log('listening on 80');
+})
+*/
+
+
+
+>>>>>>> 46047b9... Init
