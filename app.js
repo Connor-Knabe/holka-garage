@@ -19,11 +19,20 @@ var proc;
 var port = 80;
 var log4js = require('log4js');
 var logger = log4js.getLogger();
-logger.level = 'debug';
+logger.level = 'info';
 var debugMode = true;
 var hoursToWaitBeforeNextSecurityAlert = 2;
+var garageOpenStatus = null;
 
 app.use(cookieParser());
+
+if(debugMode){
+	logger.level = 'debug';
+	logger.debug('___________________________________');
+	logger.debug('In debug mode not sending texts!!!');
+	logger.debug('___________________________________');
+
+}
 
 app.use(session({
   secret: login.secret,
@@ -33,44 +42,80 @@ app.use(session({
 }));
 
 var motionSensor = new Gpio(15, 'in','both');
-var garageSensor = new Gpio(20, 'in','both');
+var garageSensor = new Gpio(4, 'in','both');
 var garageSwitch = new Gpio(21, 'out');
 
 
 var garageTimeout;
 var securityMsgTimeout = null;
 var shouldSendSecurityAlert = true;
-var hasSent = false;
+var hasSentMotionSensorAlert = false;
+var hasSentGarageDoorAlert = false;
+var garageSensorTimeoutOne = null;
+var garageSensorTimeoutTwo = null;
+
+garageSensor.watch(function(err, value) { 	
+	logger.debug('val',value);
+	if(err){
+		logger.error('Error watching garage sensor: ',err);
+	}
+	
+	if (value==1 && !hasSentGarageDoorAlert){
+// 	   clearTimeout(garageSensorTimeoutOne);
+// 	   garageSensorTimeoutOne = setTimeout(function(){
+	       hasSentGarageDoorAlert = true;       
+// 	   }, 15*1000);
+	   var msg = 'Garage door opened';
+	   logger.debug(msg);
+	   sendMessage(twilioLoginInfo.toNumbers,msg);
+		io.sockets.emit('garageErrorStatus', null);
+	} else if (value==0 && hasSentGarageDoorAlert){
+// 	   clearTimeout(garageSensorTimeoutTwo);
+// 	   garageSensorTimeoutTwo = setTimeout(function(){
+	       hasSentGarageDoorAlert = false;	       
+// 	   }, 15*1000);
+	   var msg = 'Garage door closed';
+	   logger.debug(msg);
+	   sendMessage(twilioLoginInfo.toNumbers,msg);
+		io.sockets.emit('garageErrorStatus', null);
+	}   
+});
 
 
 /*
-garageSensor.watch(function(err, value) {
-   if (value==1 && !hasSent){
-       hasSent = true;
-       logger.info('Garge door opened');
-       sendMessage(twilioLoginInfo.toNumbers,'Garage opened');
-   } else {
-       hasSent = false;
-       logger.info('Garge door closed');
-       sendMessage(twilioLoginInfo.toNumbers,'Garage closed');
-   }
-});
+setInterval(function(){
+
+	if(garageSensor.readSync()==1){
+		logger.debug('Garage opened: ',garageSensor.readSync(), new Date());
+	} else {
+		logger.debug('Garage closed: ',garageSensor.readSync(), new Date());
+	}
+}, 2000);
+	
 */
-
-sendMessage(twilioLoginInfo.toNumbers,'Garage test closed');
-
-
-
+	
+var motionSensorTimeoutOne = null;
+var motionSensorTimeoutTwo = null;
+	
 motionSensor.watch(function(err, value) {
-   if (value==1 && !hasSent){
-       hasSent = true;
-       logger.info('Motion sensor activated');
-       sendMessage(twilioLoginInfo.toNumbers,'Motion sensor activated');
-   } else if (value==0 && hasSent){
-       hasSent = false;
-       logger.info('No more motion');
-       sendMessage(twilioLoginInfo.toNumbers,'No more motion');
-   }
+	if(err){
+		logger.error('Error watching motion sensor: ',err);
+	}
+	if (value==1 && !hasSentMotionSensorAlert){
+		clearTimeout(motionSensorTimeoutOne);
+		motionSensorTimeoutOne = setTimeout(function(){
+		   hasSentMotionSensorAlert = true;       
+		}, 2*60*1000);
+		var msg = 'Motion detected in garage'
+		logger.debug(msg);
+ 		sendMessage(twilioLoginInfo.toNumbers,msg);
+
+	} else if (value==0 && hasSentMotionSensorAlert){
+		clearTimeout(motionSensorTimeoutTwo);
+		motionSensorTimeoutTwo = setTimeout(function(){
+		   hasSentMotionSensorAlert = false;	       
+		}, 2*60*1000);
+	}
 });
 
 // sendMessage(twilioLoginInfo.toNumbers,'Garage closed');
@@ -81,7 +126,7 @@ function sendMessage(numbers, msgContent){
                 sendEmail(numbers[i],msgContent);
             }
             if(numbers[i].number){
-                console.log('number',numbers[i].number);
+                logger.debug('number',numbers[i].number);
                 sendText(numbers[i],msgContent);
             }
 		}
@@ -94,7 +139,6 @@ function sendText(alertInfo, msgContent){
             to: alertInfo.number,
             from: twilioLoginInfo.fromNumber,
             body: msgContent
-            // mediaUrl:'http://24.217.217.94:3000/cam2.jpg'
         }, function(err, message) {
             if(err){
                 logger.error(new Date(), ' Error sending text message for message: ', message, '\nFor error: ', err);
@@ -145,9 +189,8 @@ function auth(req){
 }
 
 function vpnAuth(req){
-	var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-	var isOnVpn = ip===login.vpnIp;
-	
+	var clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	var isOnVpn = clientIp.includes(login.vpnIp);
     return isOnVpn;	
 }
 
@@ -180,24 +223,48 @@ function garageIsOpen(){
     return isOpen;
 }
 
-
+var garageOpenStatus = null;
+var garageErrorStatus = null
 app.post('/openOrCloseGarage', function(req,res){
-    var garageStatus = null;
     logger.debug('body',req.body);
     if(auth(req) && vpnAuth(req)){
-        if(req.body && req.body.garageSwitch == 'open' && !garageIsOpen()){
-            toggleGarageDoor();
-             garageStatus = 'opening';
-        } else if(req.body && req.body.garageSwitch == 'close' && garageIsOpen()){
-            toggleGarageDoor();
-            garageStatus = 'closing';
-        }
-        var msg = garageStatus+' garage via button';
-        if(garageStatus){
-            sendMessage(twilioLoginInfo.toNumbers,msg);
-        }
+        if(req.body && req.body.garageSwitch == 'open'){
+	        if(!garageIsOpen()){
+                toggleGarageDoor();
+				garageOpenStatus = 'Opening...';
+		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
+		        var msg = garageOpenStatus+' garage via button';
+		        if(garageOpenStatus){
+		            sendMessage(twilioLoginInfo.toNumbers,msg);
+		        }
+				io.sockets.emit('garageErrorStatus', null);
+
+	        } else {
+		        logger.debug('err');
+				io.sockets.emit('garageOpenStatus', null);
+				garageErrorStatus = 'Garage is already open!!'
+				io.sockets.emit('garageErrorStatus', garageErrorStatus);
+ 	        }
+        } else if(req.body && req.body.garageSwitch == 'close'){
+	        if(garageIsOpen()){
+                toggleGarageDoor();
+				garageOpenStatus = 'Closing...';
+		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
+		        var msg = garageOpenStatus+' garage via button';
+		        if(garageOpenStatus){
+		            sendMessage(twilioLoginInfo.toNumbers,msg);
+		        }
+				io.sockets.emit('garageErrorStatus', null);
+	        } else {
+		        logger.debug('err');
+				io.sockets.emit('garageOpenStatus', null);
+				io.sockets.emit('garageErrorStatus', 'Garage is already closed!!');
+ 	        }
+        }        
+
         logger.info(msg);
-        res.send('auth');
+        res.send(garageOpenStatus);
+
     } else {
         var securityMsg = 'SECURITY: tried to open garage via post without being authenticated!!';
         clearTimeout(securityMsgTimeout);
@@ -218,7 +285,10 @@ app.post('/openOrCloseGarage', function(req,res){
 
 function toggleGarageDoor(){
     clearTimeout(garageTimeout);
+    logger.debug('toggling now');
+
     if(debugMode){
+        logger.debug('opening/closing now');
         garageSwitch.writeSync(1);
         garageTimeout = setTimeout(function(){
             garageSwitch.writeSync(0);
@@ -228,21 +298,26 @@ function toggleGarageDoor(){
 
 var sockets = {};
 io.on('connection', function(socket) {
-  sockets[socket.id] = socket;
-  logger.info('Total clients connected : ', Object.keys(sockets).length);
-  io.sockets.emit('clients', Object.keys(sockets).length);
-  socket.on('disconnect', function() {
-    delete sockets[socket.id];
-    // no more sockets, kill the stream
-    if (Object.keys(sockets).length === 0) {
-      app.set('watchingFile', false);
-      if (proc) proc.kill();
-      fs.unwatchFile('./stream/image_stream.jpg');
-    }
-  });
-  socket.on('start-stream', function() {
-    startStreaming(io);
-  });
+	sockets[socket.id] = socket;
+	logger.info('Total clients connected : ', Object.keys(sockets).length);
+	io.sockets.emit('clients', Object.keys(sockets).length);
+	socket.on('disconnect', function() {
+	delete sockets[socket.id];
+	// no more sockets, kill the stream
+	if (Object.keys(sockets).length === 0) {
+		app.set('watchingFile', false);
+		if (proc) proc.kill();
+		fs.unwatchFile('./stream/image_stream.jpg');
+	}
+	});
+	if(garageIsOpen()){
+		io.sockets.emit('garageStatus', 'open');
+	} else {
+		io.sockets.emit('garageStatus', 'closed');
+	}
+	socket.on('start-stream', function() {
+		startStreaming(io);
+	});
 });
 
 http.listen(port, function() {
@@ -278,21 +353,33 @@ function startStreaming(io) {
         io.sockets.emit('liveStream', '/stream/image_stream.jpg?_t=' + (Math.random() * 100000));
         return;
     }
-    var args = ['-w', '1200', '-h', '900', '-vf', '-hf', '-o', './stream/image_stream.jpg', '-t', '999999999', '-tl', '3000', '-ex','night'];
+    var args = ['-w', '800', '-h', '600', '-vf', '-hf', '-o', './stream/image_stream.jpg', '-t', '999999999', '-tl', '1000', '-ex','night'];
     proc = spawn('raspistill', args);
     logger.debug('Watching for changes...');
     app.set('watchingFile', true);
     fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
-    io.sockets.emit('liveStream', '/stream/image_stream.jpg?_t=' + (Math.random() * 100000));
-    fs.stat('./stream/image_stream.jpg', function(err, stats){
-	    
-	    if(stats){
-			var mtime = new Date(stats.mtime);
-	    	io.sockets.emit('liveStreamDate', mtime.toString());    
-	    }
-        
-    });
-});
+	    io.sockets.emit('liveStream', '/stream/image_stream.jpg?_t=' + (Math.random() * 100000));
+	    fs.stat('./stream/image_stream.jpg', function(err, stats){
+		    if(stats){
+				var mtime = new Date(stats.mtime);
+		    	io.sockets.emit('liveStreamDate', mtime.toString());
+		    	if(garageIsOpen()){
+					if(garageOpenStatus=='Opening...'){
+						io.sockets.emit('garageOpenStatus', null);
+						garageOpenStatus = null;
+					}
+					io.sockets.emit('garageStatus', 'open');
+		    	} else {
+					if(garageOpenStatus=='Closing...'){
+						io.sockets.emit('garageOpenStatus', null);
+						garageOpenStatus = null;
+					}
+					io.sockets.emit('garageStatus', 'closed');
+		    	}
+		    }
+	        
+	    });
+	});
 
 }
 

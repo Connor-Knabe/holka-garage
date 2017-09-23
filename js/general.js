@@ -1,4 +1,5 @@
 $(document).ready(function(){
+	$("#progress").hide();
     $("#open").click(function(e){
         console.log('open');
         e.preventDefault();
@@ -6,7 +7,7 @@ $(document).ready(function(){
                 url: "/openOrCloseGarage",
                 data: { garageSwitch:'open' },
                 success:function(result){
-          $("#sharelink").html(result);
+				$("#status").html(result);
         }});
     });
     $("#close").click(function(e){
@@ -15,7 +16,7 @@ $(document).ready(function(){
                 url: "/openOrCloseGarage",
                 data: { garageSwitch:'close' },
                 success:function(result){
-          $("#sharelink").html(result);
+	            $("#status").html(result);
         }});
     });
 });

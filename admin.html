@@ -23,6 +23,12 @@
       /*margin-left: 150px;
       margin-right: 150px;*/
   }
+  #garageStatus{
+	  display:inline;
+  }
+  #garageErrorStatus{
+  	color: red;
+  }
 
     .load {
 	text-align:center;
@@ -46,18 +52,51 @@
   <script>
   var socket = io();
   socket.on('liveStream', function(url) {
-    $('#stream').attr('src', url);
-    $('.start').hide();
+      $('#stream').attr('src', url);
+      $('.start').hide();
   });
 
   socket.on('liveStreamDate', function(date) {
-  	$( ".date" ).text( date );
+      $( ".date" ).text( date );
   });
 
   socket.on('clients', function(clients) {
-  	$( ".clients" ).text( clients );
+  	  $( ".clients" ).text( clients );
   });
 
+    socket.on('garageOpenStatus', function(status) {
+	  if(status){
+	      if(status=="Opening..."){
+	   	  	  $("#progress").show();
+	      } else {
+		  	  $("#progress").hide();
+	      }
+	      $( "#garageOpenStatus" ).show();
+	      $( "#garageOpenStatus" ).text(status);
+	  } else {
+ 	      $( "#garageOpenStatus" ).hide();
+		  $("#progress").hide();
+
+	  }
+  });
+
+    socket.on('garageStatus', function(status) {
+	  if(status){
+	      $( "#garageStatus" ).text(status);
+	      $( "#garageStatus" ).show();
+	  } else {
+ 	      $( "#garageStatus" ).hide();
+	  }
+  });
+
+  socket.on('garageErrorStatus', function(status) {
+	  if(status){
+	      $( "#garageErrorStatus" ).text(status);
+	      $( "#garageErrorStatus" ).show();
+	  } else {
+ 	      $( "#garageErrorStatus" ).hide();
+	  }
+  });
 
 //   function startStream() {
     socket.emit('start-stream');
@@ -69,10 +108,20 @@
 <body class="container">
   <h1 class="text-center">Silver Leaf Garage
     <small>Powered by PI</small>
-    <br />
+  	  <br />
       <button type="button" class="btn btn-info" id="open">Open Garage</button>
 
       <button type="button" class="btn btn-info" id="close">Close Garage</button>
+      <br><br>
+   	  Garage is currently: <div id="garageStatus"></div>
+   	  <br>
+   	  <br>
+   	  <div id="garageOpenStatus"></div>
+   	  <br>
+   	  <div id="garageErrorStatus"></div>
+      <progress id="progress"></progress>
+	  
+
 
   </h1>
 
