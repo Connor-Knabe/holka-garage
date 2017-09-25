@@ -1,12 +1,23 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+// var io = require('socket.io')(http)
+var https = require('https');
+var login = require('./settings/login.js');
 var fs = require('fs');
+
+var options = {
+  key: fs.readFileSync(login.sslPath + 'privkey.pem'),
+  cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
+};
+
+var httpsServer = https.createServer(options, app);
+
+var io = require('socket.io')(httpsServer);
+
 var path = require('path');
 var Gpio = require('onoff').Gpio;
 var request = require('request');
-var login = require('./settings/login.js');
 var twilioLoginInfo = require('./settings/twilioLoginInfo.js');
 var twilio = require('twilio');
 var client = twilio(twilioLoginInfo.TWILIO_ACCOUNT_SID, twilioLoginInfo.TWILIO_AUTH_TOKEN);
@@ -17,6 +28,15 @@ var log4js = require('log4js');
 var logger = log4js.getLogger();
 var spawn = require('child_process').spawn;
 var proc;
+
+app.use(function(req, res, next) {
+	
+	if(!req.secure) {
+		return res.redirect(['https://', req.get('Host'), req.url].join(''));
+ 		}
+	next();
+});
+
 app.use(cookieParser());
 app.use('/', express.static(path.join(__dirname, 'js')));
 app.use(bodyParser.urlencoded({
@@ -24,6 +44,13 @@ app.use(bodyParser.urlencoded({
 }));
 
 
+
+httpsServer.listen(443, function() {
+  logger.info('listening on *:',443);
+});
+
+// httpsServer.on('error', onError);
+// httpsServer.on('listening', onListening);
 
 //settings
 var port = 80;
