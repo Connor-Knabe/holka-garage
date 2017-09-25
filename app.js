@@ -73,7 +73,7 @@ var garageSwitch = new Gpio(21, 'out');
 var hasBeenOpened = garageIsOpen();
 
 
-garageSensor.watch(function(err, value) { 	
+garageSensor.watch(function(err, value) {
 	if(err){
 		logger.error('Error watching garage sensor: ',err);
 	}
@@ -84,7 +84,7 @@ garageSensor.watch(function(err, value) {
         garageSensorTimeoutOne = setTimeout(function(){
             shouldSendGarageDoorAlertOne = true;
         },1*60*10000);
-        
+
         if(shouldSendGarageDoorAlertOne){
             sendMessage(twilioLoginInfo.toNumbers,msg);
             shouldSendGarageDoorAlertOne = false;
@@ -98,14 +98,14 @@ garageSensor.watch(function(err, value) {
         garageSensorTimeoutTwo = setTimeout(function(){
             shouldSendGarageDoorAlertTwo = true;
         },1*60*10000);
-        
+
         if(shouldSendGarageDoorAlertTwo){
             sendMessage(twilioLoginInfo.toNumbers,msg);
             shouldSendGarageDoorAlertTwo = false;
         }
         logger.debug(msg);
 		io.sockets.emit('garageErrorStatus', null);
-	}   
+	}
 });
 
 if(enableMotionSensor){
@@ -116,7 +116,7 @@ if(enableMotionSensor){
 		if (value==1 && !hasSentMotionSensorAlert){
 			clearTimeout(motionSensorTimeoutOne);
 			motionSensorTimeoutOne = setTimeout(function(){
-			   hasSentMotionSensorAlert = true;       
+			   hasSentMotionSensorAlert = true;
 			}, 2*60*1000);
 			var msg = 'Motion detected in garage'
 			logger.debug(msg);
@@ -124,7 +124,7 @@ if(enableMotionSensor){
 		} else if (value==0 && hasSentMotionSensorAlert){
 			clearTimeout(motionSensorTimeoutTwo);
 			motionSensorTimeoutTwo = setTimeout(function(){
-			   hasSentMotionSensorAlert = false;	       
+			   hasSentMotionSensorAlert = false;
 			}, 2*60*1000);
 		}
 	});
@@ -139,7 +139,7 @@ function sendMessage(numbers, msgContent){
 		messageCount=0;
 	}, 1*60*60*1000)
 	messageCount++;
-	
+
     if(numbers && messageCount<10) {
 		for (var i = 0; i < numbers.length; i++) {
             if(numbers[i].email){
@@ -205,7 +205,7 @@ function auth(req){
 function vpnAuth(req){
 	var clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	var isOnVpn = clientIp.includes(login.vpnIp);
-    return isOnVpn;	
+    return isOnVpn;
 }
 
 app.get('/', function(req, res) {
@@ -238,7 +238,7 @@ function garageIsOpen(){
 /*
     if(testingOpen){
 	    isOpen = true;
-    
+
 }*/
     return isOpen;
 }
@@ -278,7 +278,7 @@ app.post('/openOrCloseGarage', function(req,res){
 				io.sockets.emit('garageOpenStatus', null);
 				io.sockets.emit('garageErrorStatus', 'Garage is already closed!!');
  	        }
-        }        
+        }
    		io.sockets.emit('garageErrorStatus', null);
         logger.info(msg);
         res.send(garageOpenStatus);
@@ -393,7 +393,7 @@ function startStreaming(io) {
 					io.sockets.emit('garageStatus', 'closed');
 		    	}
 		    }
-	        
+
 	    });
 	});
 
