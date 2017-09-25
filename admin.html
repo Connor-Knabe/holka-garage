@@ -64,21 +64,22 @@
   	  $( ".clients" ).text( clients );
   });
 
-    socket.on('garageOpenStatus', function(status) {
-	  if(status){
-	      if(status=="Opening..."){
-	   	  	  $("#progress").show();
-	      } else {
-		  	  $("#progress").hide();
-	      }
-	      $( "#garageOpenStatus" ).show();
-	      $( "#garageOpenStatus" ).text(status);
-	  } else {
- 	      $( "#garageOpenStatus" ).hide();
-		  $("#progress").hide();
 
-	  }
-  });
+socket.on('garageOpenStatus', function(status) {
+  if(status){
+      if(status=="Opening..."){
+   	  	  $("#progress").show();
+      } else {
+	  	  $("#progress").hide();
+      }
+      $( "#garageOpenStatus" ).show();
+      $( "#garageOpenStatus" ).text(status);
+  } else {
+	      $( "#garageOpenStatus" ).hide();
+	  $("#progress").hide();
+
+  }
+});
 
     socket.on('garageStatus', function(status) {
 	  if(status){

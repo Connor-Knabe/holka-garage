@@ -13,114 +13,134 @@ var client = twilio(twilioLoginInfo.TWILIO_ACCOUNT_SID, twilioLoginInfo.TWILIO_A
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
-var spawn = require('child_process').spawn;
-
-var proc;
-var port = 80;
 var log4js = require('log4js');
 var logger = log4js.getLogger();
-logger.level = 'info';
-var debugMode = true;
-var hoursToWaitBeforeNextSecurityAlert = 2;
-var garageOpenStatus = null;
-
+var spawn = require('child_process').spawn;
+var proc;
 app.use(cookieParser());
+app.use('/', express.static(path.join(__dirname, 'js')));
+app.use(bodyParser.urlencoded({
+	extended: true
+}));
+
+
+
+//settings
+var port = 80;
+logger.level = 'debug';
+var debugMode = false;
+var enableMotionSensor = false;
+http.listen(port, function() {
+  logger.info('listening on *:',port);
+});
+app.use(session({
+	secret: login.secret,
+	resave: false,
+	saveUninitialized: true,
+	cookie: { secure: false }
+}));
+
 
 if(debugMode){
-	logger.level = 'debug';
+// 	logger.level = 'debug';
 	logger.debug('___________________________________');
 	logger.debug('In debug mode not sending texts!!!');
 	logger.debug('___________________________________');
-
 }
 
-app.use(session({
-  secret: login.secret,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false }
-}));
+//global variables
+var motionSensorTimeoutOne = null;
+var motionSensorTimeoutTwo = null;
+var hoursToWaitBeforeNextSecurityAlert = 2;
+var garageOpenStatus = null;
+var garageTimeout;
+var securityMsgTimeout = null;
+var shouldSendSecurityAlert = true;
+var hasSentMotionSensorAlert = false;
+var shouldSendGarageDoorAlertOne = true;
+var shouldSendGarageDoorAlertTwo = true;
+var garageSensorTimeoutOne = null;
+var garageSensorTimeoutTwo = null;
+var garageOpenStatus = null;
+var garageErrorStatus = null;
+var sockets = {};
 
 var motionSensor = new Gpio(15, 'in','both');
 var garageSensor = new Gpio(4, 'in','both');
 var garageSwitch = new Gpio(21, 'out');
 
 
-var garageTimeout;
-var securityMsgTimeout = null;
-var shouldSendSecurityAlert = true;
-var hasSentMotionSensorAlert = false;
-var hasSentGarageDoorAlert = false;
-var garageSensorTimeoutOne = null;
-var garageSensorTimeoutTwo = null;
+var hasBeenOpened = garageIsOpen();
+
 
 garageSensor.watch(function(err, value) { 	
-	logger.debug('val',value);
 	if(err){
 		logger.error('Error watching garage sensor: ',err);
 	}
-	
-	if (value==1 && !hasSentGarageDoorAlert){
-// 	   clearTimeout(garageSensorTimeoutOne);
-// 	   garageSensorTimeoutOne = setTimeout(function(){
-	       hasSentGarageDoorAlert = true;       
-// 	   }, 15*1000);
-	   var msg = 'Garage door opened';
-	   logger.debug(msg);
-	   sendMessage(twilioLoginInfo.toNumbers,msg);
+	if (value==1 && !hasBeenOpened){
+		hasBeenOpened = true;
+ 		var msg = 'Garage door opened';
+        clearTimeout(garageSensorTimeoutOne);
+        garageSensorTimeoutOne = setTimeout(function(){
+            shouldSendGarageDoorAlertOne = true;
+        },1*60*10000);
+        
+        if(shouldSendGarageDoorAlertOne){
+            sendMessage(twilioLoginInfo.toNumbers,msg);
+            shouldSendGarageDoorAlertOne = false;
+        }
+        logger.debug(msg);
 		io.sockets.emit('garageErrorStatus', null);
-	} else if (value==0 && hasSentGarageDoorAlert){
-// 	   clearTimeout(garageSensorTimeoutTwo);
-// 	   garageSensorTimeoutTwo = setTimeout(function(){
-	       hasSentGarageDoorAlert = false;	       
-// 	   }, 15*1000);
-	   var msg = 'Garage door closed';
-	   logger.debug(msg);
-	   sendMessage(twilioLoginInfo.toNumbers,msg);
+	} else if (value==0 && hasBeenOpened){
+		hasBeenOpened = false;
+		var msg = 'Garage door closed';
+        clearTimeout(garageSensorTimeoutTwo);
+        garageSensorTimeoutTwo = setTimeout(function(){
+            shouldSendGarageDoorAlertTwo = true;
+        },1*60*10000);
+        
+        if(shouldSendGarageDoorAlertTwo){
+            sendMessage(twilioLoginInfo.toNumbers,msg);
+            shouldSendGarageDoorAlertTwo = false;
+        }
+        logger.debug(msg);
 		io.sockets.emit('garageErrorStatus', null);
 	}   
 });
 
+if(enableMotionSensor){
+	motionSensor.watch(function(err, value) {
+		if(err){
+			logger.error('Error watching motion sensor: ',err);
+		}
+		if (value==1 && !hasSentMotionSensorAlert){
+			clearTimeout(motionSensorTimeoutOne);
+			motionSensorTimeoutOne = setTimeout(function(){
+			   hasSentMotionSensorAlert = true;       
+			}, 2*60*1000);
+			var msg = 'Motion detected in garage'
+			logger.debug(msg);
+	 		sendMessage(twilioLoginInfo.toNumbers,msg);
+		} else if (value==0 && hasSentMotionSensorAlert){
+			clearTimeout(motionSensorTimeoutTwo);
+			motionSensorTimeoutTwo = setTimeout(function(){
+			   hasSentMotionSensorAlert = false;	       
+			}, 2*60*1000);
+		}
+	});
+}
 
-/*
-setInterval(function(){
+var messageCount = 0;
+var messageTimeout=null;
 
-	if(garageSensor.readSync()==1){
-		logger.debug('Garage opened: ',garageSensor.readSync(), new Date());
-	} else {
-		logger.debug('Garage closed: ',garageSensor.readSync(), new Date());
-	}
-}, 2000);
-	
-*/
-	
-var motionSensorTimeoutOne = null;
-var motionSensorTimeoutTwo = null;
-	
-motionSensor.watch(function(err, value) {
-	if(err){
-		logger.error('Error watching motion sensor: ',err);
-	}
-	if (value==1 && !hasSentMotionSensorAlert){
-		clearTimeout(motionSensorTimeoutOne);
-		motionSensorTimeoutOne = setTimeout(function(){
-		   hasSentMotionSensorAlert = true;       
-		}, 2*60*1000);
-		var msg = 'Motion detected in garage'
-		logger.debug(msg);
- 		sendMessage(twilioLoginInfo.toNumbers,msg);
-
-	} else if (value==0 && hasSentMotionSensorAlert){
-		clearTimeout(motionSensorTimeoutTwo);
-		motionSensorTimeoutTwo = setTimeout(function(){
-		   hasSentMotionSensorAlert = false;	       
-		}, 2*60*1000);
-	}
-});
-
-// sendMessage(twilioLoginInfo.toNumbers,'Garage closed');
 function sendMessage(numbers, msgContent){
-    if(numbers) {
+	clearTimeout(messageTimeout);
+	messageTimeout = setTimeout(function(){
+		messageCount=0;
+	}, 1*60*60*1000)
+	messageCount++;
+	
+    if(numbers && messageCount<10) {
 		for (var i = 0; i < numbers.length; i++) {
             if(numbers[i].email){
                 sendEmail(numbers[i],msgContent);
@@ -177,12 +197,6 @@ function sendEmail(alertInfo, msgContent){
     }
 }
 
-app.use('/', express.static(path.join(__dirname, 'js')));
-// app.use(bodyParser.urlencoded())
-app.use(bodyParser.urlencoded({
-	extended: true
-}));
-
 function auth(req){
     var authenticated = (req && req.cookies && (req.cookies.holkaCookie === login.secretCookie));
     return authenticated;
@@ -218,13 +232,17 @@ app.post('/', function(req,res){
 	}
 });
 
+// var testingOpen;
 function garageIsOpen(){
     var isOpen = (garageSensor.readSync()==1) ? true :  false;
+/*
+    if(testingOpen){
+	    isOpen = true;
+    
+}*/
     return isOpen;
 }
 
-var garageOpenStatus = null;
-var garageErrorStatus = null
 app.post('/openOrCloseGarage', function(req,res){
     logger.debug('body',req.body);
     if(auth(req) && vpnAuth(req)){
@@ -261,14 +279,18 @@ app.post('/openOrCloseGarage', function(req,res){
 				io.sockets.emit('garageErrorStatus', 'Garage is already closed!!');
  	        }
         }        
-
+   		io.sockets.emit('garageErrorStatus', null);
         logger.info(msg);
         res.send(garageOpenStatus);
-
     } else {
-        var securityMsg = 'SECURITY: tried to open garage via post without being authenticated!!';
+	    var garageStatus = 'hack';
+	    if(req.body && req.body.garageSwitch == 'open'){
+		    garageStatus = 'open'
+	    } else if(req.body && req.body.garageSwitch == 'close'){
+		    garageStatus = 'close'
+	    }
+        var securityMsg = 'SECURITY: tried to '+garageStatus+' garage via post without being authenticated!!';
         clearTimeout(securityMsgTimeout);
-
         securityMsgTimeout = setTimeout(function(){
             shouldSendSecurityAlert = true;
         },hoursToWaitBeforeNextSecurityAlert*60*60*10000);
@@ -278,16 +300,16 @@ app.post('/openOrCloseGarage', function(req,res){
             shouldSendSecurityAlert = false;
         }
         logger.fatal(securityMsg,'Ip address is: ',req.headers['x-forwaded-for'],'or: ',req.connection.remoteAddress);
+   		io.sockets.emit('garageErrorStatus', 'You are not authorized to do this!');
         res.status(401);
         res.send('not auth');
     }
 });
 
-function toggleGarageDoor(){
-    clearTimeout(garageTimeout);
-    logger.debug('toggling now');
 
-    if(debugMode){
+function toggleGarageDoor(){
+    logger.debug('toggling now');
+    if(!debugMode){
         logger.debug('opening/closing now');
         garageSwitch.writeSync(1);
         garageTimeout = setTimeout(function(){
@@ -296,7 +318,6 @@ function toggleGarageDoor(){
     }
 }
 
-var sockets = {};
 io.on('connection', function(socket) {
 	sockets[socket.id] = socket;
 	logger.info('Total clients connected : ', Object.keys(sockets).length);
@@ -320,18 +341,13 @@ io.on('connection', function(socket) {
 	});
 });
 
-http.listen(port, function() {
-  logger.info('listening on *:',port);
-});
-
 function stopStreaming() {
-  if (Object.keys(sockets).length === 0) {
-    app.set('watchingFile', false);
-    if (proc) proc.kill();
-    fs.unwatchFile('./stream/image_stream.jpg');
-  }
+	if (Object.keys(sockets).length === 0) {
+		app.set('watchingFile', false);
+	if (proc) proc.kill();
+		fs.unwatchFile('./stream/image_stream.jpg');
+	}
 }
-
 
 app.get('/stream/image_stream.jpg',function(req,res){
     if(auth(req)){
@@ -382,17 +398,3 @@ function startStreaming(io) {
 	});
 
 }
-
-var app = express();
-var http = require('http').Server(app);
-
-
-app.get('/', function(req, res) {
-	res.send('200');
-});
-
-/*
-garageSensor.watch(function(err, val){
-	console.log('val',val);
-});
-*/
