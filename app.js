@@ -5,6 +5,7 @@ var http = require('http').Server(app);
 var https = require('https');
 var login = require('./settings/login.js');
 var fs = require('fs');
+var CronJob = require('cron').CronJob;
 
 var options = {
   key: fs.readFileSync(login.sslPath + 'privkey.pem'),
@@ -30,7 +31,7 @@ var spawn = require('child_process').spawn;
 var proc;
 
 app.use(function(req, res, next) {
-	
+
 	if(!req.secure) {
 		return res.redirect(['https://', req.get('Host'), req.url].join(''));
  		}
@@ -425,3 +426,13 @@ function startStreaming(io) {
 	});
 
 }
+
+
+var certbotRenew = new CronJob('00 40 6 * * 0-1,3-6', function() {
+        //
+    }, function () {
+    /* This function is executed when the job stops */
+    },
+    true, /* Start the job right now */
+    "America/Chicago"
+);
