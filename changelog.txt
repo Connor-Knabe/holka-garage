@@ -1,2 +1,2 @@
-
+v0.4 - refactoring 
 v0.3 - added secure cookies and ssl

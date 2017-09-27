@@ -1,12 +1,10 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-// var io = require('socket.io')(http)
 var https = require('https');
 var login = require('./settings/login.js');
+require('./services/certrenewcron.js');
 var fs = require('fs');
-var CronJob = require('cron').CronJob;
-
 var options = {
   key: fs.readFileSync(login.sslPath + 'privkey.pem'),
   cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
@@ -28,7 +26,7 @@ var cookieParser = require('cookie-parser');
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 var spawn = require('child_process').spawn;
-var raspistillProc,certbotProc;
+var raspistillProc;
 
 app.use(function(req, res, next) {
 
@@ -75,6 +73,7 @@ if(debugMode){
 	logger.debug('In debug mode not sending texts!!!');
 	logger.debug('___________________________________');
 }
+require('./controllers/routes.js')(app,logger);
 
 //global variables
 var motionSensorTimeoutOne = null;
@@ -82,7 +81,6 @@ var motionSensorTimeoutTwo = null;
 var hoursToWaitBeforeNextSecurityAlert = 2;
 var garageOpenStatus = null;
 var garageTimeout;
-var securityMsgTimeout = null;
 var shouldSendSecurityAlert = true;
 var hasSentMotionSensorAlert = false;
 var shouldSendGarageDoorAlertOne = true;
@@ -225,115 +223,11 @@ function sendEmail(alertInfo, msgContent){
     }
 }
 
-function auth(req){
-    var authenticated = (req && req.cookies && (req.cookies.holkaCookie === login.secretCookie));
-    return authenticated;
-}
 
-function vpnAuth(req){
-	var clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-	var isOnVpn = clientIp.includes(login.vpnIp);
-    return isOnVpn;
-}
-
-app.get('/', function(req, res) {
-	if(auth(req)){
-		res.sendFile(__dirname + '/admin.html');
-	} else {
-		res.sendFile(__dirname + '/index.html');
-	}
-});
-
-app.post('/', function(req,res){
-	if(req.body.username === login.username && req.body.password === login.password ){
-		req.session.userInfo = req.body;
-		var options = {
-	        maxAge: 1000 * 60* 60 * 24  * 180,
-	        httpOnly: true
-	    };
-		res.cookie('holkaCookie', login.secretCookie, options);
-
-		logger.info('cookies',req.cookies.holkaCookie);
-		res.redirect('/');
-	} else {
-		res.send('Access denied wrong username/password');
-	}
-});
-
-// var testingOpen;
 function garageIsOpen(){
     var isOpen = (garageSensor.readSync()==1) ? true :  false;
-/*
-    if(testingOpen){
-	    isOpen = true;
-
-}*/
     return isOpen;
 }
-
-app.post('/openOrCloseGarage', function(req,res){
-    logger.debug('body',req.body);
-    if(auth(req) && vpnAuth(req)){
-        if(req.body && req.body.garageSwitch == 'open'){
-	        if(!garageIsOpen()){
-                toggleGarageDoor();
-				garageOpenStatus = 'Opening...';
-		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
-		        var msg = garageOpenStatus+' garage via button';
-		        if(garageOpenStatus){
-		            sendMessage(twilioLoginInfo.toNumbers,msg);
-		        }
-				io.sockets.emit('garageErrorStatus', null);
-
-	        } else {
-		        logger.debug('err');
-				io.sockets.emit('garageOpenStatus', null);
-				garageErrorStatus = 'Garage is already open!!'
-				io.sockets.emit('garageErrorStatus', garageErrorStatus);
- 	        }
-        } else if(req.body && req.body.garageSwitch == 'close'){
-	        if(garageIsOpen()){
-                toggleGarageDoor();
-				garageOpenStatus = 'Closing...';
-		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
-		        var msg = garageOpenStatus+' garage via button';
-		        if(garageOpenStatus){
-		            sendMessage(twilioLoginInfo.toNumbers,msg);
-		        }
-				io.sockets.emit('garageErrorStatus', null);
-	        } else {
-		        logger.debug('err');
-				io.sockets.emit('garageOpenStatus', null);
-				io.sockets.emit('garageErrorStatus', 'Garage is already closed!!');
- 	        }
-        }
-   		io.sockets.emit('garageErrorStatus', null);
-        logger.info(msg);
-        res.send(garageOpenStatus);
-    } else {
-	    var garageStatus = 'hack';
-	    if(req.body && req.body.garageSwitch == 'open'){
-		    garageStatus = 'open'
-	    } else if(req.body && req.body.garageSwitch == 'close'){
-		    garageStatus = 'close'
-	    }
-        var securityMsg = 'SECURITY: tried to '+garageStatus+' garage via post without being authenticated!!';
-        clearTimeout(securityMsgTimeout);
-        securityMsgTimeout = setTimeout(function(){
-            shouldSendSecurityAlert = true;
-        },hoursToWaitBeforeNextSecurityAlert*60*60*10000);
-
-        if(shouldSendSecurityAlert){
-            sendMessage(twilioLoginInfo.toNumbers,securityMsg);
-            shouldSendSecurityAlert = false;
-        }
-        logger.fatal(securityMsg,'Ip address is: ',req.headers['x-forwaded-for'],'or: ',req.connection.remoteAddress);
-   		io.sockets.emit('garageErrorStatus', 'You are not authorized to do this!');
-        res.status(401);
-        res.send('not auth');
-    }
-});
-
 
 function toggleGarageDoor(){
     logger.debug('toggling now');
@@ -377,21 +271,6 @@ function stopStreaming() {
 	}
 }
 
-app.get('/stream/image_stream.jpg',function(req,res){
-    if(auth(req)){
-        fs.readFile('./stream/image_stream.jpg', function(err, data) {
-          if (err) throw err; // Fail if the file can't be read.
-            res.writeHead(200, {'Content-Type': 'image/jpeg'});
-            res.end(data); // Send the file data to the browser.
-        });
-    } else{
-        logger.fatal('Unauthorized request for image_stream.jpg',req.headers['x-forwaded-for'],req.connection.remoteAddress);
-        res.status(401);
-        res.send('not auth');
-    }
-
-});
-
 function startStreaming(io) {
     if (app.get('watchingFile')) {
         io.sockets.emit('liveStream', '/stream/image_stream.jpg?_t=' + (Math.random() * 100000));
@@ -426,14 +305,3 @@ function startStreaming(io) {
 	});
 
 }
-
-
-var certbotRenew = new CronJob('00 40 6 * * 0', function() {
-        if (certbotProc) certbotProc.kill();
-        certbotProc = spawn('/home/fg/certbot/certbot-auto',['renew']);
-    }, function () {
-    /* This function is executed when the job stops */
-    },
-    true, /* Start the job right now */
-    "America/Chicago"
-);
