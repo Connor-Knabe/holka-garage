@@ -28,7 +28,7 @@ var cookieParser = require('cookie-parser');
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 var spawn = require('child_process').spawn;
-var proc;
+var raspistillProc,certbotProc;
 
 app.use(function(req, res, next) {
 
@@ -65,7 +65,7 @@ app.use(session({
 	secret: login.secret,
 	resave: false,
 	saveUninitialized: true,
-	cookie: { secure: false }
+	cookie: { secure: true, httpOnly:true, sameSite:true }
 }));
 
 
@@ -355,7 +355,7 @@ io.on('connection', function(socket) {
 	// no more sockets, kill the stream
 	if (Object.keys(sockets).length === 0) {
 		app.set('watchingFile', false);
-		if (proc) proc.kill();
+		if (raspistillProc) raspistillProc.kill();
 		fs.unwatchFile('./stream/image_stream.jpg');
 	}
 	});
@@ -372,7 +372,7 @@ io.on('connection', function(socket) {
 function stopStreaming() {
 	if (Object.keys(sockets).length === 0) {
 		app.set('watchingFile', false);
-	if (proc) proc.kill();
+	if (raspistillProc) raspistillProc.kill();
 		fs.unwatchFile('./stream/image_stream.jpg');
 	}
 }
@@ -398,7 +398,7 @@ function startStreaming(io) {
         return;
     }
     var args = ['-w', '800', '-h', '600', '-vf', '-hf', '-o', './stream/image_stream.jpg', '-t', '999999999', '-tl', '1000', '-ex','night'];
-    proc = spawn('raspistill', args);
+    raspistillProc = spawn('raspistill', args);
     logger.debug('Watching for changes...');
     app.set('watchingFile', true);
     fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
@@ -428,8 +428,9 @@ function startStreaming(io) {
 }
 
 
-var certbotRenew = new CronJob('00 40 6 * * 0-1,3-6', function() {
-        //
+var certbotRenew = new CronJob('00 40 6 * * 0', function() {
+        if (certbotProc) certbotProc.kill();
+        certbotProc = spawn('/home/fg/certbot/certbot-auto',['renew']);
     }, function () {
     /* This function is executed when the job stops */
     },
