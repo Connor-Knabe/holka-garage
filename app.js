@@ -5,9 +5,8 @@ var https = require('https');
 var login = require('./settings/login.js');
 var path = require('path');
 require('./services/certrenewcron.js');
-var messenger = require('./services/messenger.js');
-
 var fs = require('fs');
+
 
 var options = {
   key: fs.readFileSync(login.sslPath + 'privkey.pem'),
@@ -27,7 +26,6 @@ var session = require('express-session');
 var cookieParser = require('cookie-parser');
 var log4js = require('log4js');
 var logger = log4js.getLogger();
-var spawn = require('child_process').spawn;
 var raspistillProc;
 
 app.use(function(req, res, next) {
@@ -71,5 +69,4 @@ if(debugMode){
 	logger.debug('___________________________________');
 }
 var routes = require('./controllers/routes.js')(app,logger,io);
-routes.log('hi');
-var iot = require('./services/iot.js')(enableMotionSensor,debugMode,io);
+var iot = require('./services/iot.js')(app,enableMotionSensor,debugMode,io,logger);

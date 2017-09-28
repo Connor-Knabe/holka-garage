@@ -1,5 +1,7 @@
 var sockets = {};
 var Gpio = require('onoff').Gpio;
+var spawn = require('child_process').spawn;
+var fs = require('fs');
 
 var motionSensor = new Gpio(15, 'in','both');
 var garageSensor = new Gpio(4, 'in','both');
@@ -13,13 +15,12 @@ var shouldSendGarageDoorAlertOne = true;
 var shouldSendGarageDoorAlertTwo = true;
 var garageSensorTimeoutOne = null;
 var garageSensorTimeoutTwo = null;
-var messageCount = 0;
-var messageTimeout=null;
 
 
-module.exports = function(enableMotionSensor,debugMode,io) {
+module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     var hasBeenOpened = garageIsOpen();
-
+	var messenger = require('./messenger.js')(logger);
+	
 
     garageSensor.watch(function(err, value) {
     	if(err){
@@ -81,7 +82,6 @@ module.exports = function(enableMotionSensor,debugMode,io) {
 
 
 
-
     function garageIsOpen(){
         var isOpen = (garageSensor.readSync()==1) ? true :  false;
         return isOpen;
@@ -97,6 +97,8 @@ module.exports = function(enableMotionSensor,debugMode,io) {
             },1000);
         }
     }
+
+	
 
     io.on('connection', function(socket) {
     	sockets[socket.id] = socket;
@@ -161,7 +163,11 @@ module.exports = function(enableMotionSensor,debugMode,io) {
 
     	    });
     	});
-    }
+	}
+	
+	return {
+		garageIsOpen: garageIsOpen,
+		toggleGarageDoor:toggleGarageDoor
+	}
 }
 
-// module.exports.garageIsOpen = garageIsOpen;

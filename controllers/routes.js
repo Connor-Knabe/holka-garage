@@ -1,10 +1,12 @@
+var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
+
 module.exports = function(app,logger,io) {
     var securityMsgTimeout = null;
     var garageErrorStatus = null;
     var garageOpenStatus = null;
     var shouldSendSecurityAlert = true;
 
-    var messenger = require('../services/messenger.js');
+    var messenger = require('../services/messenger.js')(logger);
     var iot = require('../services/iot.js')
     var fs = require('fs');
     var bodyParser = require('body-parser');
@@ -115,6 +117,7 @@ module.exports = function(app,logger,io) {
             },hoursToWaitBeforeNextSecurityAlert*60*60*10000);
 
             if(shouldSendSecurityAlert){
+                console.log('logger',logger);
                 messenger.send(twilioLoginInfo.toNumbers,securityMsg);
                 shouldSendSecurityAlert = false;
             }
