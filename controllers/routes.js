@@ -1,6 +1,11 @@
-module.exports = function(app,logger) {
+module.exports = function(app,logger,io) {
     var securityMsgTimeout = null;
+    var garageErrorStatus = null;
+    var garageOpenStatus = null;
+    var shouldSendSecurityAlert = true;
 
+    var messenger = require('../services/messenger.js');
+    var iot = require('../services/iot.js')
     var fs = require('fs');
     var bodyParser = require('body-parser');
     var login = require('../settings/login.js');
@@ -66,7 +71,7 @@ module.exports = function(app,logger) {
     		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
     		        var msg = garageOpenStatus+' garage via button';
     		        if(garageOpenStatus){
-    		            sendMessage(twilioLoginInfo.toNumbers,msg);
+    		            messenger.send(twilioLoginInfo.toNumbers,msg);
     		        }
     				io.sockets.emit('garageErrorStatus', null);
 
@@ -83,7 +88,7 @@ module.exports = function(app,logger) {
     		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
     		        var msg = garageOpenStatus+' garage via button';
     		        if(garageOpenStatus){
-    		            sendMessage(twilioLoginInfo.toNumbers,msg);
+    		            messenger.send(twilioLoginInfo.toNumbers,msg);
     		        }
     				io.sockets.emit('garageErrorStatus', null);
     	        } else {
@@ -97,6 +102,7 @@ module.exports = function(app,logger) {
             res.send(garageOpenStatus);
         } else {
     	    var garageStatus = 'hack';
+            var hoursToWaitBeforeNextSecurityAlert = 2;
     	    if(req.body && req.body.garageSwitch == 'open'){
     		    garageStatus = 'open'
     	    } else if(req.body && req.body.garageSwitch == 'close'){
@@ -109,7 +115,7 @@ module.exports = function(app,logger) {
             },hoursToWaitBeforeNextSecurityAlert*60*60*10000);
 
             if(shouldSendSecurityAlert){
-                sendMessage(twilioLoginInfo.toNumbers,securityMsg);
+                messenger.send(twilioLoginInfo.toNumbers,securityMsg);
                 shouldSendSecurityAlert = false;
             }
             logger.fatal(securityMsg,'Ip address is: ',req.headers['x-forwaded-for'],'or: ',req.connection.remoteAddress);
@@ -118,5 +124,8 @@ module.exports = function(app,logger) {
             res.send('not auth');
         }
     });
-
+    function log(test){
+        console.log('test',test);
+    }
+    module.exports.log = log;
 };
