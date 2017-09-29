@@ -1,8 +1,11 @@
 var messageTimeout=null;
 var messageCount = 0;
+var twilio = require('twilio');
+var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
 
-module.exports = function(logger) {
-    console.log('logger2',logger);
+var client = twilio(twilioLoginInfo.TWILIO_ACCOUNT_SID, twilioLoginInfo.TWILIO_AUTH_TOKEN);
+
+module.exports = function(logger,debugMode) {
     function send(numbers, msgContent){
         clearTimeout(messageTimeout);
         messageTimeout = setTimeout(function(){

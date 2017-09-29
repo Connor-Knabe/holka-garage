@@ -1,13 +1,14 @@
 var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
 
-module.exports = function(app,logger,io) {
+module.exports = function(app,logger,io,debugMode) {
+	var iot = require('../services/iot.js')(app,false,debugMode,io,logger);
+
     var securityMsgTimeout = null;
     var garageErrorStatus = null;
     var garageOpenStatus = null;
     var shouldSendSecurityAlert = true;
 
-    var messenger = require('../services/messenger.js')(logger);
-    var iot = require('../services/iot.js')
+    var messenger = require('../services/messenger.js')(logger,debugMode);
     var fs = require('fs');
     var bodyParser = require('body-parser');
     var login = require('../settings/login.js');
@@ -18,7 +19,7 @@ module.exports = function(app,logger,io) {
     }
 
     function vpnAuth(req){
-    	var clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    	var clientIp = req.connection.remoteAddress;
     	var isOnVpn = clientIp.includes(login.vpnIp);
         return isOnVpn;
     }
@@ -39,7 +40,7 @@ module.exports = function(app,logger,io) {
                 res.end(data); // Send the file data to the browser.
             });
         } else{
-            logger.fatal('Unauthorized request for image_stream.jpg',req.headers['x-forwaded-for'],req.connection.remoteAddress);
+            logger.fatal('Unauthorized request for image_stream.jpg',req.connection.remoteAddress);
             res.status(401);
             res.send('not auth');
         }
@@ -67,8 +68,8 @@ module.exports = function(app,logger,io) {
         logger.debug('body',req.body);
         if(auth(req) && vpnAuth(req)){
             if(req.body && req.body.garageSwitch == 'open'){
-    	        if(!garageIsOpen()){
-                    toggleGarageDoor();
+    	        if(!iot.garageIsOpen()){
+                    iot.toggleGarageDoor();
     				garageOpenStatus = 'Opening...';
     		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
     		        var msg = garageOpenStatus+' garage via button';
@@ -84,8 +85,8 @@ module.exports = function(app,logger,io) {
     				io.sockets.emit('garageErrorStatus', garageErrorStatus);
      	        }
             } else if(req.body && req.body.garageSwitch == 'close'){
-    	        if(garageIsOpen()){
-                    toggleGarageDoor();
+    	        if(iot.garageIsOpen()){
+                    iot.toggleGarageDoor();
     				garageOpenStatus = 'Closing...';
     		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
     		        var msg = garageOpenStatus+' garage via button';
@@ -105,12 +106,14 @@ module.exports = function(app,logger,io) {
         } else {
     	    var garageStatus = 'hack';
             var hoursToWaitBeforeNextSecurityAlert = 2;
+                                    
     	    if(req.body && req.body.garageSwitch == 'open'){
     		    garageStatus = 'open'
     	    } else if(req.body && req.body.garageSwitch == 'close'){
     		    garageStatus = 'close'
     	    }
-            var securityMsg = 'SECURITY: tried to '+garageStatus+' garage via post without being authenticated!!';
+            var securityMsg = 'SECURITY: tried to '+garageStatus+' garage via post without being authenticated!! From ip: '+req.connection.remoteAddress;
+            
             clearTimeout(securityMsgTimeout);
             securityMsgTimeout = setTimeout(function(){
                 shouldSendSecurityAlert = true;
@@ -121,14 +124,11 @@ module.exports = function(app,logger,io) {
                 messenger.send(twilioLoginInfo.toNumbers,securityMsg);
                 shouldSendSecurityAlert = false;
             }
-            logger.fatal(securityMsg,'Ip address is: ',req.headers['x-forwaded-for'],'or: ',req.connection.remoteAddress);
+            logger.fatal(securityMsg,'Ip address is: ',req.connection.remoteAddress);
        		io.sockets.emit('garageErrorStatus', 'You are not authorized to do this!');
             res.status(401);
             res.send('not auth');
         }
     });
-    function log(test){
-        console.log('test',test);
-    }
-    module.exports.log = log;
+
 };

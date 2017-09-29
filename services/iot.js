@@ -15,11 +15,11 @@ var shouldSendGarageDoorAlertOne = true;
 var shouldSendGarageDoorAlertTwo = true;
 var garageSensorTimeoutOne = null;
 var garageSensorTimeoutTwo = null;
-
+var raspistillProc;
 
 module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     var hasBeenOpened = garageIsOpen();
-	var messenger = require('./messenger.js')(logger);
+	var messenger = require('./messenger.js')(logger,debugMode);
 	
 
     garageSensor.watch(function(err, value) {
@@ -167,7 +167,7 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
 	
 	return {
 		garageIsOpen: garageIsOpen,
-		toggleGarageDoor:toggleGarageDoor
+		toggleGarageDoor: toggleGarageDoor
 	}
 }
 

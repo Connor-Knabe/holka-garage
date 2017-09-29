@@ -18,15 +18,11 @@ var httpsServer = https.createServer(options, app);
 var io = require('socket.io')(httpsServer);
 
 var request = require('request');
-var twilioLoginInfo = require('./settings/twilioLoginInfo.js');
-var twilio = require('twilio');
-var client = twilio(twilioLoginInfo.TWILIO_ACCOUNT_SID, twilioLoginInfo.TWILIO_AUTH_TOKEN);
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
 var log4js = require('log4js');
 var logger = log4js.getLogger();
-var raspistillProc;
 
 app.use(function(req, res, next) {
 
@@ -68,5 +64,5 @@ if(debugMode){
 	logger.debug('In debug mode not sending texts!!!');
 	logger.debug('___________________________________');
 }
-var routes = require('./controllers/routes.js')(app,logger,io);
+var routes = require('./controllers/routes.js')(app,logger,io,debugMode);
 var iot = require('./services/iot.js')(app,enableMotionSensor,debugMode,io,logger);
