@@ -20,7 +20,7 @@ module.exports = function(app,logger,io,debugMode) {
 
     function vpnAuth(req){
     	var clientIp = req.connection.remoteAddress;
-    	var isOnVpn = clientIp.includes(login.vpnIp);
+    	var isOnVpn = clientIp.includes(login.vpnIp) || clientIp.includes(login.localIp);
         return isOnVpn;
     }
     // var router = require('express').Router();
@@ -100,7 +100,6 @@ module.exports = function(app,logger,io,debugMode) {
     				io.sockets.emit('garageErrorStatus', 'Garage is already closed!!');
      	        }
             }
-       		io.sockets.emit('garageErrorStatus', null);
             logger.info(msg);
             res.send(garageOpenStatus);
         } else {

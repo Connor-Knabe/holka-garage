@@ -20,7 +20,9 @@ var raspistillProc;
 module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     var hasBeenOpened = garageIsOpen();
 	var messenger = require('./messenger.js')(logger,debugMode);
+	var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
 	
+
 
     garageSensor.watch(function(err, value) {
     	if(err){
