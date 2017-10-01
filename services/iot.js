@@ -16,16 +16,44 @@ var shouldSendGarageDoorAlertTwo = true;
 var garageSensorTimeoutOne = null;
 var garageSensorTimeoutTwo = null;
 var raspistillProc;
-
+var uv4lProc; 
 
 //uv4l -nopreview --auto-video_nr --driver raspicam --encoding mjpeg --width 640 --height 480 --framerate 20 --server-option '--port=9090' --server-option '--max-queued-connections=30' --server-option '--max-streams=25' --server-option '--max-threads=29' --vflip yes --hflip yes
 
 
+// var args = ['-nopreview', '-auto-video_nr', '-driver', 'raspicam', '-encoding', '-width', '1920', '-height', '1080', '-framerate', '20', '-server-option', '-port=9090','-server-option','-server-option', '-port=9090' '-server-option', '-max-queued-connections=30','-server-option','-max-streams=25','-server-option','-max-threads=29','-vflip','yes','-hflip','yes'];
+
+
+
+/*
+
+spawn('pkill',['uv4l']);
+
+
+var args = ['-nopreview', '--auto-video_nr', '--driver', 'raspicam', '--encoding','mjpeg', '--width', '1920', '--height', '1080', '--framerate', '20', '--server-option', '--port=9090', '--server-option', '-max-queued-connections=30','--server-option','-max-streams=25','--server-option','-max-threads=29','--vflip','yes','--hflip','yes'];
+
+uv4lProc  = spawn('uv4l', args);
+
+uv4lProc.stdout.on('data', (data) => {
+  console.log(`stdout: ${data}`);
+});
+
+uv4lProc.stderr.on('data', (data) => {
+  console.log(`stderr: ${data}`);
+});
+
+uv4lProc.on('close', (code) => {
+  console.log(`child process exited with code ${code}`);
+});
+*/
+
+
+
+        
 module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     var hasBeenOpened = garageIsOpen();
 	var messenger = require('./messenger.js')(logger,debugMode);
 	var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
-	
 
 
     garageSensor.watch(function(err, value) {
@@ -46,6 +74,14 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
             }
             logger.debug(msg);
     		io.sockets.emit('garageErrorStatus', null);
+    		
+			if(garageOpenStatus=='Opening...'){
+				io.sockets.emit('garageOpenStatus', null);
+				garageOpenStatus = null;
+			}
+			io.sockets.emit('garageStatus', 'open');
+			
+			
     	} else if (value==0 && hasBeenOpened){
     		hasBeenOpened = false;
     		var msg = 'Garage door closed';
@@ -59,7 +95,12 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
                 shouldSendGarageDoorAlertTwo = false;
             }
             logger.debug(msg);
-    		io.sockets.emit('garageErrorStatus', null);
+			io.sockets.emit('garageErrorStatus', null);
+			if(garageOpenStatus=='Closing...'){
+				io.sockets.emit('garageOpenStatus', null);
+				garageOpenStatus = null;
+			}
+			io.sockets.emit('garageStatus', 'closed');
     	}
     });
 
@@ -124,9 +165,7 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     	} else {
     		io.sockets.emit('garageStatus', 'closed');
     	}
-    	socket.on('start-stream', function() {
-    		startStreaming(io);
-    	});
+
     });
 
     function stopStreaming() {
@@ -137,40 +176,8 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     	}
     }
 
-    function startStreaming(io) {
-        if (app.get('watchingFile')) {
-            io.sockets.emit('liveStream', '/stream/image_stream.jpg?_t=' + (Math.random() * 100000));
-            return;
-        }
-        var args = ['-w', '800', '-h', '600', '-vf', '-hf', '-o', './stream/image_stream.jpg', '-t', '999999999', '-tl', '1000', '-ex','night'];
-        raspistillProc = spawn('raspistill', args);
-        logger.debug('Watching for changes...');
-        app.set('watchingFile', true);
-        fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
-    	    io.sockets.emit('liveStream', '/stream/image_stream.jpg?_t=' + (Math.random() * 100000));
-    	    fs.stat('./stream/image_stream.jpg', function(err, stats){
-    		    if(stats){
-    				var mtime = new Date(stats.mtime);
-    		    	io.sockets.emit('liveStreamDate', mtime.toString());
-    		    	if(garageIsOpen()){
-    					if(garageOpenStatus=='Opening...'){
-    						io.sockets.emit('garageOpenStatus', null);
-    						garageOpenStatus = null;
-    					}
-    					io.sockets.emit('garageStatus', 'open');
-    		    	} else {
-    					if(garageOpenStatus=='Closing...'){
-    						io.sockets.emit('garageOpenStatus', null);
-    						garageOpenStatus = null;
-    					}
-    					io.sockets.emit('garageStatus', 'closed');
-    		    	}
-    		    }
 
-    	    });
-    	});
-	}
-	
+
 	return {
 		garageIsOpen: garageIsOpen,
 		toggleGarageDoor: toggleGarageDoor

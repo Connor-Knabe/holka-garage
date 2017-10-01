@@ -1,4 +1,6 @@
 var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
+var request = require('request');
+var MjpegProxy = require('mjpeg-proxy').MjpegProxy;
 
 module.exports = function(app,logger,io,debugMode) {
 	var iot = require('../services/iot.js')(app,false,debugMode,io,logger);
@@ -44,8 +46,46 @@ module.exports = function(app,logger,io,debugMode) {
             res.status(401);
             res.send('not auth');
         }
-
     });
+    
+    app.get('/index1.jpg', new MjpegProxy('http://localhost:9090/stream/video.mjpeg').proxyRequest);
+   
+    
+    app.get('/stream/img.jpg',function(req,res){
+        if(auth(req)){
+	        
+	        
+	        request('http://localhost:9090/stream/snapshot.jpeg?delay_s=1').pipe(fs.createWriteStream('./downloaded.jpg'));
+            res.send('not auth');
+
+/*
+	        	request('http://localhost:9090/stream/snapshot.jpeg?delay_s=1', function (error, response, body) {
+					res.writeHead(200, {'Content-Type': 'image/jpeg'});
+					res.end(response); // Send the file data to the browser.
+
+		        	
+				    console.log('error:', error); // Print the error if one occurred
+				    console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+				    console.log('body:', body); // Print the HTML for the Google homepage.
+				});
+*/
+/*
+            fs.readFile('./stream/image_stream.jpg', function(err, data) {
+              if (err) throw err; // Fail if the file can't be read.
+                res.writeHead(200, {'Content-Type': 'image/jpeg'});
+                res.end(data); // Send the file data to the browser.
+            });
+*/
+        } else{
+            logger.fatal('Unauthorized request for image_stream.jpg',req.connection.remoteAddress);
+            res.status(401);
+            res.send('not auth');
+        }
+    });
+    
+
+
+
 
     app.post('/', function(req,res){
     	if(req.body.username === login.username && req.body.password === login.password ){
