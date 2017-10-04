@@ -1,2 +1,3 @@
+v0.5 - using UV4l instead of raspistill for the camera module
 v0.4 - refactoring 
 v0.3 - added secure cookies and ssl
