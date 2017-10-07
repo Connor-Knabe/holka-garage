@@ -111,10 +111,15 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     	io.sockets.emit('clients', Object.keys(sockets).length);
 		
 
-		hue.toggleGarageDoor();
+		hue.garageLightsOn15();
 
     	socket.on('disconnect', function() {
 	    	delete sockets[socket.id];
+			logger.info('Client Disconnected, total clients connected : ', Object.keys(sockets).length);
+			if(Object.keys(sockets).length === 0){
+				var lightOn = false;
+				hue.garageLightsOnOff(lightOn)
+			}
 	    	// no more sockets, kill the stream
 	    	if (Object.keys(sockets).length === 0) {
 	    		app.set('watchingFile', false);
