@@ -25,8 +25,7 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     var hasBeenOpened = garageIsOpen();
 	var messenger = require('./messenger.js')(logger,debugMode);
 	var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
-	
-
+	var hue = require('./hue.js')(logger);
 
     garageSensor.watch(function(err, value) {
     	if(err){
@@ -110,14 +109,18 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     	sockets[socket.id] = socket;
     	logger.info('Total clients connected : ', Object.keys(sockets).length);
     	io.sockets.emit('clients', Object.keys(sockets).length);
+		
+
+		hue.toggleGarageDoor();
+
     	socket.on('disconnect', function() {
-    	delete sockets[socket.id];
-    	// no more sockets, kill the stream
-    	if (Object.keys(sockets).length === 0) {
-    		app.set('watchingFile', false);
-    		if (raspistillProc) raspistillProc.kill();
-    		fs.unwatchFile('./stream/image_stream.jpg');
-    	}
+	    	delete sockets[socket.id];
+	    	// no more sockets, kill the stream
+	    	if (Object.keys(sockets).length === 0) {
+	    		app.set('watchingFile', false);
+	    		if (raspistillProc) raspistillProc.kill();
+	    		fs.unwatchFile('./stream/image_stream.jpg');
+	    	}
     	});
     	if(garageIsOpen()){
     		io.sockets.emit('garageStatus', 'open');

@@ -66,3 +66,5 @@ if(debugMode){
 }
 var routes = require('./controllers/routes.js')(app,logger,io,debugMode);
 var iot = require('./services/iot.js')(app,enableMotionSensor,debugMode,io,logger);
+
+
