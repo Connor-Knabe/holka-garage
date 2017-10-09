@@ -1,18 +1,13 @@
-var login = require('../settings/login.js');
-
-var hue = require("node-hue-api"),
-    HueApi = hue.HueApi,
-    lightState = hue.lightState;
-
-
-var host = "192.168.0.154",
+var login = require('../settings/login.js'),
+	hue = require("node-hue-api");
+var HueApi = hue.HueApi,
+    lightState = hue.lightState,
+	host = login.hueBridgeIp,
     username = login.hueUser,
     api = new HueApi(host, username),
-    state = lightState.create();
-
-
-var lightsOffTimeout = null;
-
+	state = lightState.create(),
+	lightsOffTimeout = null;
+	
 module.exports = function(logger) {
 	function garageLightsOn15(){
 		lightsOn();
@@ -45,17 +40,17 @@ module.exports = function(logger) {
 	};
 	
 	function lightsOn(){
-		api.setGroupLightState(2, state.on())
-			.then()
-		    .fail(displayError)
-		    .done();
+		// api.setGroupLightState(2, state.on())
+		// 	.then()
+		//     .fail(displayError)
+		//     .done();
 	}
 
 	function lightsOff(){
-		api.setGroupLightState(2, state.off())
-			.then()
-		    .fail(displayError)
-		    .done();
+		// api.setGroupLightState(2, state.off())
+		// 	.then()
+		//     .fail(displayError)
+		//     .done();
 	}
 	
 	return {

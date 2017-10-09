@@ -31,15 +31,15 @@ var proxyOptions = {
 
 
 function authChecker(req, res, next) {
+    var redirectToUrl = req.originalUrl ? req.originalUrl : '/';
+    req.session.redirectTo = redirectToUrl;
     if (req && req.cookies && (req.cookies.holkaCookie === login.secretCookie)) {
         next();
     } else {
         res.status(401);
-        res.send('not auth');
+        res.redirect('/');
     }
 }
-
-
 
 var options = {
   key: fs.readFileSync(login.sslPath + 'privkey.pem'),

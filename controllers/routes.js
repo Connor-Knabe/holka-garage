@@ -48,7 +48,7 @@ module.exports = function(app,logger,io,debugMode) {
     });
 
     app.post('/', function(req,res){
-    	if(req.body.username === login.username && req.body.password === login.password ){
+    	if(req.body.username.toLowerCase() === login.username.toLowerCase() && req.body.password === login.password ){
     		req.session.userInfo = req.body;
     		var options = {
     	        maxAge: 1000 * 60* 60 * 24  * 180,
@@ -56,8 +56,14 @@ module.exports = function(app,logger,io,debugMode) {
     	    };
     		res.cookie('holkaCookie', login.secretCookie, options);
 
-    		logger.info('cookies',req.cookies.holkaCookie);
-    		res.redirect('/');
+            logger.info('cookies',req.cookies.holkaCookie);
+            
+            if(req&& req.session && req.session.redirectTo){
+                res.redirect(req.session.redirectTo);                
+            } else {
+                res.redirect('/');                    
+            }
+            
     	} else {
     		res.send('Access denied wrong username/password');
     	}
