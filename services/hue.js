@@ -18,6 +18,7 @@ module.exports = function(logger) {
 			lightsOff();
 		}, login.garageLightTimeoutMins*60*1000);			
 	}
+
 	
 	function garageLightsOnOff(toggleOn){
 		
@@ -39,18 +40,20 @@ module.exports = function(logger) {
 	    logger.error(err);
 	};
 	
+	
+	
 	function lightsOn(){
-		// api.setGroupLightState(2, state.on())
-		// 	.then()
-		//     .fail(displayError)
-		//     .done();
+		api.setGroupLightState(8, state.on())
+			.then()
+		    .fail(displayError)
+		    .done();
 	}
 
 	function lightsOff(){
-		// api.setGroupLightState(2, state.off())
-		// 	.then()
-		//     .fail(displayError)
-		//     .done();
+		api.setGroupLightState(8, state.off())
+			.then()
+		    .fail(displayError)
+		    .done();
 	}
 	
 	return {

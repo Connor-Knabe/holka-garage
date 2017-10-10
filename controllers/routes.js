@@ -23,7 +23,6 @@ module.exports = function(app,logger,io,debugMode) {
     	var isOnVpn = clientIp.includes(login.vpnIp) || clientIp.includes(login.localIp);
         return isOnVpn;
     }
-    // var router = require('express').Router();
     app.get('/', function(req, res) {
     	if(auth(req)){
     		res.sendFile('admin.html',{'root': './views/'});
@@ -55,9 +54,7 @@ module.exports = function(app,logger,io,debugMode) {
     	        httpOnly: true
     	    };
     		res.cookie('holkaCookie', login.secretCookie, options);
-
             logger.info('cookies',req.cookies.holkaCookie);
-            
             if(req&& req.session && req.session.redirectTo){
                 res.redirect(req.session.redirectTo);                
             } else {
@@ -69,7 +66,6 @@ module.exports = function(app,logger,io,debugMode) {
     	}
     });
 
-
     app.post('/openOrCloseGarage', function(req,res){
         logger.debug('body',req.body);
         if(auth(req) && vpnAuth(req)){
@@ -79,9 +75,7 @@ module.exports = function(app,logger,io,debugMode) {
     				garageOpenStatus = 'Opening...';
     		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
     		        var msg = garageOpenStatus+' garage via button';
-    		        if(garageOpenStatus){
-    		            messenger.send(twilioLoginInfo.toNumbers,msg);
-    		        }
+                    messenger.send(twilioLoginInfo.toNumbers,msg);
     				io.sockets.emit('garageErrorStatus', null);
 
     	        } else {
@@ -96,9 +90,7 @@ module.exports = function(app,logger,io,debugMode) {
     				garageOpenStatus = 'Closing...';
     		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
     		        var msg = garageOpenStatus+' garage via button';
-    		        if(garageOpenStatus){
-    		            messenger.send(twilioLoginInfo.toNumbers,msg);
-    		        }
+                    messenger.send(twilioLoginInfo.toNumbers,msg);
     				io.sockets.emit('garageErrorStatus', null);
     	        } else {
     		        logger.debug('err');

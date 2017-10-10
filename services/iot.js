@@ -16,7 +16,7 @@ var shouldSendGarageDoorAlertTwo = true;
 var garageSensorTimeoutOne = null;
 var garageSensorTimeoutTwo = null;
 var raspistillProc;
-
+var garageOpened = false;
 
 //uv4l -nopreview --auto-video_nr --driver raspicam --encoding mjpeg --width 640 --height 480 --framerate 20 --server-option '--port=9090' --server-option '--max-queued-connections=30' --server-option '--max-streams=25' --server-option '--max-threads=29' --vflip yes --hflip yes
 
@@ -26,13 +26,14 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
 	var messenger = require('./messenger.js')(logger,debugMode);
 	var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
 	var hue = require('./hue.js')(logger);
-
+	
     garageSensor.watch(function(err, value) {
     	if(err){
     		logger.error('Error watching garage sensor: ',err);
     	}
     	if (value==1 && !hasBeenOpened){
-    		hasBeenOpened = true;
+			hasBeenOpened = true;
+			garageOpened = true;
      		var msg = 'Garage door opened';
             clearTimeout(garageSensorTimeoutOne);
             garageSensorTimeoutOne = setTimeout(function(){
@@ -40,13 +41,18 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
             },1*60*10000);
 
             if(shouldSendGarageDoorAlertOne){
-                messenger.send(twilioLoginInfo.toNumbers,msg);
+				if(twilioLoginInfo.openCloseUseTwilio){
+					messenger.send(twilioLoginInfo.toNumbers,msg);					
+				} else {
+					messenger.sendIftt(garageOpened);
+				}
                 shouldSendGarageDoorAlertOne = false;
             }
             logger.debug(msg);
     		io.sockets.emit('garageErrorStatus', null);
     	} else if (value==0 && hasBeenOpened){
-    		hasBeenOpened = false;
+			hasBeenOpened = false;
+			garageOpened = false;
     		var msg = 'Garage door closed';
             clearTimeout(garageSensorTimeoutTwo);
             garageSensorTimeoutTwo = setTimeout(function(){
@@ -54,7 +60,11 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
             },1*60*10000);
 
             if(shouldSendGarageDoorAlertTwo){
-                messenger.send(twilioLoginInfo.toNumbers,msg);
+				if(twilioLoginInfo.openCloseUseTwilio){
+					messenger.send(twilioLoginInfo.toNumbers,msg);					
+				} else {
+					messenger.sendIftt(garageOpened);
+				}
                 shouldSendGarageDoorAlertTwo = false;
             }
             logger.debug(msg);
@@ -83,9 +93,6 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     		}
     	});
     }
-
-
-
 
     function garageIsOpen(){
         var isOpen = (garageSensor.readSync()==1) ? true :  false;

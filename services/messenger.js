@@ -2,10 +2,44 @@ var messageTimeout=null;
 var messageCount = 0;
 var twilio = require('twilio');
 var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
+var login = require('../settings/login.js');
+var rp = require('request-promise');
 
 var client = twilio(twilioLoginInfo.TWILIO_ACCOUNT_SID, twilioLoginInfo.TWILIO_AUTH_TOKEN);
 
 module.exports = function(logger,debugMode) {
+    
+    function sendIftt(garageOpened){
+        for(var i = 0; i < login.iftttRecipients.length; i++){
+            requestIfttt(garageOpened,login.iftttRecipients[i].ApiKey);
+            logger.debug('requesting ifttt');
+        }
+    }
+
+    function requestIfttt(garageOpened,apiKey){
+        var url = login.iftttGarageClosedUrl;
+        if(garageOpened){
+            url = login.iftttGarageOpenedUrl;
+        }
+        url += apiKey;
+        var options = {
+            method: 'POST',
+            uri: url,
+            body: {
+                value1: login.iftttSecret
+            },
+            json: true
+        };
+         
+        rp(options)
+            .then(function (parsedBody) {
+                // POST succeeded...
+            })
+            .catch(function (err) {
+                // POST failed...
+            });
+    }
+
     function send(numbers, msgContent){
         clearTimeout(messageTimeout);
         messageTimeout = setTimeout(function(){
@@ -72,7 +106,8 @@ module.exports = function(logger,debugMode) {
     }
 
     return {
-        send:send
+        send:send,
+        sendIftt:sendIftt
     }
 
 }
