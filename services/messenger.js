@@ -26,7 +26,7 @@ module.exports = function(logger,debugMode) {
             method: 'POST',
             uri: url,
             body: {
-                Value1: login.iftttSecret
+                value1:login.iftttSecret
             },
             json: true
         };
