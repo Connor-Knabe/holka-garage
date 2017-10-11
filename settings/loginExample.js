@@ -11,6 +11,6 @@ module.exports.hueBridgeIp = '192.168.1.15';
 module.exports.iftttRecipients = [
     {"Name":"Connor","ApiKey":"SKDkdsjflSKJDFjLS"}
 ];
-module.exports.iftttGarageOpenendUrl = "https://maker.ifttt.com/trigger/garage_opened/with/key/";
+module.exports.iftttGarageOpenedUrl = "https://maker.ifttt.com/trigger/garage_opened/with/key/";
 module.exports.iftttGarageClosedUrl = "https://maker.ifttt.com/trigger/garage_closed/with/key/";   
 module.exports.iftttSecret = "Hello World";   

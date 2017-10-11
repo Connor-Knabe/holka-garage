@@ -12,7 +12,6 @@ module.exports = function(logger,debugMode) {
     function sendIftt(garageOpened){
         for(var i = 0; i < login.iftttRecipients.length; i++){
             requestIfttt(garageOpened,login.iftttRecipients[i].ApiKey);
-            logger.debug('requesting ifttt');
         }
     }
 
@@ -21,12 +20,13 @@ module.exports = function(logger,debugMode) {
         if(garageOpened){
             url = login.iftttGarageOpenedUrl;
         }
+        logger.debug('requesting ifttt with url: ',url,'. Garage opened:',garageOpened);        
         url += apiKey;
         var options = {
             method: 'POST',
             uri: url,
             body: {
-                value1: login.iftttSecret
+                Value1: login.iftttSecret
             },
             json: true
         };
