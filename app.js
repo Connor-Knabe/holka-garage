@@ -9,6 +9,8 @@ var fs = require('fs');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
+var basicAuth = require('basic-auth-connect');
+
 app.use(cookieParser());
 
 app.use(function(req, res, next) {
@@ -80,14 +82,25 @@ app.use(session({
 }));
 
 if(debugMode){
-// 	logger.level = 'debug';
+	logger.level = 'debug';
 	logger.debug('___________________________________');
 	logger.debug('In debug mode not sending texts!!!');
 	logger.debug('___________________________________');
 }
+
+
+
+
+app.use('/pictures',basicAuth(login.twilioPictureUser, login.twilioPicturePass));
+
+
 var routes = require('./controllers/routes.js')(app,logger,io,debugMode);
 var iot = require('./services/iot.js')(app,enableMotionSensor,debugMode,io,logger);
+
+
+
 
 app.use(authChecker);
 
 app.use('/proxy/stream', proxy(proxyOptions));
+

@@ -1,5 +1,5 @@
 var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
-
+var sendPicture = false;
 module.exports = function(app,logger,io,debugMode) {
 	var iot = require('../services/iot.js')(app,false,debugMode,io,logger);
 
@@ -46,6 +46,14 @@ module.exports = function(app,logger,io,debugMode) {
 
     });
 
+    app.get('/pictures',function(req,res){
+        fs.readFile('./stream/image_stream.jpg', function(err, data) {
+            if (err) throw err; // Fail if the file can't be read.
+            res.writeHead(200, {'Content-Type': 'image/jpeg'});
+            res.end(data); // Send the file data to the browser.
+        });
+    });
+
     app.post('/', function(req,res){
     	if(req.body.username.toLowerCase() === login.username.toLowerCase() && req.body.password === login.password ){
     		req.session.userInfo = req.body;
@@ -66,6 +74,10 @@ module.exports = function(app,logger,io,debugMode) {
     	}
     });
 
+    messenger.send(twilioLoginInfo.toNumbers,'testing photo',true);
+    messenger.send(twilioLoginInfo.toNumbers,'not testing photo',false);
+    
+
     app.post('/openOrCloseGarage', function(req,res){
         logger.debug('body',req.body);
         if(auth(req) && vpnAuth(req)){
@@ -74,8 +86,9 @@ module.exports = function(app,logger,io,debugMode) {
                     iot.toggleGarageDoor();
     				garageOpenStatus = 'Opening...';
     		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
-    		        var msg = garageOpenStatus+' garage via button';
-                    messenger.send(twilioLoginInfo.toNumbers,msg);
+                    var msg = garageOpenStatus+' garage via button';
+                    sendPicture = true;                    
+                    messenger.send(twilioLoginInfo.toNumbers,msg,sendPicture);
     				io.sockets.emit('garageErrorStatus', null);
 
     	        } else {
@@ -89,8 +102,9 @@ module.exports = function(app,logger,io,debugMode) {
                     iot.toggleGarageDoor();
     				garageOpenStatus = 'Closing...';
     		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
-    		        var msg = garageOpenStatus+' garage via button';
-                    messenger.send(twilioLoginInfo.toNumbers,msg);
+                    var msg = garageOpenStatus+' garage via button';
+					sendPicture = true;                    
+                    messenger.send(twilioLoginInfo.toNumbers,msg,sendPicture);
     				io.sockets.emit('garageErrorStatus', null);
     	        } else {
     		        logger.debug('err');
@@ -117,8 +131,8 @@ module.exports = function(app,logger,io,debugMode) {
             },hoursToWaitBeforeNextSecurityAlert*60*60*10000);
 
             if(shouldSendSecurityAlert){
-                console.log('logger',logger);
-                messenger.send(twilioLoginInfo.toNumbers,securityMsg);
+                sendPicture = true;                
+                messenger.send(twilioLoginInfo.toNumbers,securityMsg,sendPicture);
                 shouldSendSecurityAlert = false;
             }
             logger.fatal(securityMsg,'Ip address is: ',req.connection.remoteAddress);

@@ -17,7 +17,7 @@ var garageSensorTimeoutOne = null;
 var garageSensorTimeoutTwo = null;
 var raspistillProc;
 var garageOpened = false;
-
+var sendPicture = false;
 //uv4l -nopreview --auto-video_nr --driver raspicam --encoding mjpeg --width 640 --height 480 --framerate 20 --server-option '--port=9090' --server-option '--max-queued-connections=30' --server-option '--max-streams=25' --server-option '--max-threads=29' --vflip yes --hflip yes
 
 
@@ -34,7 +34,9 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     	if (value==1 && !hasBeenOpened){
 			hasBeenOpened = true;
 			garageOpened = true;
-     		var msg = 'Garage door opened';
+   		    var msg = 'Garage door opened';
+			hue.garageLightsOn15();
+			 
             clearTimeout(garageSensorTimeoutOne);
             garageSensorTimeoutOne = setTimeout(function(){
                 shouldSendGarageDoorAlertOne = true;
@@ -42,7 +44,8 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
 
             if(shouldSendGarageDoorAlertOne){
 				if(twilioLoginInfo.openCloseUseTwilio){
-					messenger.send(twilioLoginInfo.toNumbers,msg);					
+					sendPicture = false;
+					messenger.send(twilioLoginInfo.toNumbers,msg, sendPicture);					
 				} else {
 					messenger.sendIftt(garageOpened);
 				}
@@ -53,7 +56,8 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     	} else if (value==0 && hasBeenOpened){
 			hasBeenOpened = false;
 			garageOpened = false;
-    		var msg = 'Garage door closed';
+			var msg = 'Garage door closed';
+			hue.garageLightsOn15();			
             clearTimeout(garageSensorTimeoutTwo);
             garageSensorTimeoutTwo = setTimeout(function(){
                 shouldSendGarageDoorAlertTwo = true;
@@ -61,7 +65,8 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
 
             if(shouldSendGarageDoorAlertTwo){
 				if(twilioLoginInfo.openCloseUseTwilio){
-					messenger.send(twilioLoginInfo.toNumbers,msg);					
+					sendPicture = false;					
+					messenger.send(twilioLoginInfo.toNumbers,msg, sendPicture);					
 				} else {
 					messenger.sendIftt(garageOpened);
 				}
@@ -83,8 +88,9 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     			   hasSentMotionSensorAlert = true;
     			}, 2*60*1000);
     			var msg = 'Motion detected in garage'
-    			logger.debug(msg);
-    	 		messenger.send(twilioLoginInfo.toNumbers,msg);
+				logger.debug(msg);
+				sendPicture = false;				
+    	 		messenger.send(twilioLoginInfo.toNumbers,msg, sendPicture);
     		} else if (value==0 && hasSentMotionSensorAlert){
     			clearTimeout(motionSensorTimeoutTwo);
     			motionSensorTimeoutTwo = setTimeout(function(){
@@ -108,10 +114,8 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
                 garageSwitch.writeSync(0);
             },1000);
         }
-    }
-
+	}
 	
-
     io.on('connection', function(socket) {
     	sockets[socket.id] = socket;
     	logger.info('Total clients connected : ', Object.keys(sockets).length);

@@ -40,7 +40,7 @@ module.exports = function(logger,debugMode) {
             });
     }
 
-    function send(numbers, msgContent){
+    function send(numbers, msgContent,sendPicture){
         clearTimeout(messageTimeout);
         messageTimeout = setTimeout(function(){
             messageCount=0;
@@ -55,25 +55,43 @@ module.exports = function(logger,debugMode) {
                 if(numbers[i].number){
 
                     logger.debug('number',numbers[i].number);
-                    sendText(numbers[i],msgContent);
+                    sendText(numbers[i],msgContent,sendPicture);
                 }
             }
         }
     }
-
-    function sendText(alertInfo, msgContent){
+    
+    function sendText(alertInfo, msgContent,sendPicture){
         if(!debugMode){
-            client.messages.create({
+            var twilioRequestObj = {
                 to: alertInfo.number,
                 from: twilioLoginInfo.fromNumber,
                 body: msgContent
-            }, function(err, message) {
-                if(err){
-                    logger.error(new Date(), ' Error sending text message for message: ', message, '\nFor error: ', err);
-                } else {
-                    logger.info(new Date(),' Text sent: ', msgContent);
-                }
-            });
+            };
+            var textTimeout = 0;
+            if(sendPicture){
+                var pictureUrl = 'https://'+login.twilioPictureUser+':'+login.twilioPicturePass+'@'+login.serverPictureUrl;                
+                twilioRequestObj = {
+                    to: alertInfo.number,
+                    from: twilioLoginInfo.fromNumber,
+                    body: msgContent,
+                    mediaUrl: pictureUrl
+                };
+                textTimeout = 5;
+            }
+            logger.info('timeout',textTimeout);
+
+
+            setTimeout(function(){
+                client.messages.create(twilioRequestObj, function(err, message) {
+                    if(err){
+                        logger.error(new Date(), ' Error sending text message for message: ', message, '\nFor error: ', err);
+                    } else {
+                        logger.info(new Date(),' Text sent: ', msgContent);
+                    }
+                });
+                logger.debug('timeout triggered');
+            },textTimeout*1000);
         } else {
             logger.info('Not sending text in debug mode. Message contains:',msgContent);
         }

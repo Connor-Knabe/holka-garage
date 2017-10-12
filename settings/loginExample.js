@@ -14,3 +14,6 @@ module.exports.iftttRecipients = [
 module.exports.iftttGarageOpenedUrl = "https://maker.ifttt.com/trigger/garage_opened/with/key/";
 module.exports.iftttGarageClosedUrl = "https://maker.ifttt.com/trigger/garage_closed/with/key/";   
 module.exports.iftttSecret = "Hello World";   
+module.exports.twilioPictureUser = "asdf2234234asdf!32f2f";
+module.exports.twilioPicturePass = "asdf12342sdfAA!!dsf!34;f";
+module.exports.serverPictureUrl = "myServerIp/pictures";
