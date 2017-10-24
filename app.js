@@ -14,28 +14,26 @@ var basicAuth = require('basic-auth-connect');
 app.use(cookieParser());
 
 app.use(function(req, res, next) {
-	if(!req.secure) {
-		return res.redirect(['https://', req.get('Host'), req.url].join(''));
- 		}
-	next();
+    if (!req.secure) {
+        return res.redirect(['https://', req.get('Host'), req.url].join(''));
+    }
+    next();
 });
 
 var proxy = require('http-proxy-middleware');
 
 var proxyOptions = {
     target: 'http://192.168.0.120/image/jpeg.cgi', // target host
-    changeOrigin: false,               // needed for virtual hosted sites
+    changeOrigin: false, // needed for virtual hosted sites
     pathRewrite: {
-        '^/proxy/stream' : ''
+        '^/proxy/stream': ''
     }
 };
-
-
 
 function authChecker(req, res, next) {
     var redirectToUrl = req.originalUrl ? req.originalUrl : '/';
     req.session.redirectTo = redirectToUrl;
-    if (req && req.cookies && (req.cookies.holkaCookie === login.secretCookie)) {
+    if (req && req.cookies && req.cookies.holkaCookie === login.secretCookie) {
         next();
     } else {
         res.status(401);
@@ -44,8 +42,8 @@ function authChecker(req, res, next) {
 }
 
 var options = {
-  key: fs.readFileSync(login.sslPath + 'privkey.pem'),
-  cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
+    key: fs.readFileSync(login.sslPath + 'privkey.pem'),
+    cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
 };
 
 var httpsServer = https.createServer(options, app);
@@ -55,14 +53,15 @@ var io = require('socket.io')(httpsServer);
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 
-
 app.use('/', express.static(path.join(__dirname, 'js')));
-app.use(bodyParser.urlencoded({
-	extended: true
-}));
+app.use(
+    bodyParser.urlencoded({
+        extended: true
+    })
+);
 
 httpsServer.listen(443, function() {
-  logger.info('listening on *:',443);
+    logger.info('listening on *:', 443);
 });
 
 //settings
@@ -71,36 +70,39 @@ logger.level = 'debug';
 var debugMode = false;
 var enableMotionSensor = false;
 http.listen(port, function() {
-  logger.info('listening on *:',port);
+    logger.info('listening on *:', port);
 });
 
-app.use(session({
-	secret: login.secret,
-	resave: false,
-	saveUninitialized: true,
-	cookie: { secure: true, httpOnly:true, sameSite:true }
-}));
+app.use(
+    session({
+        secret: login.secret,
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: true, httpOnly: true, sameSite: true }
+    })
+);
 
-if(debugMode){
-	logger.level = 'debug';
-	logger.debug('___________________________________');
-	logger.debug('In debug mode not sending texts!!!');
-	logger.debug('___________________________________');
+if (debugMode) {
+    logger.level = 'debug';
+    logger.debug('___________________________________');
+    logger.debug('In debug mode not sending texts!!!');
+    logger.debug('___________________________________');
 }
 
+app.use(
+    '/pictures',
+    basicAuth(login.twilioPictureUser, login.twilioPicturePass)
+);
 
-
-
-app.use('/pictures',basicAuth(login.twilioPictureUser, login.twilioPicturePass));
-
-
-var routes = require('./controllers/routes.js')(app,logger,io,debugMode);
-var iot = require('./services/iot.js')(app,enableMotionSensor,debugMode,io,logger);
-
-
-
+var routes = require('./controllers/routes.js')(app, logger, io, debugMode);
+var iot = require('./services/iot.js')(
+    app,
+    enableMotionSensor,
+    debugMode,
+    io,
+    logger
+);
 
 app.use(authChecker);
 
 app.use('/proxy/stream', proxy(proxyOptions));
-
