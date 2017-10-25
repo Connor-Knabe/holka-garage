@@ -1,12 +1,14 @@
 # holka-garage
 
-IoT project running on a Raspberry Pi to check if garage door is open/closed via a camera.  
+IoT project running on a Raspberry Pi to open/close a garage door and to see if it's opened or closed.
 
-Coming soon...
+Features:
 
 * Ability to open close garage via website
+* Send notifications via IFTTT/Texting when garage opens/closes
+* MMS photo sent when garage open/closed clicked
 
-* Send notifications when garage opens/closes
+Coming soon:
 
 * Open garage via GPS
 
