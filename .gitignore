@@ -4,3 +4,4 @@ node_modules
 twilioLoginInfo.js
 login.js
 *jpg*
+stream/*
