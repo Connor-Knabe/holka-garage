@@ -3,7 +3,7 @@ var certbotProc;
 
 var certbotRenew = new CronJob('00 40 6 * * 0', function() {
         if (certbotProc) certbotProc.kill();
-        certbotProc = spawn('/home/fg/certbot/certbot-auto',['renew']);
+        certbotProc = spawn('certbot',['renew']);
     }, function () {
     /* This function is executed when the job stops */
     },
