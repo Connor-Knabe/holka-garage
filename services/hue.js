@@ -43,7 +43,7 @@ module.exports = function(logger) {
 	
 	
 	function lightsOn(){
-		api.setGroupLightState(8, state.on())
+		api.setGroupLightState(8, state.on().brightness(100))
 			.then()
 		    .fail(displayError)
 		    .done();
