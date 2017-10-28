@@ -1,6 +1,6 @@
 node_modules
+*package*
 *.log*
 twilioLoginInfo.js
 login.js
 *jpg*
-stream

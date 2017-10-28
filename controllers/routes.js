@@ -34,7 +34,7 @@ module.exports = function(app,logger,io,debugMode) {
     app.get('/stream/image_stream.jpg',function(req,res){
         if(auth(req)){
             fs.readFile('./stream/image_stream.jpg', function(err, data) {
-              if (err) throw err; // Fail if the file can't be read.
+              if (err) logger.error('failed to read image stream',err); // Fail if the file can't be read.
                 res.writeHead(200, {'Content-Type': 'image/jpeg'});
                 res.end(data); // Send the file data to the browser.
             });
@@ -48,7 +48,7 @@ module.exports = function(app,logger,io,debugMode) {
 
     app.get('/pictures',function(req,res){
         fs.readFile('./stream/image_stream.jpg', function(err, data) {
-            if (err) throw err; // Fail if the file can't be read.
+            if (err) logger.error('error reading image_stream',err); // Fail if the file can't be read.
             res.writeHead(200, {'Content-Type': 'image/jpeg'});
             res.end(data); // Send the file data to the browser.
         });
