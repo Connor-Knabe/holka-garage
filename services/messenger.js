@@ -89,7 +89,7 @@ module.exports = function(logger, debugMode) {
                     body: msgContent,
                     mediaUrl: pictureUrl
                 };
-                textTimeout = 5;
+                textTimeout = twilioLoginInfo.photoTextTiemeoutSeconds;
             }
             logger.info('timeout', textTimeout);
 

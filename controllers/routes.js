@@ -1,11 +1,12 @@
 var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
 var sendPicture = false;
+var garageOpenStatus = null;
+
 module.exports = function(app,logger,io,debugMode) {
 	var iot = require('../services/iot.js')(app,false,debugMode,io,logger);
 
     var securityMsgTimeout = null;
     var garageErrorStatus = null;
-    var garageOpenStatus = null;
     var shouldSendSecurityAlert = true;
 
     var messenger = require('../services/messenger.js')(logger,debugMode);
@@ -73,10 +74,7 @@ module.exports = function(app,logger,io,debugMode) {
     		res.send('Access denied wrong username/password');
     	}
     });
-
-    messenger.send(twilioLoginInfo.toNumbers,'testing photo',true);
-    messenger.send(twilioLoginInfo.toNumbers,'not testing photo',false);
-    
+   
 
     app.post('/openOrCloseGarage', function(req,res){
         logger.debug('body',req.body);
@@ -85,12 +83,12 @@ module.exports = function(app,logger,io,debugMode) {
     	        if(!iot.garageIsOpen()){
                     iot.toggleGarageDoor();
     				garageOpenStatus = 'Opening...';
+    				iot.updateGarageStatus(garageOpenStatus);
     		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
                     var msg = garageOpenStatus+' garage via button';
                     sendPicture = true;                    
                     messenger.send(twilioLoginInfo.toNumbers,msg,sendPicture);
     				io.sockets.emit('garageErrorStatus', null);
-
     	        } else {
     		        logger.debug('err');
     				io.sockets.emit('garageOpenStatus', null);
@@ -101,6 +99,7 @@ module.exports = function(app,logger,io,debugMode) {
     	        if(iot.garageIsOpen()){
                     iot.toggleGarageDoor();
     				garageOpenStatus = 'Closing...';
+    				iot.updateGarageStatus(garageOpenStatus);
     		   		io.sockets.emit('garageOpenStatus', garageOpenStatus);
                     var msg = garageOpenStatus+' garage via button';
 					sendPicture = true;                    
@@ -108,6 +107,7 @@ module.exports = function(app,logger,io,debugMode) {
     				io.sockets.emit('garageErrorStatus', null);
     	        } else {
     		        logger.debug('err');
+    				iot.updateGarageStatus(null);
     				io.sockets.emit('garageOpenStatus', null);
     				io.sockets.emit('garageErrorStatus', 'Garage is already closed!!');
      	        }

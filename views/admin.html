@@ -67,7 +67,7 @@
 
 socket.on('garageOpenStatus', function(status) {
   if(status){
-      if(status=="Opening..."){
+      if(status==="Opening..." || status==="Closing..."){
    	  	  $("#progress").show();
       } else {
 	  	  $("#progress").hide();

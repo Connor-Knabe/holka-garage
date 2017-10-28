@@ -155,6 +155,11 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     		fs.unwatchFile('./stream/image_stream.jpg');
     	}
     }
+    
+    function updateGarageStatus(status){
+		garageOpenStatus = status;
+		return;
+    }
 
     function startStreaming(io) {
         if (app.get('watchingFile')) {
@@ -173,11 +178,13 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     		    	io.sockets.emit('liveStreamDate', mtime.toString());
     		    	if(garageIsOpen()){
     					if(garageOpenStatus=='Opening...'){
+	    					console.log('status',garageOpenStatus);
     						io.sockets.emit('garageOpenStatus', null);
     						garageOpenStatus = null;
     					}
     					io.sockets.emit('garageStatus', 'open');
     		    	} else {
+						console.log('status close',garageOpenStatus);
     					if(garageOpenStatus=='Closing...'){
     						io.sockets.emit('garageOpenStatus', null);
     						garageOpenStatus = null;
@@ -192,7 +199,8 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
 	
 	return {
 		garageIsOpen: garageIsOpen,
-		toggleGarageDoor: toggleGarageDoor
+		toggleGarageDoor: toggleGarageDoor,
+		updateGarageStatus: updateGarageStatus
 	}
 }
 
