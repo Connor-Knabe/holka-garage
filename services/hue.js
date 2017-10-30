@@ -1,8 +1,10 @@
 var login = require('../settings/login.js'),
-	hue = require("node-hue-api");
+    hue = require('node-hue-api'),
+    options = require('../settings/options.js');
+
 var HueApi = hue.HueApi,
     lightState = hue.lightState,
-	host = login.hueBridgeIp,
+    host = login.hueBridgeIp,
     username = login.hueUser,
     api = new HueApi(host, username),
 	state = lightState.create(),
@@ -10,15 +12,34 @@ var HueApi = hue.HueApi,
 	lightsOff5Timeout = null;
 	
 module.exports = function(logger) {
-	function garageLightsOn15(){
-		lightsOn();
-		logger.debug('Lights on for '+login.garageLightTimeoutMins+' mins');
+    function garageLightsOn15() {
+        if (options.enableHue) {
+            lightsOn();
+            logger.debug(
+                'Lights on for ' + login.garageLightTimeoutMins + ' mins'
+            );
+            clearTimeout(lightsOffTimeout);
+            lightsOffTimeout = setTimeout(function() {
+                lightsOff();
+            }, login.garageLightTimeoutMins * 60 * 1000);
+        }
+    }
 
-		clearTimeout(lightsOffTimeout);
-		lightsOffTimeout = setTimeout(function(){
-			lightsOff();
-		}, login.garageLightTimeoutMins*60*1000);			
-	}
+    function garageLightsOnOff(toggleOn) {
+        if (options.enableHue) {
+            if (toggleOn) {
+                lightsOn();
+                logger.debug('lights on');
+            } else {
+                lightsOff();
+                logger.debug('lights off');
+            }
+        }
+    }
+
+    var displayResult = function(result) {
+        logger.debug(result);
+    };
 
 	function garageLightsOff5(){
 		logger.debug('Lights turning off in 5 min');
@@ -72,4 +93,8 @@ module.exports = function(logger) {
 		garageLightsOff5:garageLightsOff5
 	}
 
-}
+    return {
+        garageLightsOnOff: garageLightsOnOff,
+        garageLightsOn15: garageLightsOn15
+    };
+};
