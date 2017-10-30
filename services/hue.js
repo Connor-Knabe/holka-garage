@@ -6,7 +6,8 @@ var HueApi = hue.HueApi,
     username = login.hueUser,
     api = new HueApi(host, username),
 	state = lightState.create(),
-	lightsOffTimeout = null;
+	lightsOffTimeout = null,
+	lightsOff5Timeout = null;
 	
 module.exports = function(logger) {
 	function garageLightsOn15(){
@@ -17,6 +18,15 @@ module.exports = function(logger) {
 		lightsOffTimeout = setTimeout(function(){
 			lightsOff();
 		}, login.garageLightTimeoutMins*60*1000);			
+	}
+
+	function garageLightsOff5(){
+		logger.debug('Lights turning off in 5 min');
+
+		clearTimeout(lightsOff5Timeout);
+		lightsOff5Timeout = setTimeout(function(){
+			lightsOff();
+		}, 5*60*1000);			
 	}
 
 	
@@ -58,7 +68,8 @@ module.exports = function(logger) {
 	
 	return {
 		garageLightsOnOff: garageLightsOnOff,
-		garageLightsOn15:garageLightsOn15
+		garageLightsOn15:garageLightsOn15,
+		garageLightsOff5:garageLightsOff5
 	}
 
 }

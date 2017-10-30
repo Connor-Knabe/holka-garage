@@ -18,8 +18,6 @@ var garageSensorTimeoutTwo = null;
 var raspistillProc;
 var garageOpened = false;
 var sendPicture = false;
-//uv4l -nopreview --auto-video_nr --driver raspicam --encoding mjpeg --width 640 --height 480 --framerate 20 --server-option '--port=9090' --server-option '--max-queued-connections=30' --server-option '--max-streams=25' --server-option '--max-threads=29' --vflip yes --hflip yes
-
 
 module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
     var hasBeenOpened = garageIsOpen();
@@ -129,7 +127,7 @@ module.exports = function(app,enableMotionSensor,debugMode,io,logger) {
 			logger.info('Client Disconnected, total clients connected : ', Object.keys(sockets).length);
 			if(Object.keys(sockets).length === 0){
 				var lightOn = false;
-				hue.garageLightsOnOff(lightOn)
+				hue.garageLightsOnOff5(lightOn)
 			}
 	    	// no more sockets, kill the stream
 	    	if (Object.keys(sockets).length === 0) {
