@@ -2,6 +2,7 @@ var sockets = {};
 var Gpio = require('onoff').Gpio;
 var spawn = require('child_process').spawn;
 var fs = require('fs');
+const options = require('../settings/options.js');
 
 var motionSensor = new Gpio(15, 'in', 'both');
 var garageSensor = new Gpio(4, 'in', 'both');
@@ -41,10 +42,11 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             }, 1 * 60 * 10000);
 
             if (shouldSendGarageDoorAlertOne) {
-                if (twilioLoginInfo.openCloseUseTwilio) {
+                if (options.enableTexting) {
                     sendPicture = false;
                     messenger.send(twilioLoginInfo.toNumbers, msg, sendPicture);
-                } else {
+                }
+                if (options.enableIfttt) {
                     messenger.sendIftt(garageOpened);
                 }
                 shouldSendGarageDoorAlertOne = false;
@@ -62,10 +64,11 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             }, 1 * 60 * 10000);
 
             if (shouldSendGarageDoorAlertTwo) {
-                if (twilioLoginInfo.openCloseUseTwilio) {
+                if (options.enableTexting) {
                     sendPicture = false;
                     messenger.send(twilioLoginInfo.toNumbers, msg, sendPicture);
-                } else {
+                }
+                if (options.enableIfttt) {
                     messenger.sendIftt(garageOpened);
                 }
                 shouldSendGarageDoorAlertTwo = false;

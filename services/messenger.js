@@ -1,9 +1,11 @@
 var messageTimeout = null;
 var messageCount = 0;
-var twilio = require('twilio');
-var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
-var login = require('../settings/login.js');
-var rp = require('request-promise');
+const twilio = require('twilio');
+const twilioLoginInfo = require('../settings/twilioLoginInfo.js');
+const login = require('../settings/login.js');
+const rp = require('request-promise');
+const options = require('../settings/options.js');
+const nodemailer = require('nodemailer');
 
 var client = twilio(
     twilioLoginInfo.TWILIO_ACCOUNT_SID,
@@ -12,8 +14,10 @@ var client = twilio(
 
 module.exports = function(logger, debugMode) {
     function sendIftt(garageOpened) {
-        for (var i = 0; i < login.iftttRecipients.length; i++) {
-            requestIfttt(garageOpened, login.iftttRecipients[i].ApiKey);
+        if (options.enableIfttt) {
+            for (var i = 0; i < login.iftttRecipients.length; i++) {
+                requestIfttt(garageOpened, login.iftttRecipients[i].ApiKey);
+            }
         }
     }
 
