@@ -1,2 +1,3 @@
-v0.4 - refactoring 
+v1.0.2 - hue integration option to use IFTTT for alerts
+v0.4 - refactoring
 v0.3 - added secure cookies and ssl
