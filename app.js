@@ -2,7 +2,12 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var https = require('https');
-var login = require('./settings/login.js');
+const login = require('./settings/login.js');
+const options = require('./settings/options.js');
+const sslSettings = {
+    key: fs.readFileSync(login.sslPath + 'privkey.pem'),
+    cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
+};
 var path = require('path');
 require('./services/certrenewcron.js');
 var fs = require('fs');
@@ -41,12 +46,7 @@ function authChecker(req, res, next) {
     }
 }
 
-var options = {
-    key: fs.readFileSync(login.sslPath + 'privkey.pem'),
-    cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
-};
-
-var httpsServer = https.createServer(options, app);
+var httpsServer = https.createServer(sslSettings, app);
 
 var io = require('socket.io')(httpsServer);
 
@@ -67,7 +67,6 @@ httpsServer.listen(443, function() {
 //settings
 var port = 80;
 logger.level = 'debug';
-var debugMode = false;
 var enableMotionSensor = false;
 http.listen(port, function() {
     logger.info('listening on *:', port);
@@ -82,7 +81,7 @@ app.use(
     })
 );
 
-if (debugMode) {
+if (options.debugMode) {
     logger.level = 'debug';
     logger.debug('___________________________________');
     logger.debug('In debug mode not sending texts!!!');
@@ -94,11 +93,17 @@ app.use(
     basicAuth(login.twilioPictureUser, login.twilioPicturePass)
 );
 
-var routes = require('./controllers/routes.js')(app, logger, io, debugMode);
+var routes = require('./controllers/routes.js')(
+    app,
+    logger,
+    io,
+    options.debugMode
+);
+
 var iot = require('./services/iot.js')(
     app,
     enableMotionSensor,
-    debugMode,
+    options.debugMode,
     io,
     logger
 );

@@ -58,7 +58,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             var msg = 'Garage door closed';
             hue.garageLightsOn15();
             clearTimeout(garageSensorTimeoutTwo);
-            garageSensorTimeoutTwo = setTimeout(function() {
+            garageSensorTimeoutTwo = setTimeout(() => {
                 shouldSendGarageDoorAlertTwo = true;
             }, 1 * 60 * 10000);
 
