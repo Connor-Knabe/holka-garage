@@ -51,7 +51,7 @@ module.exports = function(logger, debugMode) {
             });
     }
 
-    function send(numbers, msgContent, sendPicture) {
+    function send(numbers, msgContent, sendPicture=false) {
         clearTimeout(messageTimeout);
         messageTimeout = setTimeout(function() {
             messageCount = 0;
@@ -64,7 +64,7 @@ module.exports = function(logger, debugMode) {
                     sendEmail(numbers[i], msgContent);
                 }
                 if (numbers[i].number) {
-                    logger.debug('number', numbers[i].number);
+                    logger.debug("number", numbers[i].number);
                     sendText(numbers[i], msgContent, sendPicture);
                 }
             }

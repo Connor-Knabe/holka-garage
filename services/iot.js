@@ -2,7 +2,6 @@ var sockets = {};
 var Gpio = require('onoff').Gpio;
 var spawn = require('child_process').spawn;
 var fs = require('fs');
-const options = require('../settings/options.js');
 
 var motionSensor = new Gpio(15, 'in', 'both');
 var garageSensor = new Gpio(4, 'in', 'both');
@@ -22,9 +21,10 @@ var sendPicture = false;
 
 module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
     var hasBeenOpened = garageIsOpen();
-    var messenger = require('./messenger.js')(logger, debugMode);
-    var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
-    var hue = require('./hue.js')(logger);
+    const messenger = require('./messenger.js')(logger, debugMode);
+    const twilioLoginInfo = require('../settings/twilioLoginInfo.js');
+    const hue = require('./hue.js')(logger);
+    const options = require('../settings/options.js');
 
     garageSensor.watch(function(err, value) {
         if (err) {
@@ -43,8 +43,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
 
             if (shouldSendGarageDoorAlertOne) {
                 if (options.enableTexting) {
-                    sendPicture = false;
-                    messenger.send(twilioLoginInfo.toNumbers, msg, sendPicture);
+                    messenger.send(twilioLoginInfo.toNumbers, msg);
                 }
                 if (options.enableIfttt) {
                     messenger.sendIftt(garageOpened);
@@ -65,8 +64,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
 
             if (shouldSendGarageDoorAlertTwo) {
                 if (options.enableTexting) {
-                    sendPicture = false;
-                    messenger.send(twilioLoginInfo.toNumbers, msg, sendPicture);
+                    messenger.send(twilioLoginInfo.toNumbers, msg);
                 }
                 if (options.enableIfttt) {
                     messenger.sendIftt(garageOpened);
@@ -90,8 +88,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                 }, 2 * 60 * 1000);
                 var msg = 'Motion detected in garage';
                 logger.debug(msg);
-                sendPicture = false;
-                messenger.send(twilioLoginInfo.toNumbers, msg, sendPicture);
+                messenger.send(twilioLoginInfo.toNumbers, msg);
             } else if (value == 0 && hasSentMotionSensorAlert) {
                 clearTimeout(motionSensorTimeoutTwo);
                 motionSensorTimeoutTwo = setTimeout(function() {
@@ -130,16 +127,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                 'Client Disconnected, total clients connected : ',
                 Object.keys(sockets).length
             );
-            if (Object.keys(sockets).length === 0) {
-                var lightOn = false;
-                hue.garageLightsOnOff5(lightOn);
-            }
-            // no more sockets, kill the stream
-            if (Object.keys(sockets).length === 0) {
-                app.set('watchingFile', false);
-                if (raspistillProc) raspistillProc.kill();
-                fs.unwatchFile('./stream/image_stream.jpg');
-            }
+            stopStreaming();
         });
         if (garageIsOpen()) {
             io.sockets.emit('garageStatus', 'open');
@@ -152,7 +140,10 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
     });
 
     function stopStreaming() {
+        // no more sockets, kill the stream
         if (Object.keys(sockets).length === 0) {
+            var lightOn = false;
+            hue.garageLightsOff5(lightOn);
             app.set('watchingFile', false);
             if (raspistillProc) raspistillProc.kill();
             fs.unwatchFile('./stream/image_stream.jpg');
