@@ -6,6 +6,7 @@ const login = require('./settings/login.js');
 const options = require('./settings/options.js');
 const messengerInfo = require('./settings/messengerInfo.js');
 const proxy = require('http-proxy-middleware');
+const fs = require('fs');
 
 const sslSettings = {
     key: fs.readFileSync(login.sslPath + 'privkey.pem'),
@@ -13,7 +14,6 @@ const sslSettings = {
 };
 var path = require('path');
 require('./services/certrenewcron.js');
-var fs = require('fs');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');

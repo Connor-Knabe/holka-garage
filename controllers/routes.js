@@ -1,5 +1,5 @@
 var messengerInfo = require('../settings/messengerInfo.js');
-const options = require('..settings/options.js');
+const options = require('../settings/options.js');
 var sendPicture = false;
 var garageOpenStatus = null;
 
