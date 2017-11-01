@@ -1,30 +1,33 @@
 var messageTimeout = null;
 var messageCount = 0;
 const twilio = require('twilio');
-const twilioLoginInfo = require('../settings/twilioLoginInfo.js');
+const messengerInfo = require('../settings/messengerInfo.js');
 const login = require('../settings/login.js');
 const rp = require('request-promise');
 const options = require('../settings/options.js');
 const nodemailer = require('nodemailer');
 
 var client = twilio(
-    twilioLoginInfo.TWILIO_ACCOUNT_SID,
-    twilioLoginInfo.TWILIO_AUTH_TOKEN
+    messengerInfo.TWILIO_ACCOUNT_SID,
+    messengerInfo.TWILIO_AUTH_TOKEN
 );
 
 module.exports = function(logger, debugMode) {
     function sendIftt(garageOpened) {
         if (options.enableIfttt) {
-            for (var i = 0; i < login.iftttRecipients.length; i++) {
-                requestIfttt(garageOpened, login.iftttRecipients[i].ApiKey);
+            for (var i = 0; i < messengerInfo.iftttRecipients.length; i++) {
+                requestIfttt(
+                    garageOpened,
+                    messengerInfo.iftttRecipients[i].ApiKey
+                );
             }
         }
     }
 
     function requestIfttt(garageOpened, apiKey) {
-        var url = login.iftttGarageClosedUrl;
+        var url = messengerInfo.iftttGarageClosedUrl;
         if (garageOpened) {
-            url = login.iftttGarageOpenedUrl;
+            url = messengerInfo.iftttGarageOpenedUrl;
         }
         logger.debug(
             'requesting ifttt with url: ',
@@ -37,7 +40,7 @@ module.exports = function(logger, debugMode) {
             method: 'POST',
             uri: url,
             body: {
-                value1: login.iftttSecret
+                value1: messengerInfo.iftttSecret
             },
             json: true
         };
@@ -51,7 +54,7 @@ module.exports = function(logger, debugMode) {
             });
     }
 
-    function send(numbers, msgContent, sendPicture=false) {
+    function send(numbers, msgContent, sendPicture = false) {
         clearTimeout(messageTimeout);
         messageTimeout = setTimeout(function() {
             messageCount = 0;
@@ -64,7 +67,7 @@ module.exports = function(logger, debugMode) {
                     sendEmail(numbers[i], msgContent);
                 }
                 if (numbers[i].number) {
-                    logger.debug("number", numbers[i].number);
+                    logger.debug('number', numbers[i].number);
                     sendText(numbers[i], msgContent, sendPicture);
                 }
             }
@@ -75,25 +78,26 @@ module.exports = function(logger, debugMode) {
         if (!debugMode) {
             var twilioRequestObj = {
                 to: alertInfo.number,
-                from: twilioLoginInfo.fromNumber,
+                from: messengerInfo.fromNumber,
                 body: msgContent
             };
             var textTimeout = 0;
             if (sendPicture) {
                 var pictureUrl =
                     'https://' +
-                    login.twilioPictureUser +
+                    messengerInfo.twilioPictureUser +
                     ':' +
-                    login.twilioPicturePass +
+                    messengerInfo.twilioPicturePass +
                     '@' +
-                    login.serverPictureUrl;
+                    options.serverDomain +
+                    messengerInfo.serverPictureUrl;
                 twilioRequestObj = {
                     to: alertInfo.number,
-                    from: twilioLoginInfo.fromNumber,
+                    from: messengerInfo.fromNumber,
                     body: msgContent,
                     mediaUrl: pictureUrl
                 };
-                textTimeout = twilioLoginInfo.photoTextTiemeoutSeconds;
+                textTimeout = messengerInfo.photoTextTiemeoutSeconds;
             }
             logger.info('timeout', textTimeout);
 
@@ -128,12 +132,12 @@ module.exports = function(logger, debugMode) {
         var transporter = nodemailer.createTransport({
             service: 'Gmail',
             auth: {
-                user: twilioLoginInfo.gmailUsername,
-                pass: twilioLoginInfo.gmailPass
+                user: messengerInfo.gmailUsername,
+                pass: messengerInfo.gmailPass
             }
         });
         var mailOptions = {
-            from: twilioLoginInfo.gmailUsername,
+            from: messengerInfo.gmailUsername,
             to: alertInfo.email,
             subject: 'Garge Monitor!',
             text: msgContent

@@ -1,4 +1,4 @@
-var twilioLoginInfo = require('../settings/twilioLoginInfo.js');
+var messengerInfo = require('../settings/messengerInfo.js');
 const options = require('..settings/options.js');
 var sendPicture = false;
 var garageOpenStatus = null;
@@ -97,7 +97,7 @@ module.exports = function(app, logger, io, debugMode) {
                     io.sockets.emit('garageOpenStatus', garageOpenStatus);
                     var msg = garageOpenStatus + ' garage via button';
                     sendPicture = true;
-                    messenger.send(twilioLoginInfo.toNumbers, msg, sendPicture);
+                    messenger.send(messengerInfo.toNumbers, msg, sendPicture);
                     io.sockets.emit('garageErrorStatus', null);
                 } else {
                     logger.debug('err');
@@ -113,7 +113,7 @@ module.exports = function(app, logger, io, debugMode) {
                     io.sockets.emit('garageOpenStatus', garageOpenStatus);
                     var msg = garageOpenStatus + ' garage via button';
                     sendPicture = true;
-                    messenger.send(twilioLoginInfo.toNumbers, msg, sendPicture);
+                    messenger.send(messengerInfo.toNumbers, msg, sendPicture);
                     io.sockets.emit('garageErrorStatus', null);
                 } else {
                     logger.debug('err');
@@ -150,7 +150,7 @@ module.exports = function(app, logger, io, debugMode) {
             if (shouldSendSecurityAlert) {
                 sendPicture = true;
                 messenger.send(
-                    twilioLoginInfo.toNumbers,
+                    messengerInfo.toNumbers,
                     securityMsg,
                     sendPicture
                 );

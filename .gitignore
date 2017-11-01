@@ -1,9 +1,9 @@
 node_modules
 options.js
-optionsMain.js
 *.log*
 twilioLoginInfo.js
 login.js
+messengerInfo.js
 *jpg*
 stream/*
 .vscode

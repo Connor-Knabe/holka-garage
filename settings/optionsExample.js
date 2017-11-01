@@ -7,3 +7,4 @@ module.exports.localIp = '192.168.0.1';
 module.exports.garageLightTimeoutMins = 15;
 module.exports.hueBridgeIp = '192.168.0.151';
 module.exports.hueUser = 'alksdjflKZJDFLKJSDLKFJlkshdflkjsdf';
+module.exports.serverDomain = 'example.com';
