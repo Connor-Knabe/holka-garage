@@ -4,6 +4,8 @@ var http = require('http').Server(app);
 var https = require('https');
 const login = require('./settings/login.js');
 const options = require('./settings/options.js');
+const messengerInfo = require('./settings/messengerInfo.js');
+
 const sslSettings = {
     key: fs.readFileSync(login.sslPath + 'privkey.pem'),
     cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
@@ -90,7 +92,7 @@ if (options.debugMode) {
 
 app.use(
     '/pictures',
-    basicAuth(login.twilioPictureUser, login.twilioPicturePass)
+    basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass)
 );
 
 var routes = require('./controllers/routes.js')(
