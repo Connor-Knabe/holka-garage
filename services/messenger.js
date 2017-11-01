@@ -64,7 +64,7 @@ module.exports = function(logger, debugMode) {
         if (numbers && messageCount < 10) {
             for (var i = 0; i < numbers.length; i++) {
                 if (numbers[i].email) {
-                    sendEmail(numbers[i], msgContent);
+                    //sendEmail(numbers[i], msgContent);
                 }
                 if (numbers[i].number) {
                     logger.debug('number', numbers[i].number);
