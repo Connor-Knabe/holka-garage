@@ -1,6 +1,6 @@
 {
     "name": "holka-garage",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "description":
         "IoT project running on a Raspberry Pi to open/close a garage door and to see if it's opened or closed.",
     "main": "app.js",

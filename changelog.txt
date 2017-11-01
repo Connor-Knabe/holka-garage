@@ -1,3 +1,4 @@
+v1.0.3 - major refactor, added options file, formatted files using prettier, adding debug to option.js file
 v1.0.2 - hue integration option to use IFTTT for alerts
 v0.4 - refactoring
 v0.3 - added secure cookies and ssl

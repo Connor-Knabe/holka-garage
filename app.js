@@ -5,6 +5,7 @@ var https = require('https');
 const login = require('./settings/login.js');
 const options = require('./settings/options.js');
 const messengerInfo = require('./settings/messengerInfo.js');
+const proxy = require('http-proxy-middleware');
 
 const sslSettings = {
     key: fs.readFileSync(login.sslPath + 'privkey.pem'),
@@ -26,8 +27,6 @@ app.use(function(req, res, next) {
     }
     next();
 });
-
-var proxy = require('http-proxy-middleware');
 
 var proxyOptions = {
     target: 'http://192.168.0.120/image/jpeg.cgi', // target host
