@@ -19,6 +19,9 @@ module.exports.iftttGarageOpenedUrl =
     'https://maker.ifttt.com/trigger/garage_open_trigger/with/key/';
 module.exports.iftttGarageClosedUrl =
     'https://maker.ifttt.com/trigger/garage_close_trigger/with/key/';
+module.exports.iftttGarageOpenAlertUrl =
+    'https://maker.ifttt.com/trigger/garage_alert/with/key/';
+
 module.exports.iftttSecret = 'This will be displayed in the notification';
 
 module.exports.twilioPictureUser =

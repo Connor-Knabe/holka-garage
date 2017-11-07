@@ -6,28 +6,42 @@ const login = require('../settings/login.js');
 const rp = require('request-promise');
 const options = require('../settings/options.js');
 const nodemailer = require('nodemailer');
-
-var client = twilio(
+const client = twilio(
     messengerInfo.TWILIO_ACCOUNT_SID,
     messengerInfo.TWILIO_AUTH_TOKEN
 );
-
+var minsOpened = 0;
 module.exports = function(logger, debugMode) {
     function sendIftt(garageOpened) {
         if (options.enableIfttt) {
             for (var i = 0; i < messengerInfo.iftttRecipients.length; i++) {
                 requestIfttt(
                     garageOpened,
-                    messengerInfo.iftttRecipients[i].ApiKey
+                    messengerInfo.iftttRecipients[i].ApiKey,
+                    minsOpened
                 );
             }
         }
     }
 
-    function requestIfttt(garageOpened, apiKey) {
+    function sendIfttGarageOpenedAlert(minsOpened) {
+        if (options.enableIfttt) {
+            for (var i = 0; i < messengerInfo.iftttRecipients.length; i++) {
+                requestIfttt(
+                    null,
+                    messengerInfo.iftttRecipients[i].ApiKey,
+                    minsOpened
+                );
+            }
+        }
+    }
+
+    function requestIfttt(garageOpened, apiKey, minsOpened) {
         var url = messengerInfo.iftttGarageClosedUrl;
         if (garageOpened) {
             url = messengerInfo.iftttGarageOpenedUrl;
+        } else if (!garageOpened) {
+            url = messengerInfo.iftttGarageOpenAlertUrl;
         }
         logger.debug(
             'requesting ifttt with url: ',
@@ -40,7 +54,8 @@ module.exports = function(logger, debugMode) {
             method: 'POST',
             uri: url,
             body: {
-                value1: messengerInfo.iftttSecret
+                value1: messengerInfo.iftttSecret,
+                value2: minsOpened
             },
             json: true
         };
@@ -54,7 +69,7 @@ module.exports = function(logger, debugMode) {
             });
     }
 
-    function send(numbers, msgContent, sendPicture = false) {
+    function send(numbers, msgContent, sendPicture = false, btnPress = false) {
         clearTimeout(messageTimeout);
         messageTimeout = setTimeout(function() {
             messageCount = 0;
@@ -64,11 +79,19 @@ module.exports = function(logger, debugMode) {
         if (numbers && messageCount < 10) {
             for (var i = 0; i < numbers.length; i++) {
                 if (numbers[i].email) {
-                    //sendEmail(numbers[i], msgContent);
+                    sendEmail(numbers[i], msgContent);
                 }
                 if (numbers[i].number) {
                     logger.debug('number', numbers[i].number);
-                    sendText(numbers[i], msgContent, sendPicture);
+                    if (options.generalTexts) {
+                        sendText(numbers[i], msgContent, sendPicture);
+                    } else if (options.alertButtonPressTexts && btnPress) {
+                        sendText(numbers[i], msgContent, sendPicture);
+                    } else {
+                        logger.debug(
+                            `Not sending texts generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress}`
+                        );
+                    }
                 }
             }
         }
@@ -89,7 +112,6 @@ module.exports = function(logger, debugMode) {
                     ':' +
                     messengerInfo.twilioPicturePass +
                     '@' +
-                    options.serverDomain +
                     messengerInfo.serverPictureUrl;
                 twilioRequestObj = {
                     to: alertInfo.number,

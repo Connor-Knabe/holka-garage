@@ -18,11 +18,12 @@ var garageSensorTimeoutTwo = null;
 var raspistillProc;
 var garageOpened = false;
 var sendPicture = false;
+var garageOpenAlertTimeout = null;
 
 module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
     var hasBeenOpened = garageIsOpen();
     const messenger = require('./messenger.js')(logger, debugMode);
-    const twilioLoginInfo = require('../settings/twilioLoginInfo.js');
+    const twilioLoginInfo = require('../settings/messengerInfo.js');
     const hue = require('./hue.js')(logger);
     const options = require('../settings/options.js');
 
@@ -41,13 +42,27 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                 shouldSendGarageDoorAlertOne = true;
             }, 1 * 60 * 10000);
 
+            clearTimeout(garageOpenAlertTimeout);
+            garageOpenAlertTimeout = setTimeout(() => {
+                if (garageIsOpen()) {
+                    if (options.enableTexting) {
+                        messenger.send(
+                            twilioLoginInfo.toNumbers,
+                            `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`
+                        );
+                    }
+                    messenger.sendIfttGarageOpenedAlert(
+                        options.garageOpenAlertMins
+                    );
+                }
+            }, options.garageOpenAlertMins * 60 * 1000);
+
             if (shouldSendGarageDoorAlertOne) {
                 if (options.enableTexting) {
                     messenger.send(twilioLoginInfo.toNumbers, msg);
                 }
-                if (options.enableIfttt) {
-                    messenger.sendIftt(garageOpened);
-                }
+                messenger.sendIftt(garageOpened);
+
                 shouldSendGarageDoorAlertOne = false;
             }
             logger.debug(msg);
@@ -66,9 +81,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                 if (options.enableTexting) {
                     messenger.send(twilioLoginInfo.toNumbers, msg);
                 }
-                if (options.enableIfttt) {
-                    messenger.sendIftt(garageOpened);
-                }
+                messenger.sendIftt(garageOpened);
                 shouldSendGarageDoorAlertTwo = false;
             }
             logger.debug(msg);
