@@ -23,3 +23,21 @@ Required for setup:
 4.Pi Camera (<https://www.amazon.com/Arducam-Megapixels-Sensor-OV5647-Raspberry/dp/B012V1HEP4/ref=sr_1_6?ie=UTF8&qid=1508849318&sr=8-6&keywords=raspberry+pi+camera+module>)
 
 5.Door magnent sensor (<https://www.amazon.com/Gikfun-Sensor-Magnetic-Switch-Arduino/dp/B0154PTDFI/ref=sr_1_1_sspa?ie=UTF8&qid=1508849795&sr=8-1-spons&keywords=wired+door+sensor&psc=1>)
+
+Setup:
+
+1.Setup Rasbperry Pi
+
+2.Get packages installed on RPi <https://github.com/Connor-Knabe/install-scripts>
+
+3.Get a Twilio account (for texting) <https://www.twilio.com/try-twilio>
+
+4.Get an IFTTT account (for push notifications) <https://ifttt.com/join>
+
+5.Clone holka-garage repo <https://github.com/Connor-Knabe/holka-garage>
+
+6.Rename remove example from files in settings folder.  For example mv optionsExample options.js
+
+7.Fill out information including API keys phone numbers etc in the various setting files
+
+8.Use pm2 to start the program
