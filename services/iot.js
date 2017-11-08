@@ -45,10 +45,12 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             clearTimeout(garageOpenAlertTimeout);
             garageOpenAlertTimeout = setTimeout(() => {
                 if (garageIsOpen()) {
+                    var garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`;
+                    logger.debug(garageAlertMsg);
                     if (options.enableTexting) {
                         messenger.send(
                             twilioLoginInfo.toNumbers,
-                            `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`
+                            garageAlertMsg
                         );
                     }
                     messenger.sendIfttGarageOpenedAlert(
