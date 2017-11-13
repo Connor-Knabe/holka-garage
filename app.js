@@ -13,7 +13,6 @@ const sslSettings = {
     cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
 };
 var path = require('path');
-require('./services/certrenewcron.js');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
@@ -108,6 +107,8 @@ var iot = require('./services/iot.js')(
     io,
     logger
 );
+
+require('./services/certrenewcron.js')(logger);
 
 app.use(authChecker);
 

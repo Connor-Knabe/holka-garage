@@ -47,7 +47,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                 if (garageIsOpen()) {
                     var garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`;
                     logger.debug(garageAlertMsg);
-                    if (options.enableTexting) {
+                    if (options.garageOpenMinsAlert) {
                         messenger.send(
                             twilioLoginInfo.toNumbers,
                             garageAlertMsg
@@ -60,7 +60,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             }, options.garageOpenAlertMins * 60 * 1000);
 
             if (shouldSendGarageDoorAlertOne) {
-                if (options.enableTexting) {
+                if (options.alertButtonPressTexts) {
                     messenger.send(twilioLoginInfo.toNumbers, msg);
                 }
                 messenger.sendIftt(garageOpened);
@@ -80,7 +80,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             }, 1 * 60 * 10000);
 
             if (shouldSendGarageDoorAlertTwo) {
-                if (options.enableTexting) {
+                if (options.alertButtonPressTexts) {
                     messenger.send(twilioLoginInfo.toNumbers, msg);
                 }
                 messenger.sendIftt(garageOpened);
@@ -197,6 +197,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
         raspistillProc = spawn('raspistill', args);
         logger.debug('Watching for changes...');
         app.set('watchingFile', true);
+
         fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
             io.sockets.emit(
                 'liveStream',
@@ -208,13 +209,13 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                     io.sockets.emit('liveStreamDate', mtime.toString());
                     if (garageIsOpen()) {
                         if (garageOpenStatus == 'Opening...') {
-                            console.log('status', garageOpenStatus);
+                            logger.debug('status', garageOpenStatus);
                             io.sockets.emit('garageOpenStatus', null);
                             garageOpenStatus = null;
                         }
                         io.sockets.emit('garageStatus', 'open');
                     } else {
-                        console.log('status close', garageOpenStatus);
+                        logger.debug('status close', garageOpenStatus);
                         if (garageOpenStatus == 'Closing...') {
                             io.sockets.emit('garageOpenStatus', null);
                             garageOpenStatus = null;

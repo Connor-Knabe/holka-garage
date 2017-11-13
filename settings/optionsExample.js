@@ -1,10 +1,13 @@
 module.exports.enableHue = true;
 module.exports.enableIfttt = true;
-module.exports.enableTexting = true;
-module.exports.debugMode = true;
+module.exports.generalTexts = false;
+module.exports.garageOpenMinsAlert = true;
+module.exports.alertButtonPressTexts = true;
+module.exports.debugMode = false;
 module.exports.vpnIp = '188.223.139.19';
-module.exports.localIp = '192.168.0.1';
+module.exports.localIp = '192.168.1.1';
 module.exports.garageLightTimeoutMins = 15;
-module.exports.hueBridgeIp = '192.168.0.151';
+module.exports.hueBridgeIp = '192.168.0.31';
 module.exports.hueUser = 'alksdjflKZJDFLKJSDLKFJlkshdflkjsdf';
 module.exports.serverDomain = 'example.com';
+module.exports.garageOpenAlertMins = 15;

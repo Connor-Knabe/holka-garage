@@ -66,6 +66,7 @@ module.exports = function(app, logger, io, debugMode) {
 
     app.post('/', function(req, res) {
         if (
+            req.body.username &&
             req.body.username.toLowerCase() === login.username.toLowerCase() &&
             req.body.password === login.password
         ) {
