@@ -1,9 +1,10 @@
 var CronJob = require('cron').CronJob;
 var certbotProc;
-
+//jan 25
 var certbotRenew = new CronJob(
     '00 40 6 * * 0',
     () => {
+		console.log(new Date(),'running cert renew');
         if (certbotProc) certbotProc.kill();
         certbotProc = spawn('certbot', ['renew']);
     },

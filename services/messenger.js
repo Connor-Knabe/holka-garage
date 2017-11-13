@@ -41,7 +41,7 @@ module.exports = function(logger, debugMode) {
         var url = messengerInfo.iftttGarageClosedUrl;
         if (garageOpened) {
             url = messengerInfo.iftttGarageOpenedUrl;
-        } else if (!garageOpened) {
+        } else if (garageOpened === null) {
             url = messengerInfo.iftttGarageOpenAlertUrl;
         }
         logger.debug(
@@ -183,6 +183,7 @@ module.exports = function(logger, debugMode) {
 
     return {
         send: send,
-        sendIftt: sendIftt
+        sendIftt: sendIftt,
+        sendIfttGarageOpenedAlert: sendIfttGarageOpenedAlert
     };
 };
