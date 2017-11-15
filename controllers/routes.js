@@ -98,7 +98,13 @@ module.exports = function(app, logger, io, debugMode) {
                     io.sockets.emit('garageOpenStatus', garageOpenStatus);
                     var msg = garageOpenStatus + ' garage via button';
                     sendPicture = true;
-                    messenger.send(messengerInfo.toNumbers, msg, sendPicture);
+                    var btnPress = true;
+                    messenger.send(
+                        messengerInfo.toNumbers,
+                        msg,
+                        sendPicture,
+                        btnPress
+                    );
                     io.sockets.emit('garageErrorStatus', null);
                 } else {
                     logger.debug('err');

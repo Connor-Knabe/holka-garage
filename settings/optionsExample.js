@@ -1,6 +1,7 @@
 module.exports.enableHue = true;
 module.exports.enableIfttt = true;
 module.exports.generalTexts = false;
+module.exports.emailAlerts = true;
 module.exports.garageOpenMinsAlert = true;
 module.exports.alertButtonPressTexts = true;
 module.exports.debugMode = false;
@@ -11,3 +12,4 @@ module.exports.hueBridgeIp = '192.168.0.31';
 module.exports.hueUser = 'alksdjflKZJDFLKJSDLKFJlkshdflkjsdf';
 module.exports.serverDomain = 'example.com';
 module.exports.garageOpenAlertMins = 15;
+module.exports.geoIpFilter = 'MO';

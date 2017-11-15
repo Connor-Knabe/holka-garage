@@ -6,6 +6,8 @@ module.exports.toNumbers = [
         email: 'myemailaddress@gmail.com'
     }
 ];
+//For gmail emails must enable less secure apps.... 
+//https://support.google.com/accounts/answer/6010255?hl=en
 module.exports.gmailUsername = 'mygmailsendingemail@gmail.com';
 module.exports.gmailPass = 'mygmailsendingemailPassword';
 module.exports.TWILIO_AUTH_TOKEN = 'authtokenLKAJSLKFDJSSDF';

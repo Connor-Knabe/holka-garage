@@ -12,6 +12,7 @@ const sslSettings = {
     key: fs.readFileSync(login.sslPath + 'privkey.pem'),
     cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
 };
+
 var path = require('path');
 var bodyParser = require('body-parser');
 var session = require('express-session');
@@ -53,7 +54,7 @@ var io = require('socket.io')(httpsServer);
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 
-app.use('/', express.static(path.join(__dirname, 'js')));
+app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(
     bodyParser.urlencoded({
         extended: true

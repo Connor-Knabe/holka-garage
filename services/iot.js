@@ -199,14 +199,14 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
         app.set('watchingFile', true);
 
         fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
-            io.sockets.emit(
-                'liveStream',
-                '/stream/image_stream.jpg?_t=' + Math.random() * 100000
-            );
             fs.stat('./stream/image_stream.jpg', function(err, stats) {
                 if (stats) {
                     var mtime = new Date(stats.mtime);
                     io.sockets.emit('liveStreamDate', mtime.toString());
+                    io.sockets.emit(
+                        'liveStream',
+                        '/stream/image_stream.jpg?_t=' + Math.random() * 100000
+                    );
                     if (garageIsOpen()) {
                         if (garageOpenStatus == 'Opening...') {
                             logger.debug('status', garageOpenStatus);
@@ -215,7 +215,6 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                         }
                         io.sockets.emit('garageStatus', 'open');
                     } else {
-                        logger.debug('status close', garageOpenStatus);
                         if (garageOpenStatus == 'Closing...') {
                             io.sockets.emit('garageOpenStatus', null);
                             garageOpenStatus = null;

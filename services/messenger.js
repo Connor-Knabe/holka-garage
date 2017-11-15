@@ -76,6 +76,9 @@ module.exports = function(logger, debugMode) {
             messageCount = 0;
         }, 1 * 60 * 60 * 1000);
         messageCount++;
+        logger.debug(
+            `Sending message? -> msgContent:${msgContent} messageCount:${messageCount} generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress} sendPicture:${sendPicture}`
+        );
 
         if (numbers && messageCount < 10) {
             for (var i = 0; i < numbers.length; i++) {
@@ -90,7 +93,7 @@ module.exports = function(logger, debugMode) {
                         sendText(numbers[i], msgContent, sendPicture);
                     } else {
                         logger.debug(
-                            `Not sending texts generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress}`
+                            `Not sending texts generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress} sendPicture:${sendPicture}`
                         );
                     }
                 }
@@ -152,32 +155,34 @@ module.exports = function(logger, debugMode) {
     }
 
     function sendEmail(alertInfo, msgContent) {
-        var transporter = nodemailer.createTransport({
-            service: 'Gmail',
-            auth: {
-                user: messengerInfo.gmailUsername,
-                pass: messengerInfo.gmailPass
-            }
-        });
-        var mailOptions = {
-            from: messengerInfo.gmailUsername,
-            to: alertInfo.email,
-            subject: 'Garge Monitor!',
-            text: msgContent
-        };
-        if (!debugMode) {
-            transporter.sendMail(mailOptions, function(error, info) {
-                if (error) {
-                    return logger.error(error);
+        if (options.emailAlerts) {
+            var transporter = nodemailer.createTransport({
+                service: 'Gmail',
+                auth: {
+                    user: messengerInfo.gmailUsername,
+                    pass: messengerInfo.gmailPass
                 }
-                logger.info(new Date(), ' Email sent: ', msgContent);
             });
-        } else {
-            logger.info(
-                new Date(),
-                'not sending email in debug mode',
-                msgContent
-            );
+            var mailOptions = {
+                from: messengerInfo.gmailUsername,
+                to: alertInfo.email,
+                subject: 'Garge Monitor!',
+                text: msgContent
+            };
+            if (!debugMode) {
+                transporter.sendMail(mailOptions, function(error, info) {
+                    if (error) {
+                        return logger.error(error);
+                    }
+                    logger.info(new Date(), ' Email sent: ', msgContent);
+                });
+            } else {
+                logger.info(
+                    new Date(),
+                    'not sending email in debug mode',
+                    msgContent
+                );
+            }
         }
     }
 
