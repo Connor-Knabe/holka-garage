@@ -2,6 +2,7 @@ var messengerInfo = require('../settings/messengerInfo.js');
 const options = require('../settings/options.js');
 var sendPicture = false;
 var garageOpenStatus = null;
+const geoip = require('geoip-lite');
 
 module.exports = function(app, logger, io, debugMode) {
     var iot = require('../services/iot.js')(app, false, debugMode, io, logger);
@@ -30,6 +31,13 @@ module.exports = function(app, logger, io, debugMode) {
             clientIp.includes(options.localIp) ||
             debugMode;
         return isOnVpn;
+    }
+
+    function regionAuth(req) {
+        var clientIp = req.connection.remoteAddress;
+        var geo = geoip.lookup(clientIp);
+        logger.debug(`Region auth from ${geo.region}`);
+        return options.geoIpFilter.includes(geo.region);
     }
     app.get('/', function(req, res) {
         if (auth(req)) {
@@ -89,7 +97,7 @@ module.exports = function(app, logger, io, debugMode) {
 
     app.post('/openOrCloseGarage', function(req, res) {
         logger.debug('body', req.body);
-        if (auth(req) && vpnAuth(req)) {
+        if (auth(req) && (vpnAuth(req) || regionAuth(req))) {
             if (req.body && req.body.garageSwitch == 'open') {
                 if (!iot.garageIsOpen()) {
                     iot.toggleGarageDoor();

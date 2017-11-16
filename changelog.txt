@@ -1,3 +1,4 @@
+v1.0.5 - adding geoip lookup
 v1.0.4 - adding alert if garage open for more than a certain time
 v1.0.3 - major refactor, added options file, formatted files using prettier, adding debug to option.js file
 v1.0.2 - hue integration option to use IFTTT for alerts

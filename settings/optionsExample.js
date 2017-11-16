@@ -12,4 +12,4 @@ module.exports.hueBridgeIp = '192.168.0.31';
 module.exports.hueUser = 'alksdjflKZJDFLKJSDLKFJlkshdflkjsdf';
 module.exports.serverDomain = 'example.com';
 module.exports.garageOpenAlertMins = 15;
-module.exports.geoIpFilter = 'MO';
+module.exports.geoIpFilter = 'FL';

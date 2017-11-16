@@ -1,29 +1,29 @@
 {
-    "name": "holka-garage",
-    "version": "1.0.3",
-    "description":
-        "IoT project running on a Raspberry Pi to open/close a garage door and to see if it's opened or closed.",
-    "main": "app.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "author": "Connor Knabe",
-    "license": "MIT",
-    "dependencies": {
-        "basic-auth-connect": "1.0.0",
-        "body-parser": "1.18.2",
-        "cookie-parser": "1.4.3",
-        "cron": "1.3.0",
-        "express": "4.16.2",
-        "express-session": "1.15.6",
-        "http-proxy-middleware": "0.17.4",
-        "log4js": "2.3.10",
-        "node-hue-api": "2.4.2",
-        "nodemailer": "4.3.1 ",
-        "onoff": "1.1.8",
-        "request": "2.83.0",
-        "request-promise": "4.2.2",
-        "socket.io": "2.0.4",
-        "twilio": "3.9.1"
-    }
+  "name": "holka-garage",
+  "version": "1.0.3",
+  "description": "IoT project running on a Raspberry Pi to open/close a garage door and to see if it's opened or closed.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Connor Knabe",
+  "license": "MIT",
+  "dependencies": {
+    "basic-auth-connect": "1.0.0",
+    "body-parser": "1.18.2",
+    "cookie-parser": "1.4.3",
+    "cron": "1.3.0",
+    "express": "4.16.2",
+    "express-session": "1.15.6",
+    "geoip-lite": "^1.2.1",
+    "http-proxy-middleware": "0.17.4",
+    "log4js": "2.3.10",
+    "node-hue-api": "2.4.2",
+    "nodemailer": "4.3.1 ",
+    "onoff": "1.1.8",
+    "request": "2.83.0",
+    "request-promise": "4.2.2",
+    "socket.io": "2.0.4",
+    "twilio": "3.9.1"
+  }
 }
