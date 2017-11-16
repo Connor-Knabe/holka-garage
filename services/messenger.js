@@ -55,7 +55,7 @@ module.exports = function(logger, debugMode) {
             method: 'POST',
             uri: url,
             body: {
-                value1: messengerInfo.iftttSecret,
+                value1: messengerInfo.iftttValue1,
                 value2: minsOpened
             },
             json: true

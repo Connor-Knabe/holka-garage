@@ -30,14 +30,26 @@ Setup:
 
 2.Get packages installed on RPi <https://github.com/Connor-Knabe/install-scripts>
 
-3.Get a Twilio account (for texting) <https://www.twilio.com/try-twilio>
+3.Rename example files in settings folder.  Note the files (login.js, options.js, messengerInfo.js) are .gitignored.  Be sure to NOT commit these files as they contain sensitive info! If you mistype this command you might accidently commit these if you use version control.  Use command below:
 
-4.Get an IFTTT account (for push notifications) <https://ifttt.com/join>
+    mv optionsExample.js options.js && mv messengerInfoExample.js messengerInfo.js && mv loginExample.js login.js
 
-5.Clone holka-garage repo <https://github.com/Connor-Knabe/holka-garage>
+4.Get a Twilio account (for texting) <https://www.twilio.com/try-twilio>
 
-6.Rename remove example from files in settings folder.  For example mv optionsExample options.js
+    4a. Fill out TWILIO_AUTH_TOKEN and TWILIO_ACCOUNT_SID in messengerInfo.js
 
-7.Fill out information including API keys phone numbers etc in the various setting files
+5.Get an IFTTT account (for push notifications) <https://ifttt.com/join>
 
-8.Use pm2 to start the program
+    5a.Setup a new applet (webhook, receive a request) with the event name that matches the one in messengerInfoExample.js then notification(garage_open_trigger, garage_alert, etc.)
+    5b. Fill out the text such as: {{Value1}} Garage Door Opened or {{Value1}} Garage Door has been open for more than: {{Value2}} minutes!.
+    Value1 = iftttValue1 from the messengerInfoExample.js file
+    Value2 = mins garage has been opened before alert sends.
+    5c.Download and login to the IFTTT mobile app on your phone and turn notifications on.
+
+6.Add your IFTTT API key from <https://ifttt.com/services/maker_webhooks/settings> to the messengerInfo file under iftttRecipients -> ApiKey
+
+7.Clone holka-garage repo <https://github.com/Connor-Knabe/holka-garage>
+
+8.Fill out information including API keys phone numbers etc in the various setting files
+
+9.Use pm2 to start the program

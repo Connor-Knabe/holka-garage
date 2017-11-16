@@ -24,7 +24,7 @@ module.exports.iftttGarageClosedUrl =
 module.exports.iftttGarageOpenAlertUrl =
     'https://maker.ifttt.com/trigger/garage_alert/with/key/';
 
-module.exports.iftttSecret = 'This will be displayed in the notification';
+module.exports.iftttValue1 = 'This will be displayed in the notification';
 
 module.exports.twilioPictureUser =
     'make this a random string like -> alksjdfiajsd0fjsd';
