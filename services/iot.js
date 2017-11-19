@@ -20,14 +20,14 @@ var garageOpened = false;
 var sendPicture = false;
 var garageOpenAlertTimeout = null;
 
-module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
+module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
     var hasBeenOpened = garageIsOpen();
     const messenger = require('./messenger.js')(logger, debugMode);
     const twilioLoginInfo = require('../settings/messengerInfo.js');
     const hue = require('./hue.js')(logger);
     const options = require('../settings/options.js');
 
-    garageSensor.watch(function(err, value) {
+    garageSensor.watch(function (err, value) {
         if (err) {
             logger.error('Error watching garage sensor: ', err);
         }
@@ -38,7 +38,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             hue.garageLightsOn15();
 
             clearTimeout(garageSensorTimeoutOne);
-            garageSensorTimeoutOne = setTimeout(function() {
+            garageSensorTimeoutOne = setTimeout(function () {
                 shouldSendGarageDoorAlertOne = true;
             }, 1 * 60 * 10000);
 
@@ -47,24 +47,19 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                 if (garageIsOpen()) {
                     var garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`;
                     logger.debug(garageAlertMsg);
-                    if (options.garageOpenMinsAlert) {
-                        messenger.send(
-                            twilioLoginInfo.toNumbers,
-                            garageAlertMsg
-                        );
-                    }
-                    messenger.sendIfttGarageOpenedAlert(
+                    messenger.send(options.garageOpenMinsAlert,
+                        twilioLoginInfo.toNumbers,
+                        garageAlertMsg
+                    );
+                    messenger.sendIfttGarageOpenedAlert(options.garageOpenMinsAlert,
                         options.garageOpenAlertMins
                     );
                 }
             }, options.garageOpenAlertMins * 60 * 1000);
 
             if (shouldSendGarageDoorAlertOne) {
-                if (options.alertButtonPressTexts) {
-                    messenger.send(twilioLoginInfo.toNumbers, msg);
-                }
-                messenger.sendIftt(garageOpened);
-
+                messenger.send(options.alertButtonPressTexts, twilioLoginInfo.toNumbers, msg);
+                messenger.sendIftt(options.alertButtonPressTexts, garageOpened);
                 shouldSendGarageDoorAlertOne = false;
             }
             logger.debug(msg);
@@ -80,10 +75,8 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             }, 1 * 60 * 10000);
 
             if (shouldSendGarageDoorAlertTwo) {
-                if (options.alertButtonPressTexts) {
-                    messenger.send(twilioLoginInfo.toNumbers, msg);
-                }
-                messenger.sendIftt(garageOpened);
+                messenger.send(options.alertButtonPressTexts, twilioLoginInfo.toNumbers, msg);
+                messenger.sendIftt(options.alertButtonPressTexts, garageOpened);
                 shouldSendGarageDoorAlertTwo = false;
             }
             logger.debug(msg);
@@ -92,21 +85,21 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
     });
 
     if (enableMotionSensor) {
-        motionSensor.watch(function(err, value) {
+        motionSensor.watch(function (err, value) {
             if (err) {
                 logger.error('Error watching motion sensor: ', err);
             }
             if (value == 1 && !hasSentMotionSensorAlert) {
                 clearTimeout(motionSensorTimeoutOne);
-                motionSensorTimeoutOne = setTimeout(function() {
+                motionSensorTimeoutOne = setTimeout(function () {
                     hasSentMotionSensorAlert = true;
                 }, 2 * 60 * 1000);
                 var msg = 'Motion detected in garage';
                 logger.debug(msg);
-                messenger.send(twilioLoginInfo.toNumbers, msg);
+                messenger.send(options.alertMotionSensor, twilioLoginInfo.toNumbers, msg);
             } else if (value == 0 && hasSentMotionSensorAlert) {
                 clearTimeout(motionSensorTimeoutTwo);
-                motionSensorTimeoutTwo = setTimeout(function() {
+                motionSensorTimeoutTwo = setTimeout(function () {
                     hasSentMotionSensorAlert = false;
                 }, 2 * 60 * 1000);
             }
@@ -123,20 +116,20 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
         if (!debugMode) {
             logger.debug('opening/closing now');
             garageSwitch.writeSync(1);
-            garageTimeout = setTimeout(function() {
+            garageTimeout = setTimeout(function () {
                 garageSwitch.writeSync(0);
             }, 1000);
         }
     }
 
-    io.on('connection', function(socket) {
+    io.on('connection', function (socket) {
         sockets[socket.id] = socket;
         logger.info('Total clients connected : ', Object.keys(sockets).length);
         io.sockets.emit('clients', Object.keys(sockets).length);
 
         hue.garageLightsOn15();
 
-        socket.on('disconnect', function() {
+        socket.on('disconnect', function () {
             delete sockets[socket.id];
             logger.info(
                 'Client Disconnected, total clients connected : ',
@@ -149,7 +142,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
         } else {
             io.sockets.emit('garageStatus', 'closed');
         }
-        socket.on('start-stream', function() {
+        socket.on('start-stream', function () {
             startStreaming(io);
         });
     });
@@ -198,8 +191,8 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
         logger.debug('Watching for changes...');
         app.set('watchingFile', true);
 
-        fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
-            fs.stat('./stream/image_stream.jpg', function(err, stats) {
+        fs.watchFile('./stream/image_stream.jpg', function (current, previous) {
+            fs.stat('./stream/image_stream.jpg', function (err, stats) {
                 if (stats) {
                     var mtime = new Date(stats.mtime);
                     io.sockets.emit('liveStreamDate', mtime.toString());

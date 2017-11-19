@@ -21,7 +21,7 @@ var basicAuth = require('basic-auth-connect');
 
 app.use(cookieParser());
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     if (!req.secure) {
         return res.redirect(['https://', req.get('Host'), req.url].join(''));
     }
@@ -61,7 +61,7 @@ app.use(
     })
 );
 
-httpsServer.listen(443, function() {
+httpsServer.listen(443, function () {
     logger.info('listening on *:', 443);
 });
 
@@ -69,7 +69,7 @@ httpsServer.listen(443, function() {
 var port = 80;
 logger.level = 'debug';
 var enableMotionSensor = false;
-http.listen(port, function() {
+http.listen(port, function () {
     logger.info('listening on *:', port);
 });
 

@@ -24,16 +24,16 @@ module.exports = function(logger, debugMode) {
         }
     }
 
-    function sendIfttGarageOpenedAlert(minsOpened) {
-        if (options.enableIfttt) {
-            for (var i = 0; i < messengerInfo.iftttRecipients.length; i++) {
+    function sendIfttGarageOpenedAlert(shouldSend = true, minsOpened) {
+	    if(shouldSend && options.enableIfttt){
+		    for (var i = 0; i < messengerInfo.iftttRecipients.length; i++) {
                 requestIfttt(
                     null,
                     messengerInfo.iftttRecipients[i].ApiKey,
                     minsOpened
                 );
-            }
-        }
+            }   
+	    }
     }
 
     function requestIfttt(garageOpened, apiKey, minsOpened) {
@@ -70,7 +70,12 @@ module.exports = function(logger, debugMode) {
             });
     }
 
-    function send(numbers, msgContent, sendPicture = false, btnPress = false) {
+    function send(shouldSend = true, numbers, msgContent, sendPicture = false, btnPress = false) {
+	    
+	    if(!shouldSend){
+		    return;
+	    }
+	    
         clearTimeout(messageTimeout);
         messageTimeout = setTimeout(function() {
             messageCount = 0;
@@ -87,9 +92,7 @@ module.exports = function(logger, debugMode) {
                 }
                 if (numbers[i].number) {
                     logger.debug('number', numbers[i].number);
-                    if (options.generalTexts) {
-                        sendText(numbers[i], msgContent, sendPicture);
-                    } else if (options.alertButtonPressTexts && btnPress) {
+                    if (options.generalTexts || (options.alertButtonPressTexts && btnPress)) {
                         sendText(numbers[i], msgContent, sendPicture);
                     } else {
                         logger.debug(

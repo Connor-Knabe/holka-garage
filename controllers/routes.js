@@ -1,10 +1,9 @@
 var messengerInfo = require('../settings/messengerInfo.js');
 const options = require('../settings/options.js');
-var sendPicture = false;
 var garageOpenStatus = null;
 const geoip = require('geoip-lite');
 
-module.exports = function(app, logger, io, debugMode) {
+module.exports = function (app, logger, io, debugMode) {
     var iot = require('../services/iot.js')(app, false, debugMode, io, logger);
 
     var securityMsgTimeout = null;
@@ -39,7 +38,7 @@ module.exports = function(app, logger, io, debugMode) {
         logger.debug(`Region auth from ${geo.region}`);
         return options.geoIpFilter.includes(geo.region);
     }
-    app.get('/', function(req, res) {
+    app.get('/', function (req, res) {
         if (auth(req)) {
             res.sendFile('admin.html', { root: './views/' });
         } else {
@@ -47,9 +46,9 @@ module.exports = function(app, logger, io, debugMode) {
         }
     });
 
-    app.get('/stream/image_stream.jpg', function(req, res) {
+    app.get('/stream/image_stream.jpg', function (req, res) {
         if (auth(req)) {
-            fs.readFile('./stream/image_stream.jpg', function(err, data) {
+            fs.readFile('./stream/image_stream.jpg', function (err, data) {
                 if (err) logger.error('failed to read image stream', err); // Fail if the file can't be read.
                 res.writeHead(200, { 'Content-Type': 'image/jpeg' });
                 res.end(data); // Send the file data to the browser.
@@ -64,15 +63,15 @@ module.exports = function(app, logger, io, debugMode) {
         }
     });
 
-    app.get('/pictures', function(req, res) {
-        fs.readFile('./stream/image_stream.jpg', function(err, data) {
+    app.get('/pictures', function (req, res) {
+        fs.readFile('./stream/image_stream.jpg', function (err, data) {
             if (err) logger.error('error reading image_stream', err); // Fail if the file can't be read.
             res.writeHead(200, { 'Content-Type': 'image/jpeg' });
             res.end(data); // Send the file data to the browser.
         });
     });
 
-    app.post('/', function(req, res) {
+    app.post('/', function (req, res) {
         if (
             req.body.username &&
             req.body.username.toLowerCase() === login.username.toLowerCase() &&
@@ -95,7 +94,7 @@ module.exports = function(app, logger, io, debugMode) {
         }
     });
 
-    app.post('/openOrCloseGarage', function(req, res) {
+    app.post('/openOrCloseGarage', function (req, res) {
         logger.debug('body', req.body);
         if (auth(req) && (vpnAuth(req) || regionAuth(req))) {
             if (req.body && req.body.garageSwitch == 'open') {
@@ -105,12 +104,11 @@ module.exports = function(app, logger, io, debugMode) {
                     iot.updateGarageStatus(garageOpenStatus);
                     io.sockets.emit('garageOpenStatus', garageOpenStatus);
                     var msg = garageOpenStatus + ' garage via button';
-                    sendPicture = true;
                     var btnPress = true;
-                    messenger.send(
+                    messenger.send(options.alertButtonPressTexts,
                         messengerInfo.toNumbers,
                         msg,
-                        sendPicture,
+                        options.alertSendPictureText,
                         btnPress
                     );
                     io.sockets.emit('garageErrorStatus', null);
@@ -127,12 +125,11 @@ module.exports = function(app, logger, io, debugMode) {
                     iot.updateGarageStatus(garageOpenStatus);
                     io.sockets.emit('garageOpenStatus', garageOpenStatus);
                     var msg = garageOpenStatus + ' garage via button';
-                    sendPicture = true;
                     var btnPress = true;
-                    messenger.send(
+                    messenger.send(options.alertButtonPressTexts,
                         messengerInfo.toNumbers,
                         msg,
-                        sendPicture,
+                        options.alertSendPictureText,
                         btnPress
                     );
                     io.sockets.emit('garageErrorStatus', null);
@@ -164,16 +161,17 @@ module.exports = function(app, logger, io, debugMode) {
                 req.connection.remoteAddress;
 
             clearTimeout(securityMsgTimeout);
-            securityMsgTimeout = setTimeout(function() {
+            securityMsgTimeout = setTimeout(function () {
                 shouldSendSecurityAlert = true;
             }, hoursToWaitBeforeNextSecurityAlert * 60 * 60 * 10000);
-
+            var btnPress = true;
             if (shouldSendSecurityAlert) {
-                sendPicture = true;
-                messenger.send(
+                logger.debug('alerttt');
+                messenger.send(true,
                     messengerInfo.toNumbers,
                     securityMsg,
-                    sendPicture
+                    options.alertSendPictureText,
+                    btnPress
                 );
                 shouldSendSecurityAlert = false;
             }
