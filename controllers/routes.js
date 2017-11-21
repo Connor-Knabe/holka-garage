@@ -166,7 +166,6 @@ module.exports = function (app, logger, io, debugMode) {
             }, hoursToWaitBeforeNextSecurityAlert * 60 * 60 * 10000);
             var btnPress = true;
             if (shouldSendSecurityAlert) {
-                logger.debug('alerttt');
                 messenger.send(true,
                     messengerInfo.toNumbers,
                     securityMsg,

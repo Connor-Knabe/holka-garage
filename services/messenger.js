@@ -128,7 +128,7 @@ module.exports = function(logger, debugMode) {
                 };
                 textTimeout = messengerInfo.photoTextTiemeoutSeconds;
             }
-            logger.info('timeout', textTimeout);
+            logger.debug('timeout', textTimeout);
 
             setTimeout(function() {
                 client.messages.create(twilioRequestObj, function(

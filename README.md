@@ -52,4 +52,5 @@ Setup:
 
 8.Fill out information including API keys phone numbers etc in the various setting files
 
-9.Use pm2 to start the program
+9.Use pm2 to start the program using the following command
+    sudo pm2 start app.js --name hg && pm2 startup && pm2 --save
