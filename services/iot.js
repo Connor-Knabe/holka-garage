@@ -37,7 +37,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             hue.garageLightsOn15();
 
             clearTimeout(garageSensorTimeoutOne);
-            garageSensorTimeoutOne = setTimeout(function() {
+            garageSensorTimeoutOne = setTimeout(() => {
                 shouldSendGarageDoorAlertOne = true;
             }, 1 * 60 * 10000);
 

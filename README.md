@@ -11,6 +11,7 @@ Features:
 Coming soon:
 
 * Open garage via GPS
+* Wire diagram
 
 Required for setup:
 
