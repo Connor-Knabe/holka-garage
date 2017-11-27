@@ -28,7 +28,8 @@ module.exports = function (app, logger, io, debugMode) {
         var isOnVpn =
             clientIp.includes(options.vpnIp) ||
             clientIp.includes(options.localIp) ||
-            debugMode;
+            debugMode || 
+            (options.vpnIp ==='' && options.localIp==='');
         return isOnVpn;
     }
 
@@ -36,7 +37,7 @@ module.exports = function (app, logger, io, debugMode) {
         var clientIp = req.connection.remoteAddress;
         var geo = geoip.lookup(clientIp);
         logger.debug(`Region auth from ${geo.region}`);
-        return options.geoIpFilter.includes(geo.region);
+        return options.geoIpFilter.includes(geo.region) || options.geoIpFilter==='';
     }
     app.get('/', function (req, res) {
         if (auth(req)) {

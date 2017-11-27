@@ -55,3 +55,15 @@ Setup:
 
 9.Use pm2 to start the program using the following command
     sudo pm2 start app.js --name hg && pm2 startup && pm2 --save
+
+10.Setup a domain name and point it to your external ip address.
+
+11.Install ssl certificate <https://github.com/certbot/certbot>
+
+12.Change the sslPath variable in login.js to the location of your certificate.
+
+13.Visting https://yourdomain.com should pull up the website.
+
+14.If you've entered geoIpFilter in options.js it will limit ip addresses within those state abbreviations (comma separated) to open the garage door.
+
+15.If you've entered values for vpnIp or localIp it will only allow an ip address from those ip's to open the garage door
