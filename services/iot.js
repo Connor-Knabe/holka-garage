@@ -118,9 +118,8 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
     }
 
     function toggleGarageDoor() {
-        logger.debug('toggling now');
         if (!debugMode) {
-            logger.debug('opening/closing now');
+            logger.debug('Opening/closing door now');
             garageSwitch.writeSync(1);
             garageTimeout = setTimeout(function() {
                 garageSwitch.writeSync(0);
@@ -143,14 +142,17 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             );
             stopStreaming();
         });
+
         if (garageIsOpen()) {
             io.sockets.emit('garageStatus', 'open');
         } else {
             io.sockets.emit('garageStatus', 'closed');
         }
+
         socket.on('start-stream', function() {
             startStreaming(io);
         });
+
     });
 
     function stopStreaming() {
