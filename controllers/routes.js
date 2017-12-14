@@ -39,6 +39,7 @@ module.exports = function (app, logger, io, debugMode) {
         logger.debug(`Region auth from ${geo.region}`);
         return options.geoIpFilter.includes(geo.region) || options.geoIpFilter==='';
     }
+
     app.get('/', function (req, res) {
         if (auth(req)) {
             res.sendFile('admin.html', { root: './views/' });
@@ -46,6 +47,17 @@ module.exports = function (app, logger, io, debugMode) {
             res.sendFile('index.html', { root: './views/' });
         }
     });
+
+    app.get('/.well-known/acme-challenge/xU97cGMktBxWlazVatltHlcbQ47zR5vUeogyHz01QTs', function (req, res) {
+       res.send('xU97cGMktBxWlazVatltHlcbQ47zR5vUeogyHz01QTs.wio9jmyFJmAGffuCTZ9wnTtm4SVP-LrF0phbQ8qLjeQ');
+    });
+
+    app.get('/.well-known/acme-challenge/yLspuv2noUqRcxTsjxVZ802YdAbG7tZIZY0QkfZ9U1U', function (req, res) {
+        res.send('yLspuv2noUqRcxTsjxVZ802YdAbG7tZIZY0QkfZ9U1U.wio9jmyFJmAGffuCTZ9wnTtm4SVP-LrF0phbQ8qLjeQ');
+     });
+    
+
+
 
     app.get('/stream/image_stream.jpg', function (req, res) {
         if (auth(req)) {
@@ -74,9 +86,11 @@ module.exports = function (app, logger, io, debugMode) {
 
     app.post('/', function (req, res) {
         if (
-            req.body.username &&
+            (req.body.username &&
             req.body.username.toLowerCase() === login.username.toLowerCase() &&
-            req.body.password === login.password
+            req.body.password === login.password) || req.body.username2 &&
+            req.body.username2.toLowerCase() === login.username2.toLowerCase() &&
+            req.body.password2 === login.password2
         ) {
             req.session.userInfo = req.body;
             var options = {

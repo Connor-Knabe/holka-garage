@@ -58,7 +58,7 @@ Setup:
 
 10.Setup a domain name and point it to your external ip address.
 
-11.Install ssl certificate <https://github.com/certbot/certbot>
+11.Install ssl certificate <https://github.com/certbot/certbot> use ./certbot-auto certonly --manual --email admin@example.com -d example.com -d www.example.com -d other.example.net note you will need to make sure app.js is running and add a route to routes.js with the specified info to verify this.
 
 12.Change the sslPath variable in login.js to the location of your certificate.
 
