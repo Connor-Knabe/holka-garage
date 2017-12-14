@@ -48,15 +48,23 @@ module.exports = function (app, logger, io, debugMode) {
         }
     });
 
-    app.get('/.well-known/acme-challenge/xU97cGMktBxWlazVatltHlcbQ47zR5vUeogyHz01QTs', function (req, res) {
-       res.send('xU97cGMktBxWlazVatltHlcbQ47zR5vUeogyHz01QTs.wio9jmyFJmAGffuCTZ9wnTtm4SVP-LrF0phbQ8qLjeQ');
+
+    //Used to verify letsencrypt manually
+    app.get('/.well-known/acme-challenge/KK3s1rtB4iIj8EI7UgjYOSeFedprbxA5yWfNDhjWz_w', function (req, res) {
+       res.send('KK3s1rtB4iIj8EI7UgjYOSeFedprbxA5yWfNDhjWz_w.wio9jmyFJmAGffuCTZ9wnTtm4SVP-LrF0phbQ8qLjeQ');
     });
 
-    app.get('/.well-known/acme-challenge/yLspuv2noUqRcxTsjxVZ802YdAbG7tZIZY0QkfZ9U1U', function (req, res) {
-        res.send('yLspuv2noUqRcxTsjxVZ802YdAbG7tZIZY0QkfZ9U1U.wio9jmyFJmAGffuCTZ9wnTtm4SVP-LrF0phbQ8qLjeQ');
+    app.get('/.well-known/acme-challenge/vXJyQUpLUcMICVjccqxQ3Z8naTGXxMY36HnWPYgIRdY', function (req, res) {
+        res.send('vXJyQUpLUcMICVjccqxQ3Z8naTGXxMY36HnWPYgIRdY.wio9jmyFJmAGffuCTZ9wnTtm4SVP-LrF0phbQ8qLjeQ');
      });
-    
+     
 
+     app.get('/.well-known/acme-challenge/cinImn8fKBlQUENMfuKdEPljBgJxNy2nEGEiNzkgHB0', function (req, res) {
+        res.send('cinImn8fKBlQUENMfuKdEPljBgJxNy2nEGEiNzkgHB0.wio9jmyFJmAGffuCTZ9wnTtm4SVP-LrF0phbQ8qLjeQ');
+     });
+     app.get('/.well-known/acme-challenge/PdzdYzoSD8AvGLw-d3ijXuEdXNTXr-6dHykbWtT207Y', function (req, res) {
+        res.send('PdzdYzoSD8AvGLw-d3ijXuEdXNTXr-6dHykbWtT207Y.wio9jmyFJmAGffuCTZ9wnTtm4SVP-LrF0phbQ8qLjeQ');
+     });
 
 
     app.get('/stream/image_stream.jpg', function (req, res) {
@@ -88,9 +96,9 @@ module.exports = function (app, logger, io, debugMode) {
         if (
             (req.body.username &&
             req.body.username.toLowerCase() === login.username.toLowerCase() &&
-            req.body.password === login.password) || req.body.username2 &&
-            req.body.username2.toLowerCase() === login.username2.toLowerCase() &&
-            req.body.password2 === login.password2
+            req.body.password === login.password) || req.body.username &&
+            req.body.username.toLowerCase() === login.username2.toLowerCase() &&
+            req.body.password === login.password2
         ) {
             req.session.userInfo = req.body;
             var options = {
