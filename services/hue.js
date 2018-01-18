@@ -9,10 +9,10 @@ var HueApi = hue.HueApi,
     api = new HueApi(host, username),
     state = lightState.create(),
     lightsOffTimeout = null,
-    lightsOff5Timeout = null;
+    lightsOffTimedTimeout = null;
 
 module.exports = function(logger) {
-    function garageLightsOn15() {
+    function garageLightsOnTimed() {
         if (options.enableHue) {
             lightsOn();
             logger.debug(
@@ -41,13 +41,12 @@ module.exports = function(logger) {
         logger.debug(result);
     };
 
-    function garageLightsOff5() {
-        logger.debug('Lights turning off in 5 min');
-
-        clearTimeout(lightsOff5Timeout);
-        lightsOff5Timeout = setTimeout(function() {
+    function garageLightsOffTimed() {
+        logger.debug(`Lights turning off in ${options.garageLightTimeoutMins} mins`);
+        clearTimeout(lightsOffTimedTimeout);
+        lightsOffTimedTimeout = setTimeout(function() {
             lightsOff();
-        }, 5 * 60 * 1000);
+        }, options.garageLightTimeoutMins * 60 * 1000);
     }
 
     function garageLightsOnOff(toggleOn) {
@@ -86,12 +85,7 @@ module.exports = function(logger) {
 
     return {
         garageLightsOnOff: garageLightsOnOff,
-        garageLightsOn15: garageLightsOn15,
-        garageLightsOff5: garageLightsOff5
-    };
-
-    return {
-        garageLightsOnOff: garageLightsOnOff,
-        garageLightsOn15: garageLightsOn15
+        garageLightsOnTimed: garageLightsOnTimed,
+        garageLightsOffTimed: garageLightsOffTimed
     };
 };

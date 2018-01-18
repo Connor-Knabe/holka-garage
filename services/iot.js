@@ -1,3 +1,5 @@
+import { setTimeout } from 'timers';
+
 var sockets = {};
 var Gpio = require('onoff').Gpio;
 var spawn = require('child_process').spawn;
@@ -18,7 +20,7 @@ var garageSensorTimeoutTwo = null;
 var raspistillProc;
 var garageOpened = false;
 var garageOpenAlertTimeout = null;
-
+var garageOpenAlertMessageTimeout = null;
 module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
     var hasBeenOpened = garageIsOpen();
     const messenger = require('./messenger.js')(logger, debugMode);
@@ -34,7 +36,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             hasBeenOpened = true;
             garageOpened = true;
             var msg = 'Garage door opened';
-            hue.garageLightsOn15();
+            hue.garageLightsOnTimed();
 
             clearTimeout(garageSensorTimeoutOne);
             garageSensorTimeoutOne = setTimeout(() => {
@@ -44,20 +46,24 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             clearTimeout(garageOpenAlertTimeout);
             garageOpenAlertTimeout = setTimeout(() => {
                 if (garageIsOpen()) {
-                    var garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`;
-                    logger.debug(garageAlertMsg);
-                    if (options.garageOpenMinsAlert) {
 
-                        messenger.send(
-                            options.alertButtonPressTexts,
-                            messengerInfo.toNumbers,
-                            garageAlertMsg,
-                            options.alertSendPictureText,
-                            true);
-                    }
-                    messenger.sendIfttGarageOpenedAlert(
-                        options.garageOpenAlertMins
-                    );
+                    startCamera();
+                    garageOpenAlertMessageTimeout = setTimeout(() => {
+                        var garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`;
+                        logger.debug(garageAlertMsg);
+                        if (options.garageOpenMinsAlert) {
+                            messenger.send(
+                                options.alertButtonPressTexts,
+                                messengerInfo.toNumbers,
+                                garageAlertMsg,
+                                options.alertSendPictureText,
+                                true);
+                        }
+                        messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert,
+                            options.garageOpenAlertMins
+                        );
+                        stopStreaming();
+                    },30*1000);
                 }
             }, options.garageOpenAlertMins * 60 * 1000);
 
@@ -75,7 +81,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             hasBeenOpened = false;
             garageOpened = false;
             var msg = 'Garage door closed';
-            hue.garageLightsOn15();
+            hue.garageLightsOnTimed();
             clearTimeout(garageSensorTimeoutTwo);
             garageSensorTimeoutTwo = setTimeout(() => {
                 shouldSendGarageDoorAlertTwo = true;
@@ -135,7 +141,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
         logger.info('Total clients connected : ', Object.keys(sockets).length);
         io.sockets.emit('clients', Object.keys(sockets).length);
 
-        hue.garageLightsOn15();
+        hue.garageLightsOnTimed();
 
         socket.on('disconnect', function() {
             delete sockets[socket.id];
@@ -143,6 +149,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                 'Client Disconnected, total clients connected : ',
                 Object.keys(sockets).length
             );
+            hue.garageLightsOffTimed();
             stopStreaming();
         });
 
@@ -161,27 +168,15 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
     function stopStreaming() {
         // no more sockets, kill the stream
         if (Object.keys(sockets).length === 0) {
-            var lightOn = false;
-            hue.garageLightsOff5(lightOn);
             app.set('watchingFile', false);
             if (raspistillProc) raspistillProc.kill();
             fs.unwatchFile('./stream/image_stream.jpg');
         }
     }
 
-    function updateGarageStatus(status) {
-        garageOpenStatus = status;
-        return;
-    }
+    function startCamera(){
+        hue.garageLightsOnTimed();
 
-    function startStreaming(io) {
-        if (app.get('watchingFile')) {
-            io.sockets.emit(
-                'liveStream',
-                '/stream/image_stream.jpg?_t=' + Math.random() * 100000
-            );
-            return;
-        }
         var args = [
             '-w',
             '800',
@@ -199,9 +194,25 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             'night'
         ];
         raspistillProc = spawn('raspistill', args);
-        logger.debug('Watching for changes...');
+        logger.debug('Starting camera...');
         app.set('watchingFile', true);
+    }
 
+    function updateGarageStatus(status) {
+        garageOpenStatus = status;
+        return;
+    }
+
+    function startStreaming(io) {
+        if (app.get('watchingFile')) {
+            io.sockets.emit(
+                'liveStream',
+                '/stream/image_stream.jpg?_t=' + Math.random() * 100000
+            );
+            return;
+        }
+        startCamera();
+        logger.debug('Watching for changes...');
         fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
             fs.stat('./stream/image_stream.jpg', function(err, stats) {
                 if (stats) {
