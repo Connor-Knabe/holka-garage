@@ -1,5 +1,3 @@
-import { setTimeout } from 'timers';
-
 var sockets = {};
 var Gpio = require('onoff').Gpio;
 var spawn = require('child_process').spawn;
