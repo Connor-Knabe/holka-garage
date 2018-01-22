@@ -67,7 +67,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
 
             if (shouldSendGarageDoorAlertOne) {
                 if (options.alertButtonPressTexts) {
-                    messenger.send(messengerInfo.toNumbers, msg);
+                    messenger.send(true,messengerInfo.toNumbers, msg, false, false);
                 }
                 messenger.sendIftt(garageOpened);
 
@@ -87,7 +87,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
 
             if (shouldSendGarageDoorAlertTwo) {
                 if (options.alertButtonPressTexts) {
-                    messenger.send(messengerInfo.toNumbers, msg);
+                    messenger.send(true,messengerInfo.toNumbers, msg, false, false);
                 }
                 messenger.sendIftt(garageOpened);
                 shouldSendGarageDoorAlertTwo = false;
@@ -109,7 +109,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                 }, 2 * 60 * 1000);
                 var msg = 'Motion detected in garage';
                 logger.debug(msg);
-                messenger.send(messengerInfo.toNumbers, msg);
+                messenger.send(true,messengerInfo.toNumbers, msg, false, false);
             } else if (value == 0 && hasSentMotionSensorAlert) {
                 clearTimeout(motionSensorTimeoutTwo);
                 motionSensorTimeoutTwo = setTimeout(function() {
@@ -215,11 +215,12 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             fs.stat('./stream/image_stream.jpg', function(err, stats) {
                 if (stats) {
                     var mtime = new Date(stats.mtime);
-                    io.sockets.emit('liveStreamDate', mtime.toString());
                     io.sockets.emit(
                         'liveStream',
                         '/stream/image_stream.jpg?_t=' + Math.random() * 100000
                     );
+                    io.sockets.emit('liveStreamDate', mtime.toString());
+
                     if (garageIsOpen()) {
                         if (garageOpenStatus == 'Opening...') {
                             logger.debug('status', garageOpenStatus);

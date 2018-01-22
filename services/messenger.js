@@ -1,17 +1,20 @@
-var messageTimeout = null;
-var messageCount = 0;
-const twilio = require('twilio');
-const messengerInfo = require('../settings/messengerInfo.js');
-const login = require('../settings/login.js');
-const rp = require('request-promise');
-const options = require('../settings/options.js');
-const nodemailer = require('nodemailer');
-const client = twilio(
-    messengerInfo.TWILIO_ACCOUNT_SID,
-    messengerInfo.TWILIO_AUTH_TOKEN
-);
-var minsOpened = 0;
+
 module.exports = function(logger, debugMode) {
+    var messageTimeout = null;
+    var messageCount = 0;
+    // @ts-ignore
+    const twilio = require('twilio');
+
+    const messengerInfo = require('../settings/messengerInfo.js');
+    const login = require('../settings/login.js');
+    const rp = require('request-promise');
+    const options = require('../settings/options.js');
+    const nodemailer = require('nodemailer');
+    const client = twilio(
+        messengerInfo.TWILIO_ACCOUNT_SID,
+        messengerInfo.TWILIO_AUTH_TOKEN
+    );
+    var minsOpened = 0;
     function sendIftt(garageOpened) {
         if (options.enableIfttt) {
             for (var i = 0; i < messengerInfo.iftttRecipients.length; i++) {

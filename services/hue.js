@@ -1,4 +1,5 @@
 var login = require('../settings/login.js'),
+    // @ts-ignore
     hue = require('node-hue-api'),
     options = require('../settings/options.js');
 
