@@ -2,6 +2,7 @@ var sockets = {};
 var Gpio = require('onoff').Gpio;
 var spawn = require('child_process').spawn;
 var fs = require('fs');
+var path = require('path');
 
 var motionSensor = new Gpio(15, 'in', 'both');
 var garageSensor = new Gpio(4, 'in', 'both');
@@ -16,15 +17,19 @@ var shouldSendGarageDoorAlertTwo = true;
 var garageSensorTimeoutOne = null;
 var garageSensorTimeoutTwo = null;
 var raspistillProc;
+var convertProc;
 var garageOpened = false;
 var garageOpenAlertTimeout = null;
 var garageOpenAlertMessageTimeout = null;
+var pictureCounter = 0;
+
 module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
     var hasBeenOpened = garageIsOpen();
     const messenger = require('./messenger.js')(logger, debugMode);
     const messengerInfo = require('../settings/messengerInfo.js');
     const hue = require('./hue.js')(logger);
     const options = require('../settings/options.js');
+    app.set('takingVideo', false);
 
     garageSensor.watch(function(err, value) {
         if (err) {
@@ -44,30 +49,42 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             clearTimeout(garageOpenAlertTimeout);
             garageOpenAlertTimeout = setTimeout(() => {
                 if (garageIsOpen()) {
-
                     startCamera();
                     garageOpenAlertMessageTimeout = setTimeout(() => {
-                        var garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`;
+                        var garageAlertMsg = `Garage has been open for more than: ${
+                            options.garageOpenAlertMins
+                        } minutes!`;
                         logger.debug(garageAlertMsg);
                         if (options.garageOpenMinsAlert) {
-                            messenger.send(
-                                options.alertButtonPressTexts,
-                                messengerInfo.toNumbers,
-                                garageAlertMsg,
-                                options.alertSendPictureText,
-                                true);
+                            streamVideo().then(() => {
+                                messenger.send(
+                                    options.alertButtonPressTexts,
+                                    messengerInfo.toNumbers,
+                                    garageAlertMsg,
+                                    options.alertSendPictureText,
+                                    true
+                                );
+                            });
                         }
-                        messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert,
+                        messenger.sendIfttGarageOpenedAlert(
+                            options.iftttSendGarageOpenAlert,
                             options.garageOpenAlertMins
                         );
+                        app.set('takingVideo', false);
                         stopStreaming();
-                    },30*1000);
+                    }, 30 * 1000);
                 }
             }, options.garageOpenAlertMins * 60 * 1000);
 
             if (shouldSendGarageDoorAlertOne) {
                 if (options.alertButtonPressTexts) {
-                    messenger.send(true,messengerInfo.toNumbers, msg, false, false);
+                    messenger.send(
+                        true,
+                        messengerInfo.toNumbers,
+                        msg,
+                        false,
+                        false
+                    );
                 }
                 messenger.sendIftt(garageOpened);
 
@@ -87,7 +104,13 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
 
             if (shouldSendGarageDoorAlertTwo) {
                 if (options.alertButtonPressTexts) {
-                    messenger.send(true,messengerInfo.toNumbers, msg, false, false);
+                    messenger.send(
+                        true,
+                        messengerInfo.toNumbers,
+                        msg,
+                        false,
+                        false
+                    );
                 }
                 messenger.sendIftt(garageOpened);
                 shouldSendGarageDoorAlertTwo = false;
@@ -109,7 +132,13 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                 }, 2 * 60 * 1000);
                 var msg = 'Motion detected in garage';
                 logger.debug(msg);
-                messenger.send(true,messengerInfo.toNumbers, msg, false, false);
+                messenger.send(
+                    true,
+                    messengerInfo.toNumbers,
+                    msg,
+                    false,
+                    false
+                );
             } else if (value == 0 && hasSentMotionSensorAlert) {
                 clearTimeout(motionSensorTimeoutTwo);
                 motionSensorTimeoutTwo = setTimeout(function() {
@@ -160,21 +189,20 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
         socket.on('start-stream', function() {
             startStreaming(io);
         });
-
     });
 
     function stopStreaming() {
         // no more sockets, kill the stream
-        if (Object.keys(sockets).length === 0) {
+        if (Object.keys(sockets).length === 0 && !app.get('takingVideo')) {
             app.set('watchingFile', false);
             if (raspistillProc) raspistillProc.kill();
             fs.unwatchFile('./stream/image_stream.jpg');
         }
     }
 
-    function startCamera(){
+    function startCamera() {
         hue.garageLightsOnTimed();
-
+        // streamVideo();
         var args = [
             '-w',
             '800',
@@ -192,6 +220,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             'night'
         ];
         raspistillProc = spawn('raspistill', args);
+
         logger.debug('Starting camera...');
         app.set('watchingFile', true);
     }
@@ -220,7 +249,6 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                         '/stream/image_stream.jpg?_t=' + Math.random() * 100000
                     );
                     io.sockets.emit('liveStreamDate', mtime.toString());
-
                     if (garageIsOpen()) {
                         if (garageOpenStatus == 'Opening...') {
                             logger.debug('status', garageOpenStatus);
@@ -240,7 +268,115 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
         });
     }
 
+    function streamVideo() {
+        return new Promise(function(resolve, reject) {
+            pictureCounter = 0;
+            logger.debug('streaming video');
+            deleteStream();
+
+            if (!app.get('takingVideo')) {
+                app.set('takingVideo', true);
+                fs.watchFile('./stream/image_stream.jpg', function(
+                    current,
+                    previous
+                ) {
+                    fs.stat('./stream/image_stream.jpg', function(err, stats) {
+                        if (stats && app.get('takingVideo')) {
+                            var mtime = new Date(stats.mtime);
+                            logger.debug('stats', stats.mtime);
+                            logger.debug('picture counter', pictureCounter);
+                            fs
+                                .createReadStream('./stream/image_stream.jpg')
+                                .pipe(
+                                    fs.createWriteStream(
+                                        './stream/video/' +
+                                            pictureCounter++ +
+                                            '.jpg'
+                                    )
+                                );
+
+                            if (pictureCounter > 5) {
+                                logger.debug('count greater than 5');
+                                var args = [
+                                    '-loop',
+                                    '0',
+                                    './stream/video/*.jpg',
+                                    '-resize',
+                                    '100%',
+                                    './stream/video.gif'
+                                ];
+
+                                convertProc = spawn('convert', args);
+
+                                convertProc.stdout.on('data', data => {
+                                    logger.debug(`stdout: ${data}`);
+                                });
+
+                                convertProc.stderr.on('data', data => {
+                                    logger.error(`stderr: ${data}`);
+                                });
+                                convertProc.on('exit', () => {
+                                    pictureCounter = 0;
+                                    deleteStream();
+                                    app.set('takingVideo', false);
+                                    resolve();
+                                });
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    }
+
+    function rmDir(dirPath) {
+        try {
+            var files = fs.readdirSync(dirPath);
+        } catch (e) {
+            return;
+        }
+        if (files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                var filePath = dirPath + '/' + files[i];
+                if (fs.statSync(filePath).isFile()) {
+                    fs.unlinkSync(filePath);
+                } else {
+                    rmDir(filePath);
+                }
+            }
+        }
+    }
+
+    function deleteStream() {
+        if (convertProc) convertProc.kill();
+        console.log('deleteing stream');
+        var directory = './stream/video/';
+        rmDir(directory);
+    }
+
+    //testVideo();
+    function testVideo() {
+        startCamera();
+        console.log('about to stream video');
+
+        streamVideo().then(() => {
+            console.log('done streaming video');
+        });
+        console.log('taking video');
+        app.set('takingVideo', true);
+        var garageAlertMsg = `test gif`;
+        logger.debug(garageAlertMsg);
+        messenger.send(
+            options.alertButtonPressTexts,
+            messengerInfo.toTestNumbers,
+            garageAlertMsg,
+            options.alertSendPictureText,
+            true
+        );
+    }
+
     return {
+        streamVideo: streamVideo,
         garageIsOpen: garageIsOpen,
         toggleGarageDoor: toggleGarageDoor,
         updateGarageStatus: updateGarageStatus

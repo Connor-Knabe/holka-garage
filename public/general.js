@@ -24,4 +24,14 @@ $(document).ready(function() {
             }
         });
     });
+    $('#video').click(function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '/video',
+            success: function(result) {
+                $('#status').html(result);
+            }
+        });
+    });
 });

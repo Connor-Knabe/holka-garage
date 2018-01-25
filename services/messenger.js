@@ -1,8 +1,6 @@
-
 module.exports = function(logger, debugMode) {
     var messageTimeout = null;
     var messageCount = 0;
-    // @ts-ignore
     const twilio = require('twilio');
 
     const messengerInfo = require('../settings/messengerInfo.js');
@@ -28,15 +26,15 @@ module.exports = function(logger, debugMode) {
     }
 
     function sendIfttGarageOpenedAlert(shouldSend = true, minsOpened) {
-	    if(shouldSend && options.enableIfttt){
-		    for (var i = 0; i < messengerInfo.iftttRecipients.length; i++) {
+        if (shouldSend && options.enableIfttt) {
+            for (var i = 0; i < messengerInfo.iftttRecipients.length; i++) {
                 requestIfttt(
                     null,
                     messengerInfo.iftttRecipients[i].ApiKey,
                     minsOpened
                 );
-            }   
-	    }
+            }
+        }
     }
 
     function requestIfttt(garageOpened, apiKey, minsOpened) {
@@ -73,19 +71,28 @@ module.exports = function(logger, debugMode) {
             });
     }
 
-    function send(shouldSend = true, numbers, msgContent, sendPicture = false, btnPress = false) {
-	    
-	    if(!shouldSend){
-		    return;
-	    }
-	    
+    function send(
+        shouldSend = true,
+        numbers,
+        msgContent,
+        sendPicture = false,
+        btnPress = false
+    ) {
+        if (!shouldSend) {
+            return;
+        }
+
         clearTimeout(messageTimeout);
         messageTimeout = setTimeout(function() {
             messageCount = 0;
         }, 1 * 60 * 60 * 1000);
         messageCount++;
         logger.debug(
-            `Sending message? -> msgContent:${msgContent} messageCount:${messageCount} generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress} sendPicture:${sendPicture}`
+            `Sending message? -> msgContent:${msgContent} messageCount:${messageCount} generalTexts:${
+                options.generalTexts
+            }alertButtonPressTexts:${
+                options.alertButtonPressTexts
+            } btnPress:${btnPress} sendPicture:${sendPicture}`
         );
 
         if (numbers && messageCount < 10) {
@@ -95,11 +102,18 @@ module.exports = function(logger, debugMode) {
                 }
                 if (numbers[i].number) {
                     logger.debug('number', numbers[i].number);
-                    if (options.generalTexts || (options.alertButtonPressTexts && btnPress)) {
+                    if (
+                        options.generalTexts ||
+                        (options.alertButtonPressTexts && btnPress)
+                    ) {
                         sendText(numbers[i], msgContent, sendPicture);
                     } else {
                         logger.debug(
-                            `Not sending texts generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress} sendPicture:${sendPicture}`
+                            `Not sending texts generalTexts:${
+                                options.generalTexts
+                            }alertButtonPressTexts:${
+                                options.alertButtonPressTexts
+                            } btnPress:${btnPress} sendPicture:${sendPicture}`
                         );
                     }
                 }
@@ -129,7 +143,7 @@ module.exports = function(logger, debugMode) {
                     body: msgContent,
                     mediaUrl: pictureUrl
                 };
-                textTimeout = messengerInfo.photoTextTiemeoutSeconds;
+                textTimeout = messengerInfo.photoTextTimeoutSeconds;
             }
             logger.debug('timeout', textTimeout);
 

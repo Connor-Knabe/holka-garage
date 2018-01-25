@@ -1,5 +1,4 @@
 var login = require('../settings/login.js'),
-    // @ts-ignore
     hue = require('node-hue-api'),
     options = require('../settings/options.js');
 
@@ -43,7 +42,9 @@ module.exports = function(logger) {
     };
 
     function garageLightsOffTimed() {
-        logger.debug(`Lights turning off in ${options.garageLightTimeoutMins} mins`);
+        logger.debug(
+            `Lights turning off in ${options.garageLightTimeoutMins} mins`
+        );
         clearTimeout(lightsOffTimedTimeout);
         lightsOffTimedTimeout = setTimeout(function() {
             lightsOff();
@@ -69,19 +70,11 @@ module.exports = function(logger) {
     };
 
     function lightsOn() {
-        api
-            .setGroupLightState(8, state.on().brightness(100))
-            .then()
-            .fail(displayError)
-            .done();
+        api.setGroupLightState(8, state.on().brightness(100)).then();
     }
 
     function lightsOff() {
-        api
-            .setGroupLightState(8, state.off())
-            .then()
-            .fail(displayError)
-            .done();
+        api.setGroupLightState(8, state.off()).then();
     }
 
     return {

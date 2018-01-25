@@ -1,10 +1,13 @@
+// @ts-ignore
 var express = require('express');
 var app = express();
+// @ts-ignore
 var http = require('http').Server(app);
 var https = require('https');
 const login = require('./settings/login.js');
 const options = require('./settings/options.js');
 const messengerInfo = require('./settings/messengerInfo.js');
+// @ts-ignore
 const proxy = require('http-proxy-middleware');
 const fs = require('fs');
 
@@ -14,9 +17,13 @@ const sslSettings = {
 };
 
 var path = require('path');
+// @ts-ignore
 var bodyParser = require('body-parser');
+// @ts-ignore
 var session = require('express-session');
+// @ts-ignore
 var cookieParser = require('cookie-parser');
+// @ts-ignore
 var basicAuth = require('basic-auth-connect');
 
 app.use(cookieParser());
@@ -50,7 +57,7 @@ function authChecker(req, res, next) {
 var httpsServer = https.createServer(sslSettings, app);
 
 var io = require('socket.io')(httpsServer);
-
+// @ts-ignore
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 

@@ -12,7 +12,7 @@ module.exports.gmailUsername = 'mygmailsendingemail@gmail.com';
 module.exports.gmailPass = 'mygmailsendingemailPassword';
 module.exports.TWILIO_AUTH_TOKEN = 'authtokenLKAJSLKFDJSSDF';
 module.exports.TWILIO_ACCOUNT_SID = 'accountSIDlkasjdf0jSIDFJ11DF';
-module.exports.photoTextTiemeoutSeconds = 20;
+module.exports.photoTextTimeoutSeconds = 20;
 
 module.exports.iftttRecipients = [
     { Name: 'Connor', ApiKey: 'apiKeylaksdjf09sdjf' }
