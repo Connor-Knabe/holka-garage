@@ -115,7 +115,7 @@ module.exports = function(app, logger, io, debugMode) {
     app.post('/video', function(req, res) {
         io.sockets.emit('garageOpenStatus', 'Recording video');
         iot.streamVideo().then(() => {
-            var msg = 'Testing video';
+            var msg = 'Testing /video';
             var btnPress = true;
             messenger.send(
                 options.alertButtonPressTexts,
@@ -124,7 +124,7 @@ module.exports = function(app, logger, io, debugMode) {
                 options.alertSendPictureText,
                 btnPress
             );
-            io.sockets.emit('garageOpenStatus', null);
+            io.sockets.emit('garageOpenStatus', 'Video sent');
         });
     });
 

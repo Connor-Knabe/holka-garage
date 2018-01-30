@@ -23,7 +23,7 @@ var garageOpenAlertTimeout = null;
 var garageOpenAlertMessageTimeout = null;
 var pictureCounter = 0;
 
-module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
+module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
     var hasBeenOpened = garageIsOpen();
     const messenger = require('./messenger.js')(logger, debugMode);
     const messengerInfo = require('../settings/messengerInfo.js');
@@ -31,7 +31,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
     const options = require('../settings/options.js');
     app.set('takingVideo', false);
 
-    garageSensor.watch(function(err, value) {
+    garageSensor.watch(function (err, value) {
         if (err) {
             logger.error('Error watching garage sensor: ', err);
         }
@@ -53,7 +53,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                     garageOpenAlertMessageTimeout = setTimeout(() => {
                         var garageAlertMsg = `Garage has been open for more than: ${
                             options.garageOpenAlertMins
-                        } minutes!`;
+                            } minutes!`;
                         logger.debug(garageAlertMsg);
                         if (options.garageOpenMinsAlert) {
                             streamVideo().then(() => {
@@ -70,7 +70,6 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                             options.iftttSendGarageOpenAlert,
                             options.garageOpenAlertMins
                         );
-                        app.set('takingVideo', false);
                         stopStreaming();
                     }, 30 * 1000);
                 }
@@ -121,13 +120,13 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
     });
 
     if (enableMotionSensor) {
-        motionSensor.watch(function(err, value) {
+        motionSensor.watch(function (err, value) {
             if (err) {
                 logger.error('Error watching motion sensor: ', err);
             }
             if (value == 1 && !hasSentMotionSensorAlert) {
                 clearTimeout(motionSensorTimeoutOne);
-                motionSensorTimeoutOne = setTimeout(function() {
+                motionSensorTimeoutOne = setTimeout(function () {
                     hasSentMotionSensorAlert = true;
                 }, 2 * 60 * 1000);
                 var msg = 'Motion detected in garage';
@@ -141,7 +140,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                 );
             } else if (value == 0 && hasSentMotionSensorAlert) {
                 clearTimeout(motionSensorTimeoutTwo);
-                motionSensorTimeoutTwo = setTimeout(function() {
+                motionSensorTimeoutTwo = setTimeout(function () {
                     hasSentMotionSensorAlert = false;
                 }, 2 * 60 * 1000);
             }
@@ -157,20 +156,20 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
         if (!debugMode) {
             logger.debug('Opening/closing door now');
             garageSwitch.writeSync(1);
-            garageTimeout = setTimeout(function() {
+            garageTimeout = setTimeout(function () {
                 garageSwitch.writeSync(0);
             }, 1000);
         }
     }
 
-    io.on('connection', function(socket) {
+    io.on('connection', function (socket) {
         sockets[socket.id] = socket;
         logger.info('Total clients connected : ', Object.keys(sockets).length);
         io.sockets.emit('clients', Object.keys(sockets).length);
 
         hue.garageLightsOnTimed();
 
-        socket.on('disconnect', function() {
+        socket.on('disconnect', function () {
             delete sockets[socket.id];
             logger.info(
                 'Client Disconnected, total clients connected : ',
@@ -186,7 +185,7 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
             io.sockets.emit('garageStatus', 'closed');
         }
 
-        socket.on('start-stream', function() {
+        socket.on('start-stream', function () {
             startStreaming(io);
         });
     });
@@ -240,8 +239,8 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
         }
         startCamera();
         logger.debug('Watching for changes...');
-        fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
-            fs.stat('./stream/image_stream.jpg', function(err, stats) {
+        fs.watchFile('./stream/image_stream.jpg', function (current, previous) {
+            fs.stat('./stream/image_stream.jpg', function (err, stats) {
                 if (stats) {
                     var mtime = new Date(stats.mtime);
                     io.sockets.emit(
@@ -269,18 +268,20 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
     }
 
     function streamVideo() {
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             pictureCounter = 0;
-            logger.debug('streaming video');
+            logger.debug('About to stream video');
             deleteStream();
 
             if (!app.get('takingVideo')) {
+                logger.debug('Wasnt already taking video, starting stream');
+
                 app.set('takingVideo', true);
-                fs.watchFile('./stream/image_stream.jpg', function(
+                fs.watchFile('./stream/image_stream.jpg', function (
                     current,
                     previous
                 ) {
-                    fs.stat('./stream/image_stream.jpg', function(err, stats) {
+                    fs.stat('./stream/image_stream.jpg', function (err, stats) {
                         if (stats && app.get('takingVideo')) {
                             var mtime = new Date(stats.mtime);
                             logger.debug('stats', stats.mtime);
@@ -290,13 +291,13 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
                                 .pipe(
                                     fs.createWriteStream(
                                         './stream/video/' +
-                                            pictureCounter++ +
-                                            '.jpg'
+                                        pictureCounter++ +
+                                        '.jpg'
                                     )
                                 );
 
-                            if (pictureCounter > 5) {
-                                logger.debug('count greater than 5');
+                            if (pictureCounter > 25) {
+                                logger.debug('count greater than 25');
                                 var args = [
                                     '-loop',
                                     '0',
@@ -352,27 +353,6 @@ module.exports = function(app, enableMotionSensor, debugMode, io, logger) {
         console.log('deleteing stream');
         var directory = './stream/video/';
         rmDir(directory);
-    }
-
-    //testVideo();
-    function testVideo() {
-        startCamera();
-        console.log('about to stream video');
-
-        streamVideo().then(() => {
-            console.log('done streaming video');
-        });
-        console.log('taking video');
-        app.set('takingVideo', true);
-        var garageAlertMsg = `test gif`;
-        logger.debug(garageAlertMsg);
-        messenger.send(
-            options.alertButtonPressTexts,
-            messengerInfo.toTestNumbers,
-            garageAlertMsg,
-            options.alertSendPictureText,
-            true
-        );
     }
 
     return {
