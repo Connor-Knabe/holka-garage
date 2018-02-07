@@ -245,6 +245,7 @@ module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
         fs.watchFile('./stream/image_stream.jpg', function (current, previous) {
             fs.stat('./stream/image_stream.jpg', function (err, stats) {
                 if (stats) {
+                    logger.debug('Updated image from stream');
                     var mtime = new Date(stats.mtime);
                     io.sockets.emit(
                         'liveStream',
@@ -295,7 +296,7 @@ module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
                                         '0',
                                         './stream/video/*.jpg',
                                         '-resize',
-                                        '75%',
+                                        '50%',
                                         './stream/video.gif'
                                     ];
 
