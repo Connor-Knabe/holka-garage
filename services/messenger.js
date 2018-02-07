@@ -1,4 +1,4 @@
-module.exports = function(logger, debugMode) {
+module.exports = function (logger, debugMode) {
     var messageTimeout = null;
     var messageCount = 0;
     const twilio = require('twilio');
@@ -63,35 +63,29 @@ module.exports = function(logger, debugMode) {
         };
 
         rp(options)
-            .then(function(parsedBody) {
+            .then(function (parsedBody) {
                 // POST succeeded...
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 // POST failed...
             });
     }
 
-    function send(
-        shouldSend = true,
-        numbers,
-        msgContent,
-        sendPicture = false,
-        btnPress = false
-    ) {
+    function send(shouldSend = true, numbers, msgContent, sendPicture = false, btnPress = false) {
         if (!shouldSend) {
             return;
         }
 
         clearTimeout(messageTimeout);
-        messageTimeout = setTimeout(function() {
+        messageTimeout = setTimeout(function () {
             messageCount = 0;
         }, 1 * 60 * 60 * 1000);
         messageCount++;
         logger.debug(
             `Sending message? -> msgContent:${msgContent} messageCount:${messageCount} generalTexts:${
-                options.generalTexts
+            options.generalTexts
             }alertButtonPressTexts:${
-                options.alertButtonPressTexts
+            options.alertButtonPressTexts
             } btnPress:${btnPress} sendPicture:${sendPicture}`
         );
 
@@ -109,11 +103,7 @@ module.exports = function(logger, debugMode) {
                         sendText(numbers[i], msgContent, sendPicture);
                     } else {
                         logger.debug(
-                            `Not sending texts generalTexts:${
-                                options.generalTexts
-                            }alertButtonPressTexts:${
-                                options.alertButtonPressTexts
-                            } btnPress:${btnPress} sendPicture:${sendPicture}`
+                            `Not sending texts generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress} sendPicture:${sendPicture}`
                         );
                     }
                 }
@@ -147,8 +137,8 @@ module.exports = function(logger, debugMode) {
             }
             logger.debug('timeout', textTimeout);
 
-            setTimeout(function() {
-                client.messages.create(twilioRequestObj, function(
+            setTimeout(function () {
+                client.messages.create(twilioRequestObj, function (
                     err,
                     message
                 ) {
@@ -190,7 +180,7 @@ module.exports = function(logger, debugMode) {
                 text: msgContent
             };
             if (!debugMode) {
-                transporter.sendMail(mailOptions, function(error, info) {
+                transporter.sendMail(mailOptions, function (error, info) {
                     if (error) {
                         return logger.error(error);
                     }

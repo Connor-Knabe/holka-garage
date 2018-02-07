@@ -3,7 +3,7 @@ const options = require('../settings/options.js');
 var garageOpenStatus = null;
 const geoip = require('geoip-lite');
 
-module.exports = function(app, logger, io, debugMode) {
+module.exports = function (app, logger, io, debugMode) {
     var iot = require('../services/iot.js')(app, false, debugMode, io, logger);
 
     var securityMsgTimeout = null;
@@ -43,7 +43,7 @@ module.exports = function(app, logger, io, debugMode) {
         );
     }
 
-    app.get('/', function(req, res) {
+    app.get('/', function (req, res) {
         if (auth(req)) {
             res.sendFile('admin.html', { root: './views/' });
         } else {
@@ -52,16 +52,16 @@ module.exports = function(app, logger, io, debugMode) {
     });
 
     //Used to verify letsencrypt manually
-    app.get('/.well-known/acme-challenge/' + login.acmeChallenge, function(
+    app.get('/.well-known/acme-challenge/' + login.acmeChallenge, function (
         req,
         res
     ) {
         res.send(login.acmeChallengeKey);
     });
 
-    app.get('/stream/image_stream.jpg', function(req, res) {
+    app.get('/stream/image_stream.jpg', function (req, res) {
         if (auth(req)) {
-            fs.readFile('./stream/image_stream.jpg', function(err, data) {
+            fs.readFile('./stream/image_stream.jpg', function (err, data) {
                 if (err) logger.error('failed to read image stream', err); // Fail if the file can't be read.
                 res.writeHead(200, { 'Content-Type': 'image/jpeg' });
                 res.end(data); // Send the file data to the browser.
@@ -76,23 +76,23 @@ module.exports = function(app, logger, io, debugMode) {
         }
     });
 
-    app.get('/pictures', function(req, res) {
-        fs.readFile('./stream/video.gif', function(err, data) {
+    app.get('/pictures', function (req, res) {
+        fs.readFile('./stream/video.gif', function (err, data) {
             if (err) logger.error('error reading image_stream', err); // Fail if the file can't be read.
             res.writeHead(200, { 'Content-Type': 'image/gif' });
             res.end(data); // Send the file data to the browser.
         });
     });
 
-    app.post('/', function(req, res) {
+    app.post('/', function (req, res) {
         if (
             (req.body.username &&
                 req.body.username.toLowerCase() ===
-                    login.username.toLowerCase() &&
+                login.username.toLowerCase() &&
                 req.body.password === login.password) ||
             (req.body.username &&
                 req.body.username.toLowerCase() ===
-                    login.username2.toLowerCase() &&
+                login.username2.toLowerCase() &&
                 req.body.password === login.password2)
         ) {
             req.session.userInfo = req.body;
@@ -112,8 +112,9 @@ module.exports = function(app, logger, io, debugMode) {
         }
     });
 
-    app.post('/video', function(req, res) {
+    app.post('/video', function (req, res) {
         io.sockets.emit('garageOpenStatus', 'Recording video');
+        logger.debug('hit /video route');
         iot.streamVideo().then(() => {
             var msg = 'Testing /video';
             var btnPress = true;
@@ -128,7 +129,7 @@ module.exports = function(app, logger, io, debugMode) {
         });
     });
 
-    app.post('/openOrCloseGarage', function(req, res) {
+    app.post('/openOrCloseGarage', function (req, res) {
         logger.debug('body', req.body);
         if (auth(req) && (vpnAuth(req) || regionAuth(req))) {
             if (req.body && req.body.garageSwitch == 'open') {
@@ -202,7 +203,7 @@ module.exports = function(app, logger, io, debugMode) {
                 req.connection.remoteAddress;
 
             clearTimeout(securityMsgTimeout);
-            securityMsgTimeout = setTimeout(function() {
+            securityMsgTimeout = setTimeout(function () {
                 shouldSendSecurityAlert = true;
             }, hoursToWaitBeforeNextSecurityAlert * 60 * 60 * 10000);
             var btnPress = true;
