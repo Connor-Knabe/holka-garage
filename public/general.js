@@ -1,35 +1,75 @@
-$(document).ready(function() {
+$(document).ready(function () {
     $('#progress').hide();
     $('#stream').hide();
-    $('#open').click(function(e) {
+    $('#open').click(function (e) {
         console.log('open');
         e.preventDefault();
         $.ajax({
             type: 'POST',
             url: '/openOrCloseGarage',
             data: { garageSwitch: 'open' },
-            success: function(result) {
+            success: function (result) {
                 $('#status').html(result);
             }
         });
     });
-    $('#close').click(function(e) {
+    $('#close').click(function (e) {
         e.preventDefault();
         $.ajax({
             type: 'POST',
             url: '/openOrCloseGarage',
             data: { garageSwitch: 'close' },
-            success: function(result) {
+            success: function (result) {
                 $('#status').html(result);
             }
         });
     });
-    $('#video').click(function(e) {
+    $('#video').click(function (e) {
         e.preventDefault();
         $.ajax({
             type: 'POST',
             url: '/video',
-            success: function(result) {
+            success: function (result) {
+                $('#status').html(result);
+            }
+        });
+    });
+    $('#lights25').click(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '/lights/25',
+            success: function (result) {
+                $('#status').html(result);
+            }
+        });
+    });
+    $('#lights50').click(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '/lights/50',
+            success: function (result) {
+                $('#status').html(result);
+            }
+        });
+    });
+    $('#lights75').click(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '/lights/75',
+            success: function (result) {
+                $('#status').html(result);
+            }
+        });
+    });
+    $('#lights100').click(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '/lights/100',
+            success: function (result) {
                 $('#status').html(result);
             }
         });

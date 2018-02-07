@@ -2,9 +2,9 @@ var messengerInfo = require('../settings/messengerInfo.js');
 const options = require('../settings/options.js');
 var garageOpenStatus = null;
 const geoip = require('geoip-lite');
-
 module.exports = function (app, logger, io, debugMode) {
     var iot = require('../services/iot.js')(app, false, debugMode, io, logger);
+    const hue = require('../services/hue.js')(logger);
 
     var securityMsgTimeout = null;
     var garageErrorStatus = null;
@@ -127,7 +127,21 @@ module.exports = function (app, logger, io, debugMode) {
             );
             io.sockets.emit('garageOpenStatus', 'Video sent');
         });
+        res.send("Ok");
     });
+
+
+    app.post('/lights/:brightness', function (req, res) {
+        io.sockets.emit('garageOpenStatus', 'Changing light brightness');
+        logger.debug(`Hit /light route with setting ${req.params.brightness}`);
+        hue.lightsOn(req.params.brightness).then(() => {
+            setTimeout(() => {
+                io.sockets.emit('garageOpenStatus', 'Light brightness changed, wait for image to update');
+            }, 2 * 1000);
+        });
+        res.send(`Set to brightness ${req.params.brightness}`)
+    });
+
 
     app.post('/openOrCloseGarage', function (req, res) {
         logger.debug('body', req.body);

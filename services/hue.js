@@ -11,15 +11,15 @@ var HueApi = hue.HueApi,
     lightsOffTimeout = null,
     lightsOffTimedTimeout = null;
 
-module.exports = function(logger) {
+module.exports = function (logger) {
     function garageLightsOnTimed() {
         if (options.enableHue) {
-            lightsOn();
+            lightsOn(100).then();
             logger.debug(
                 'Lights on for ' + options.garageLightTimeoutMins + ' mins'
             );
             clearTimeout(lightsOffTimeout);
-            lightsOffTimeout = setTimeout(function() {
+            lightsOffTimeout = setTimeout(function () {
                 lightsOff();
             }, options.garageLightTimeoutMins * 60 * 1000);
         }
@@ -28,7 +28,7 @@ module.exports = function(logger) {
     function garageLightsOnOff(toggleOn) {
         if (options.enableHue) {
             if (toggleOn) {
-                lightsOn();
+                lightsOn(100).then();
                 logger.debug('lights on');
             } else {
                 lightsOff();
@@ -37,7 +37,7 @@ module.exports = function(logger) {
         }
     }
 
-    var displayResult = function(result) {
+    var displayResult = function (result) {
         logger.debug(result);
     };
 
@@ -46,14 +46,14 @@ module.exports = function(logger) {
             `Lights turning off in ${options.garageLightTimeoutMins} mins`
         );
         clearTimeout(lightsOffTimedTimeout);
-        lightsOffTimedTimeout = setTimeout(function() {
+        lightsOffTimedTimeout = setTimeout(function () {
             lightsOff();
         }, options.garageLightTimeoutMins * 60 * 1000);
     }
 
     function garageLightsOnOff(toggleOn) {
         if (toggleOn) {
-            lightsOn();
+            lightsOn(100).then();
             logger.debug('lights on');
         } else {
             lightsOff();
@@ -61,16 +61,23 @@ module.exports = function(logger) {
         }
     }
 
-    var displayResult = function(result) {
+    var displayResult = function (result) {
         logger.debug(result);
     };
 
-    var displayError = function(err) {
+    var displayError = function (err) {
         logger.error(err);
     };
 
-    function lightsOn() {
-        api.setGroupLightState(8, state.on().brightness(100)).then();
+    function lightsOn(brightness) {
+        return new Promise((resolve, reject) => {
+            api.setGroupLightState(8, state.on().brightness(brightness)).then(() => {
+                resolve();
+            }).catch((e) => {
+                logger.error(`Error setting light brightness ${e}`)
+                reject();
+            });
+        });
     }
 
     function lightsOff() {
@@ -78,6 +85,7 @@ module.exports = function(logger) {
     }
 
     return {
+        lightsOn: lightsOn,
         garageLightsOnOff: garageLightsOnOff,
         garageLightsOnTimed: garageLightsOnTimed,
         garageLightsOffTimed: garageLightsOffTimed
