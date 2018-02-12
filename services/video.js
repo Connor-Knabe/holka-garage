@@ -14,6 +14,7 @@ var garageOpenStatus = null;
 
 module.exports = (app, logger, io) => {
     const hue = require('./hue.js')(logger);
+    const remove = require('./remove.js')(convertProc);
 
     io.on('connection', function (socket) {
         sockets[socket.id] = socket;
@@ -128,7 +129,7 @@ module.exports = (app, logger, io) => {
             if (!app.get('takingVideo')) {
                 pictureCounter = 0;
                 startCamera();
-                deleteStream().then(() => {
+                remove.deleteStream().then(() => {
                     logger.debug('Wasnt already taking video, starting stream');
                     app.set('takingVideo', true);
                     fs.watchFile('./stream/image_stream.jpg', function (current, previous) {
@@ -162,7 +163,7 @@ module.exports = (app, logger, io) => {
                                     convertProc.on('exit', () => {
                                         pictureCounter = 0;
                                         logger.debug('picture count 0');
-                                        deleteStream().then(() => {
+                                        remove.deleteStream().then(() => {
                                             logger.debug('taking video now set to false');
                                             app.set('takingVideo', false);
                                             stopStreaming();
@@ -180,46 +181,7 @@ module.exports = (app, logger, io) => {
         });
     }
 
-    function rmDir(dirPath) {
-        return new Promise((resolve, reject) => {
-            try {
-                var files = fs.readdirSync(dirPath);
-                console.log('files', files);
-            } catch (e) {
-                console.log('error', e);
-                resolve();
-                return;
-            }
-            if (files.length > 0) {
-                console.log('more files to delete');
-                for (var i = 0; i < files.length; i++) {
-                    var filePath = dirPath + '/' + files[i];
-                    if (i == files.length - 1) {
-                        fs.unlinkSync(filePath);
-                        resolve();
-                    } else if (fs.statSync(filePath).isFile()) {
-                        fs.unlinkSync(filePath);
-                    } else {
-                        rmDir(filePath);
-                    }
-                }
-            } else {
-                resolve();
-            }
-        });
-    }
 
-    function deleteStream() {
-        return new Promise((resolve, reject) => {
-            if (convertProc) convertProc.kill();
-            console.log('deleteing stream');
-            var directory = './stream/video/';
-            rmDir(directory).then(() => {
-                logger.debug('resolving from delete stream');
-                resolve();
-            });
-        });
-    }
     function updateGarageStatus(status) {
         garageOpenStatus = status;
         return;
