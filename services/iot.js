@@ -17,7 +17,7 @@ var garageTimeout = null,
     garageOpenAlertTimeout = null,
     garageOpenAlertMessageTimeout = null;
 
-module.exports = function (app, enableMotionSensor, debugMode, logger, io) {
+module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
     var hasBeenOpened = garageIsOpen();
     const messenger = require('./messenger.js')(logger, debugMode);
     const messengerInfo = require('../settings/messengerInfo.js');

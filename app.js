@@ -112,8 +112,8 @@ var iot = require('./services/iot.js')(
     app,
     enableMotionSensor,
     options.debugMode,
-    logger,
-    io
+    io,
+    logger
 );
 
 require('./services/certrenewcron.js')(logger);

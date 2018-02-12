@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-module.exports = (convertProc) => {
+module.exports = (convertProc, logger) => {
 
     function rmDir(dirPath) {
         return new Promise((resolve, reject) => {
