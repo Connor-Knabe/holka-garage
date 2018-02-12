@@ -117,7 +117,7 @@ module.exports = function (app, logger, io, debugMode) {
         io.sockets.emit('garageOpenStatus', 'Recording video');
         logger.debug('hit /video route');
         video.streamVideo().then(() => {
-            var msg = 'Testing /video';
+            var msg = 'Sending video via website';
             var btnPress = true;
             messenger.send(
                 options.alertButtonPressTexts,
