@@ -177,6 +177,8 @@ module.exports = (app, logger, io) => {
                     });
 
                 });
+            } else {
+                reject();
             }
         });
     }

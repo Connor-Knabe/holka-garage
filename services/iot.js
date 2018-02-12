@@ -52,6 +52,10 @@ module.exports = function (app, enableMotionSensor, debugMode, logger, io) {
                             video.streamVideo().then(() => {
                                 messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg,
                                     options.alertSendPictureText, true);
+                            }).catch(() => {
+                                garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes! Error taking new video.`;
+                                messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg,
+                                    options.alertSendPictureText, true);
                             });
                         }
                         messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert, options.garageOpenAlertMins);
