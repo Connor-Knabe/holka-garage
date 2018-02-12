@@ -1,5 +1,4 @@
 var Gpio = require('onoff').Gpio;
-var spawn = require('child_process').spawn;
 var path = require('path');
 
 var motionSensor = new Gpio(15, 'in', 'both');
@@ -8,7 +7,6 @@ var garageSwitch = new Gpio(21, 'out');
 var garageTimeout = null;
 var motionSensorTimeoutOne = null;
 var motionSensorTimeoutTwo = null;
-var garageOpenStatus = null;
 var hasSentMotionSensorAlert = false;
 var shouldSendGarageDoorAlertOne = true;
 var shouldSendGarageDoorAlertTwo = true;
@@ -18,8 +16,6 @@ var garageSensorTimeoutTwo = null;
 var garageOpened = false;
 var garageOpenAlertTimeout = null;
 var garageOpenAlertMessageTimeout = null;
-var needsToConvert = true;
-var pictureCounter = 0;
 
 module.exports = function (app, enableMotionSensor, debugMode, logger, io) {
     var hasBeenOpened = garageIsOpen();
@@ -27,8 +23,9 @@ module.exports = function (app, enableMotionSensor, debugMode, logger, io) {
     const messengerInfo = require('../settings/messengerInfo.js');
     const hue = require('./hue.js')(logger);
     const options = require('../settings/options.js');
-    const video = require('./video.js')(logger, io);
+    const video = require('./video.js')(app, logger, io);
     app.set('takingVideo', false);
+
 
     garageSensor.watch(function (err, value) {
         if (err) {
@@ -55,7 +52,7 @@ module.exports = function (app, enableMotionSensor, debugMode, logger, io) {
                             } minutes!`;
                         logger.debug(garageAlertMsg);
                         if (options.garageOpenMinsAlert) {
-                            streamVideo().then(() => {
+                            video.streamVideo().then(() => {
                                 messenger.send(
                                     options.alertButtonPressTexts,
                                     messengerInfo.toNumbers,
@@ -69,7 +66,7 @@ module.exports = function (app, enableMotionSensor, debugMode, logger, io) {
                             options.iftttSendGarageOpenAlert,
                             options.garageOpenAlertMins
                         );
-                        stopStreaming();
+                        video.stopStreaming();
                     }, 30 * 1000);
                 }
             }, options.garageOpenAlertMins * 60 * 1000);
@@ -163,14 +160,10 @@ module.exports = function (app, enableMotionSensor, debugMode, logger, io) {
 
 
 
-    function updateGarageStatus(status) {
-        garageOpenStatus = status;
-        return;
-    }
+
 
     return {
         garageIsOpen: garageIsOpen,
-        toggleGarageDoor: toggleGarageDoor,
-        updateGarageStatus: updateGarageStatus
+        toggleGarageDoor: toggleGarageDoor
     };
 };

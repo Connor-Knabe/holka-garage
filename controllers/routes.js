@@ -5,6 +5,7 @@ const geoip = require('geoip-lite');
 module.exports = function (app, logger, io, debugMode) {
     var iot = require('../services/iot.js')(app, false, debugMode, io, logger);
     const hue = require('../services/hue.js')(logger);
+    const video = require('../services/video.js')(app, logger, io);
 
     var securityMsgTimeout = null;
     var garageErrorStatus = null;
@@ -115,7 +116,7 @@ module.exports = function (app, logger, io, debugMode) {
     app.post('/video', function (req, res) {
         io.sockets.emit('garageOpenStatus', 'Recording video');
         logger.debug('hit /video route');
-        iot.streamVideo().then(() => {
+        video.streamVideo().then(() => {
             var msg = 'Testing /video';
             var btnPress = true;
             messenger.send(
@@ -150,7 +151,7 @@ module.exports = function (app, logger, io, debugMode) {
                 if (!iot.garageIsOpen()) {
                     iot.toggleGarageDoor();
                     garageOpenStatus = 'Opening...';
-                    iot.updateGarageStatus(garageOpenStatus);
+                    video.updateGarageStatus(garageOpenStatus);
                     io.sockets.emit('garageOpenStatus', garageOpenStatus);
                     var msg = garageOpenStatus + ' garage via button';
                     var btnPress = true;
@@ -175,11 +176,11 @@ module.exports = function (app, logger, io, debugMode) {
                 if (iot.garageIsOpen()) {
                     iot.toggleGarageDoor();
                     garageOpenStatus = 'Closing...';
-                    iot.updateGarageStatus(garageOpenStatus);
+                    video.updateGarageStatus(garageOpenStatus);
                     io.sockets.emit('garageOpenStatus', garageOpenStatus);
                     var msg = garageOpenStatus + ' garage via button';
                     var btnPress = true;
-                    iot.streamVideo().then(() => {
+                    video.streamVideo().then(() => {
                         messenger.send(
                             options.alertButtonPressTexts,
                             messengerInfo.toNumbers,
@@ -191,7 +192,7 @@ module.exports = function (app, logger, io, debugMode) {
                     io.sockets.emit('garageErrorStatus', null);
                 } else {
                     logger.debug('err');
-                    iot.updateGarageStatus(null);
+                    video.updateGarageStatus(null);
                     io.sockets.emit('garageOpenStatus', null);
                     io.sockets.emit(
                         'garageErrorStatus',

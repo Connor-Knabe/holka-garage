@@ -2,10 +2,19 @@ var fs = require('fs');
 var raspistillProc;
 var convertProc;
 var sockets = {};
+var Gpio = require('onoff').Gpio;
+var spawn = require('child_process').spawn;
 
-module.exports = (logger, io) => {
+var garageSensor = new Gpio(4, 'in', 'both');
+var pictureCounter = 0;
+var needsToConvert = true;
+const options = require('../settings/options.js');
+var garageOpenStatus = null;
+
+
+module.exports = (app, logger, io) => {
     const hue = require('./hue.js')(logger);
-    const iot = require('./iot.js')();
+
     io.on('connection', function (socket) {
         sockets[socket.id] = socket;
         logger.info('Total clients connected : ', Object.keys(sockets).length);
@@ -23,7 +32,7 @@ module.exports = (logger, io) => {
             stopStreaming();
         });
 
-        if (iot.garageIsOpen()) {
+        if (garageIsOpen()) {
             io.sockets.emit('garageStatus', 'open');
         } else {
             io.sockets.emit('garageStatus', 'closed');
@@ -69,7 +78,10 @@ module.exports = (logger, io) => {
             app.set('cameraOn', true);
         }
     }
-
+    function garageIsOpen() {
+        var isOpen = garageSensor.readSync() == 1 ? true : false;
+        return isOpen;
+    }
 
     function startStreaming(io) {
         if (app.get('cameraOn')) {
@@ -207,9 +219,14 @@ module.exports = (logger, io) => {
                 resolve();
             });
         });
-
     }
+    function updateGarageStatus(status) {
+        garageOpenStatus = status;
+        return;
+    }
+
     return {
-        streamVideo: streamVideo
+        streamVideo: streamVideo,
+        updateGarageStatus: updateGarageStatus
     };
 };
