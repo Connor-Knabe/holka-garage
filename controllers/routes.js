@@ -115,7 +115,6 @@ module.exports = function (app, logger, io, debugMode) {
 
     app.post('/video', function (req, res) {
         io.sockets.emit('garageOpenStatus', 'Recording video');
-        logger.debug('hit /video route');
         video.streamVideo().then(() => {
             var msg = 'Sending video via website';
             var btnPress = true;
@@ -134,7 +133,6 @@ module.exports = function (app, logger, io, debugMode) {
 
     app.post('/lights/:brightness', function (req, res) {
         io.sockets.emit('garageOpenStatus', 'Changing light brightness');
-        logger.debug(`Hit /light route with setting ${req.params.brightness}`);
         hue.lightsOn(req.params.brightness).then(() => {
             setTimeout(() => {
                 io.sockets.emit('garageOpenStatus', 'Light brightness changed, wait for image to update');
@@ -155,7 +153,7 @@ module.exports = function (app, logger, io, debugMode) {
                     io.sockets.emit('garageOpenStatus', garageOpenStatus);
                     var msg = garageOpenStatus + ' garage via button';
                     var btnPress = true;
-                    iot.streamVideo().then(() => {
+                    video.streamVideo().then(() => {
                         messenger.send(
                             options.alertButtonPressTexts,
                             messengerInfo.toNumbers,

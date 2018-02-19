@@ -6,14 +6,12 @@ module.exports = (convertProc, logger) => {
         return new Promise((resolve, reject) => {
             try {
                 var files = fs.readdirSync(dirPath);
-                console.log('files', files);
             } catch (e) {
-                console.log('error', e);
+                logger.error('Issue deleting files', e);
                 resolve();
                 return;
             }
             if (files.length > 0) {
-                console.log('more files to delete');
                 for (var i = 0; i < files.length; i++) {
                     var filePath = dirPath + '/' + files[i];
                     if (i == files.length - 1) {

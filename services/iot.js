@@ -129,6 +129,7 @@ module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
     }
 
     function toggleGarageDoor() {
+
         if (!debugMode) {
             logger.debug('Opening/closing door now');
             garageSwitch.writeSync(1);
@@ -136,6 +137,7 @@ module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
                 garageSwitch.writeSync(0);
             }, 1000);
         }
+
     }
     return {
         garageIsOpen: garageIsOpen,

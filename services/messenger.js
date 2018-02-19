@@ -138,10 +138,10 @@ module.exports = function (logger, debugMode) {
             logger.debug('timeout', textTimeout);
 
             setTimeout(function () {
-                client.messages.create(twilioRequestObj, function (
+                client.messages.create(twilioRequestObj, (
                     err,
                     message
-                ) {
+                ) => {
                     if (err) {
                         logger.error(
                             new Date(),
@@ -151,6 +151,27 @@ module.exports = function (logger, debugMode) {
                             err
                         );
                     } else {
+                        logger.info('Msg sid: ', message.sid);
+
+                        setTimeout(() => {
+                            if (message && message.sid) {
+                                //@ts-ignore
+                                client.messages(message.sid).media.each((media) => {
+                                    if (media && media.sid) {
+                                        console.log(`Deleting media for message.sid ${message.sid}`);
+                                        client.messages(message.sid).media(media.sid)
+                                            //@ts-ignore
+                                            .remove()
+                                            .then(() => {
+                                                logger.info(`Media Sid ${media.sid}  deleted successfully. Message.sid ${message.sid}`);
+                                            }).catch((err) => logger.error(`Issue deleting media for Twilio ${err} Message.SID:${message.sid} Media SID:${media.sid}`));
+
+                                    }
+                                });
+
+                            }
+                        }, 75 * 1000);
+
                         logger.info(new Date(), ' Text sent: ', msgContent);
                     }
                 });

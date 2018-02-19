@@ -18,14 +18,14 @@ module.exports = (app, logger, io) => {
 
     io.on('connection', function (socket) {
         sockets[socket.id] = socket;
-        logger.info('Total clients connected : ', Object.keys(sockets).length);
+        logger.debug('Total clients connected : ', Object.keys(sockets).length);
         io.sockets.emit('clients', Object.keys(sockets).length);
 
         hue.garageLightsOnTimed();
 
         socket.on('disconnect', function () {
             delete sockets[socket.id];
-            logger.info(
+            logger.debug(
                 'Client Disconnected, total clients connected : ',
                 Object.keys(sockets).length
             );
@@ -37,6 +37,10 @@ module.exports = (app, logger, io) => {
             io.sockets.emit('garageStatus', 'open');
         } else {
             io.sockets.emit('garageStatus', 'closed');
+        }
+
+        if (app.get('takingVideo')) {
+            io.sockets.emit('garageOpenStatus', 'Recording video');
         }
 
         socket.on('start-stream', function () {
@@ -55,7 +59,6 @@ module.exports = (app, logger, io) => {
 
     function startCamera() {
         hue.garageLightsOnTimed();
-        logger.debug('camera status', !app.get('cameraOn'));
         if (!app.get('cameraOn')) {
             var args = [
                 '-w',
@@ -97,7 +100,6 @@ module.exports = (app, logger, io) => {
         fs.watchFile('./stream/image_stream.jpg', function (current, previous) {
             fs.stat('./stream/image_stream.jpg', function (err, stats) {
                 if (stats) {
-                    logger.debug('Updated image from stream');
                     var mtime = new Date(stats.mtime);
                     io.sockets.emit(
                         'liveStream',
@@ -130,14 +132,11 @@ module.exports = (app, logger, io) => {
                 pictureCounter = 0;
                 startCamera();
                 remove.deleteStream().then(() => {
-                    logger.debug('Wasnt already taking video, starting stream');
                     app.set('takingVideo', true);
                     fs.watchFile('./stream/image_stream.jpg', function (current, previous) {
                         fs.stat('./stream/image_stream.jpg', function (err, stats) {
                             if (stats && app.get('takingVideo')) {
                                 var mtime = new Date(stats.mtime);
-                                logger.debug('stats', stats.mtime);
-                                logger.debug('picture counter', pictureCounter);
                                 fs.createReadStream('./stream/image_stream.jpg').pipe(fs.createWriteStream('./stream/video/' + pictureCounter++ + '.jpg'));
 
                                 if (pictureCounter > options.numberOfGifFrames && needsToConvert) {
@@ -162,7 +161,6 @@ module.exports = (app, logger, io) => {
                                     });
                                     convertProc.on('exit', () => {
                                         pictureCounter = 0;
-                                        logger.debug('picture count 0');
                                         remove.deleteStream().then(() => {
                                             logger.debug('taking video now set to false');
                                             app.set('takingVideo', false);
