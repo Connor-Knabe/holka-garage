@@ -15,3 +15,4 @@ module.exports.garageOpenAlertMins = 15;
 module.exports.geoIpFilter = 'FL';
 module.exports.iftttSendGarageOpenAlert = false;
 module.exports.numberOfGifFrames = 15;
+module.exports.enableHueEnergyUsageReport = false;
