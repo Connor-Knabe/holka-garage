@@ -43,6 +43,16 @@ var proxyOptions = {
     }
 };
 
+//if using https://github.com/Connor-Knabe/hue-energy-usage
+var hueEnergyUsageOptions = {
+    target: 'http://localhost:1234',
+    changeOrigin: false,
+    pathRewrite: {
+        '^/proxy/hue-energy-usage': ''
+    }
+};
+
+
 function authChecker(req, res, next) {
     var redirectToUrl = req.originalUrl ? req.originalUrl : '/';
     req.session.redirectTo = redirectToUrl;
@@ -121,3 +131,4 @@ require('./services/certrenewcron.js')(logger);
 app.use(authChecker);
 
 app.use('/proxy/stream', proxy(proxyOptions));
+app.use('/proxy/hue-energy-usage', proxy(hueEnergyUsageOptions));
