@@ -21,7 +21,6 @@ module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
     var hasBeenOpened = garageIsOpen();
     const messenger = require('./messenger.js')(logger, debugMode);
     const messengerInfo = require('../settings/messengerInfo.js');
-    const hue = require('./hue.js')(logger);
     const options = require('../settings/options.js');
     const video = require('./video.js')(app, logger, io);
     app.set('takingVideo', false);
@@ -34,32 +33,31 @@ module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
             hasBeenOpened = true;
             garageOpened = true;
             var msg = 'Garage door opened';
-            hue.garageLightsOnTimed();
 
             clearTimeout(garageSensorTimeoutOne);
             garageSensorTimeoutOne = setTimeout(() => {
                 shouldSendGarageDoorAlertOne = true;
             }, 1 * 60 * 10000);
-			logger.debug('garage open');
+            logger.debug('garage open');
             clearTimeout(garageOpenAlertTimeout);
             garageOpenAlertTimeout = setTimeout(() => {
-	            logger.debug('testing garage open not sure if open');
+                logger.debug('testing garage open not sure if open');
                 if (garageIsOpen()) {
                     garageOpenAlertMessageTimeout = setTimeout(() => {
                         var garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`;
                         logger.debug(garageAlertMsg);
                         if (options.garageOpenMinsAlert) {
-	                        logger.debug(garageAlertMsg);
+                            logger.debug(garageAlertMsg);
                             video.streamVideo().then(() => {
                                 messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg,
                                     options.alertSendPictureText, true);
-									video.stopStreaming();
+                                video.stopStreaming();
 
                             }).catch(() => {
                                 garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes! Error taking new video.`;
                                 messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg,
                                     options.alertSendPictureText, true);
-									video.stopStreaming();
+                                video.stopStreaming();
 
                             });
                         }
@@ -81,7 +79,6 @@ module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
             hasBeenOpened = false;
             garageOpened = false;
             var msg = 'Garage door closed';
-            hue.garageLightsOnTimed();
             clearTimeout(garageSensorTimeoutTwo);
             garageSensorTimeoutTwo = setTimeout(() => {
                 shouldSendGarageDoorAlertTwo = true;

@@ -25,18 +25,6 @@ module.exports = function (logger) {
         }
     }
 
-    function garageLightsOnOff(toggleOn) {
-        if (options.enableHue) {
-            if (toggleOn) {
-                lightsOn(100).then();
-                logger.debug('lights on');
-            } else {
-                lightsOff();
-                logger.debug('lights off');
-            }
-        }
-    }
-
     var displayResult = function (result) {
         logger.debug(result);
     };
@@ -49,16 +37,6 @@ module.exports = function (logger) {
         lightsOffTimedTimeout = setTimeout(function () {
             lightsOff();
         }, options.garageLightTimeoutMins * 60 * 1000);
-    }
-
-    function garageLightsOnOff(toggleOn) {
-        if (toggleOn) {
-            lightsOn(100).then();
-            logger.debug('lights on');
-        } else {
-            lightsOff();
-            logger.debug('lights off');
-        }
     }
 
     var displayResult = function (result) {
@@ -86,7 +64,6 @@ module.exports = function (logger) {
 
     return {
         lightsOn: lightsOn,
-        garageLightsOnOff: garageLightsOnOff,
         garageLightsOnTimed: garageLightsOnTimed,
         garageLightsOffTimed: garageLightsOffTimed
     };

@@ -21,8 +21,6 @@ module.exports = (app, logger, io) => {
         logger.debug('Total clients connected : ', Object.keys(sockets).length);
         io.sockets.emit('clients', Object.keys(sockets).length);
 
-        hue.garageLightsOnTimed();
-
         socket.on('disconnect', function () {
             delete sockets[socket.id];
             logger.debug(
@@ -189,7 +187,7 @@ module.exports = (app, logger, io) => {
 
     return {
         streamVideo: streamVideo,
-        stopStreaming:stopStreaming,
+        stopStreaming: stopStreaming,
         updateGarageStatus: updateGarageStatus
     };
 };
