@@ -189,6 +189,7 @@ module.exports = (app, logger, io) => {
 
     return {
         streamVideo: streamVideo,
+        stopStreaming:stopStreaming,
         updateGarageStatus: updateGarageStatus
     };
 };

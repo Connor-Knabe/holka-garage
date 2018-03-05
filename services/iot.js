@@ -40,26 +40,30 @@ module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
             garageSensorTimeoutOne = setTimeout(() => {
                 shouldSendGarageDoorAlertOne = true;
             }, 1 * 60 * 10000);
-
+			logger.debug('garage open');
             clearTimeout(garageOpenAlertTimeout);
             garageOpenAlertTimeout = setTimeout(() => {
+	            logger.debug('testing garage open not sure if open');
                 if (garageIsOpen()) {
-                    video.startCamera();
                     garageOpenAlertMessageTimeout = setTimeout(() => {
                         var garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`;
                         logger.debug(garageAlertMsg);
                         if (options.garageOpenMinsAlert) {
+	                        logger.debug(garageAlertMsg);
                             video.streamVideo().then(() => {
                                 messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg,
                                     options.alertSendPictureText, true);
+									video.stopStreaming();
+
                             }).catch(() => {
                                 garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes! Error taking new video.`;
                                 messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg,
                                     options.alertSendPictureText, true);
+									video.stopStreaming();
+
                             });
                         }
                         messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert, options.garageOpenAlertMins);
-                        video.stopStreaming();
                     }, 30 * 1000);
                 }
             }, options.garageOpenAlertMins * 60 * 1000);

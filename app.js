@@ -89,6 +89,7 @@ var enableMotionSensor = false;
 http.listen(port, function () {
     logger.info('listening on *:', port);
 });
+logger.error('new error log started');
 
 app.use(
     session({
