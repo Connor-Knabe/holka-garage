@@ -1,4 +1,4 @@
-module.exports.enableHue = true;
+module.exports.enableHue = false;
 module.exports.enableIfttt = true;
 module.exports.generalTexts = false;
 module.exports.emailAlerts = true;
@@ -16,3 +16,4 @@ module.exports.geoIpFilter = 'FL';
 module.exports.iftttSendGarageOpenAlert = false;
 module.exports.numberOfGifFrames = 15;
 module.exports.enableHueEnergyUsageReport = false;
+module.exports.enableWebcamStream = false;

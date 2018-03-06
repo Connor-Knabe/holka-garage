@@ -30,13 +30,19 @@ module.exports = function (logger) {
     };
 
     function garageLightsOffTimed() {
-        logger.debug(
-            `Lights turning off in ${options.garageLightTimeoutMins} mins`
-        );
-        clearTimeout(lightsOffTimedTimeout);
-        lightsOffTimedTimeout = setTimeout(function () {
-            lightsOff();
-        }, options.garageLightTimeoutMins * 60 * 1000);
+
+        if (options.enableHue) {
+
+            logger.debug(
+                `Lights turning off in ${options.garageLightTimeoutMins} mins`
+            );
+            clearTimeout(lightsOffTimedTimeout);
+            lightsOffTimedTimeout = setTimeout(function () {
+                lightsOff();
+            }, options.garageLightTimeoutMins * 60 * 1000);
+
+        }
+
     }
 
     var displayResult = function (result) {
@@ -48,14 +54,17 @@ module.exports = function (logger) {
     };
 
     function lightsOn(brightness) {
-        return new Promise((resolve, reject) => {
-            api.setGroupLightState(8, state.on().brightness(brightness)).then(() => {
-                resolve();
-            }).catch((e) => {
-                logger.error(`Error setting light brightness ${e}`)
-                reject();
+        if (options.enableHue) {
+            return new Promise((resolve, reject) => {
+                api.setGroupLightState(8, state.on().brightness(brightness)).then(() => {
+                    resolve();
+                }).catch((e) => {
+                    logger.error(`Error setting light brightness ${e}`)
+                    reject();
+                });
             });
-        });
+        }
+
     }
 
     function lightsOff() {

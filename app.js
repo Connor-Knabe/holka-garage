@@ -131,7 +131,9 @@ require('./services/certrenewcron.js')(logger);
 
 app.use(authChecker);
 
-app.use('/proxy/stream', proxy(proxyOptions));
+if (options.enableWebcamStream) {
+    app.use('/proxy/stream', proxy(proxyOptions));
+}
 if (options.enableHueEnergyUsageReport) {
     app.use('/proxy/hue-energy-usage', proxy(hueEnergyUsageOptions));
 }
