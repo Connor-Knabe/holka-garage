@@ -85,7 +85,6 @@ httpsServer.listen(443, function () {
 //settings
 var port = 80;
 logger.level = 'debug';
-var enableMotionSensor = false;
 http.listen(port, function () {
     logger.info('listening on *:', port);
 });
@@ -112,20 +111,9 @@ app.use(
     basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass)
 );
 
-var routes = require('./controllers/routes.js')(
-    app,
-    logger,
-    io,
-    options.debugMode
-);
+var routes = require('./controllers/routes.js')(app, logger, io, options.debugMode);
 
-var iot = require('./services/iot.js')(
-    app,
-    enableMotionSensor,
-    options.debugMode,
-    io,
-    logger
-);
+var iot = require('./services/iot.js')(app, options.debugMode, io, logger);
 
 require('./services/certrenewcron.js')(logger);
 

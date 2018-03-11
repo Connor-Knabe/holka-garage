@@ -17,11 +17,12 @@ var garageTimeout = null,
     garageOpenAlertTimeout = null,
     garageOpenAlertMessageTimeout = null;
 
-module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
+module.exports = function (app, debugMode, io, logger) {
     var hasBeenOpened = garageIsOpen();
     const messenger = require('./messenger.js')(logger, debugMode);
     const messengerInfo = require('../settings/messengerInfo.js');
     const options = require('../settings/options.js');
+    const hue = require('./hue.js')(logger);
     const video = require('./video.js')(app, logger, io);
     app.set('takingVideo', false);
 
@@ -96,8 +97,8 @@ module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
         }
     });
 
-    if (enableMotionSensor) {
-        motionSensor.watch(function (err, value) {
+    if (options.enableMotionSensor && options.enableHue) {
+        motionSensor.watch((err, value) => {
             if (err) {
                 logger.error('Error watching motion sensor: ', err);
             }
@@ -106,15 +107,7 @@ module.exports = function (app, enableMotionSensor, debugMode, io, logger) {
                 motionSensorTimeoutOne = setTimeout(function () {
                     hasSentMotionSensorAlert = true;
                 }, 2 * 60 * 1000);
-                var msg = 'Motion detected in garage';
-                logger.debug(msg);
-                messenger.send(
-                    true,
-                    messengerInfo.toNumbers,
-                    msg,
-                    false,
-                    false
-                );
+                hue.garageLightsOnTimed();
             } else if (value == 0 && hasSentMotionSensorAlert) {
                 clearTimeout(motionSensorTimeoutTwo);
                 motionSensorTimeoutTwo = setTimeout(function () {

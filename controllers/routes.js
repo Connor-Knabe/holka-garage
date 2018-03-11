@@ -3,7 +3,7 @@ const options = require('../settings/options.js');
 var garageOpenStatus = null;
 const geoip = require('geoip-lite');
 module.exports = function (app, logger, io, debugMode) {
-    var iot = require('../services/iot.js')(app, false, debugMode, io, logger);
+    var iot = require('../services/iot.js')(app, debugMode, io, logger);
     const hue = require('../services/hue.js')(logger);
     const video = require('../services/video.js')(app, logger, io);
 
@@ -59,23 +59,23 @@ module.exports = function (app, logger, io, debugMode) {
     ) {
         res.send(login.acmeChallengeKey);
     });
-    
-	//Used to verify letsencrypt manually
+
+    //Used to verify letsencrypt manually
     app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey2.split(".")[0], function (
         req,
         res
     ) {
         res.send(login.acmeChallengeKey2);
     });
-   
-	//Used to verify letsencrypt manually
+
+    //Used to verify letsencrypt manually
     app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey3.split(".")[0], function (
         req,
         res
     ) {
         res.send(login.acmeChallengeKey3);
     });
-     
+
 
     app.get('/stream/image_stream.jpg', function (req, res) {
         if (auth(req)) {
@@ -156,6 +156,59 @@ module.exports = function (app, logger, io, debugMode) {
             }, 2 * 1000);
         });
         res.send(`Set to brightness ${req.params.brightness}`)
+    });
+
+
+    app.post('/sms', function (req, res) {
+        var incomingPhoneNumber = req.body.From;
+
+        var msg = {
+            sid: req.body.MessageSid,
+            type: 'text',
+            textMessage: req.body.Body,
+            fromCity: req.body.FromCity,
+            fromState: req.body.FromState,
+            fromCountry: req.body.FromCountry
+        };
+        logger.info(`SMS containing: "${msg.textMessage}". Recieved from: ${incomingPhoneNumber}`);
+
+
+        var alertInfo = [
+            {
+                number: incomingPhoneNumber
+            }
+        ];
+
+
+        if (msg.textMessage.toLowerCase().trim() == "video") {
+            video.streamVideo().then(() => {
+                var txtMsg = "Video requested from " + incomingPhoneNumber;
+                var btnPress = true;
+                video.streamVideo().then(() => {
+                    messenger.send(
+                        options.alertButtonPressTexts,
+                        messengerInfo.toNumbers,
+                        txtMsg,
+                        options.alertSendPictureText,
+                        btnPress
+                    );
+                });
+                io.sockets.emit('garageOpenStatus', 'Video sent');
+            });
+        } else {
+            var txtMsg = "Unrecognized command: " + msg.textMessage + ". Video is the only recognized command at the moment.";
+            logger.info('here');
+            messenger.send(
+                true,
+                alertInfo,
+                txtMsg,
+                false,
+                true
+            );
+        }
+
+        res.status(204);
+        res.send('No content');
     });
 
 
