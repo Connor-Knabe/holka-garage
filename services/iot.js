@@ -8,7 +8,7 @@ const garageSwitch = new Gpio(21, 'out');
 var garageTimeout = null,
     motionSensorTimeoutOne = null,
     motionSensorTimeoutTwo = null,
-    hasSentMotionSensorAlert = false,
+    hasTurnedLightsOn = false,
     shouldSendGarageDoorAlertOne = true,
     shouldSendGarageDoorAlertTwo = true,
     garageSensorTimeoutOne = null,
@@ -34,7 +34,9 @@ module.exports = function (app, debugMode, io, logger) {
             hasBeenOpened = true;
             garageOpened = true;
             var msg = 'Garage door opened';
-
+            if (options.enableLightsOnGarageOpen) {
+                hue.garageLightsOnTimed();
+            }
             clearTimeout(garageSensorTimeoutOne);
             garageSensorTimeoutOne = setTimeout(() => {
                 shouldSendGarageDoorAlertOne = true;
@@ -42,7 +44,6 @@ module.exports = function (app, debugMode, io, logger) {
             logger.debug('garage open');
             clearTimeout(garageOpenAlertTimeout);
             garageOpenAlertTimeout = setTimeout(() => {
-                logger.debug('testing garage open not sure if open');
                 if (garageIsOpen()) {
                     garageOpenAlertMessageTimeout = setTimeout(() => {
                         var garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`;
@@ -102,16 +103,17 @@ module.exports = function (app, debugMode, io, logger) {
             if (err) {
                 logger.error('Error watching motion sensor: ', err);
             }
-            if (value == 1 && !hasSentMotionSensorAlert) {
+            logger.debug('value:', value);
+            if (value == 1 && !hasTurnedLightsOn) {
                 clearTimeout(motionSensorTimeoutOne);
                 motionSensorTimeoutOne = setTimeout(function () {
-                    hasSentMotionSensorAlert = true;
+                    hasTurnedLightsOn = true;
                 }, 2 * 60 * 1000);
                 hue.garageLightsOnTimed();
-            } else if (value == 0 && hasSentMotionSensorAlert) {
+            } else if (value == 0 && hasTurnedLightsOn) {
                 clearTimeout(motionSensorTimeoutTwo);
                 motionSensorTimeoutTwo = setTimeout(function () {
-                    hasSentMotionSensorAlert = false;
+                    hasTurnedLightsOn = false;
                 }, 2 * 60 * 1000);
             }
         });
