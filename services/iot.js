@@ -108,13 +108,13 @@ module.exports = function (app, debugMode, io, logger) {
                 clearTimeout(motionSensorTimeoutOne);
                 motionSensorTimeoutOne = setTimeout(function () {
                     hasTurnedLightsOn = true;
-                }, 2 * 60 * 1000);
+                }, 5 * 1000);
                 hue.garageLightsOnTimed();
             } else if (value == 0 && hasTurnedLightsOn) {
                 clearTimeout(motionSensorTimeoutTwo);
                 motionSensorTimeoutTwo = setTimeout(function () {
                     hasTurnedLightsOn = false;
-                }, 2 * 60 * 1000);
+                }, 5 * 1000);
             }
         });
     }
