@@ -20,7 +20,9 @@ module.exports = function (app, logger, io, debugMode) {
         var authenticated =
             req &&
             req.cookies &&
-            req.cookies.holkaCookie === login.secretCookie;
+            ((req.cookies.holkaCookie === login.secretCookie) || (req.cookies.holkaCookie === login.secretAdminCookie) );
+            
+            
         return authenticated;
     }
 
@@ -103,32 +105,44 @@ module.exports = function (app, logger, io, debugMode) {
     });
 
     app.post('/', function (req, res) {
-        if (
-            (req.body.username &&
-                req.body.username.toLowerCase() ===
-                login.username.toLowerCase() &&
-                req.body.password === login.password) ||
-            (req.body.username &&
-                req.body.username.toLowerCase() ===
-                login.username2.toLowerCase() &&
-                req.body.password === login.password2)
-        ) {
+		var options = {
+            maxAge: 1000 * 60 * 60 * 24 * 180,
+            httpOnly: true
+        };	
+        
+        var shouldRedirect = false;
+        
+        if(req.body.username && req.body.password && isAdminLogin(req.body.username,  req.body.password)){
+			req.session.userInfo = req.body;
+			res.cookie('holkaCookie', login.secretAdminCookie, options);		
+			shouldRedirect = true;
+	        
+        } else if(req.body.username && req.body.password && isUserLogin(req.body.username,  req.body.password)){
             req.session.userInfo = req.body;
-            var options = {
-                maxAge: 1000 * 60 * 60 * 24 * 180,
-                httpOnly: true
-            };
             res.cookie('holkaCookie', login.secretCookie, options);
-            logger.info('cookies', req.cookies.holkaCookie);
-            if (req && req.session && req.session.redirectTo) {
-                res.redirect(req.session.redirectTo);
-            } else {
-                res.redirect('/');
-            }
+            shouldRedirect = true;
+	        
         } else {
-            res.send('Access denied wrong username/password');
+            res.status(401);
+            res.send('Access denied wrong username/password');        
         }
+        if(shouldRedirect){
+			if (req && req.session && req.session.redirectTo) {
+	            res.redirect(req.session.redirectTo);
+	        } else {
+	            res.redirect('/');
+	        } 
+        } 
     });
+    
+    
+    function isAdminLogin(username, password){
+	    return username.toLowerCase() === login.adminUsername.toLowerCase() && password === login.adminPassword;
+    }
+    
+	function isUserLogin(username, password){
+	    return username.toLowerCase() === login.username.toLowerCase() && password === login.password;
+    }
 
     app.post('/video', function (req, res) {
         io.sockets.emit('garageOpenStatus', 'Recording video');

@@ -56,7 +56,7 @@ var hueEnergyUsageOptions = {
 function authChecker(req, res, next) {
     var redirectToUrl = req.originalUrl ? req.originalUrl : '/';
     req.session.redirectTo = redirectToUrl;
-    if (req && req.cookies && req.cookies.holkaCookie === login.secretCookie) {
+    if (req && req.cookies && req.cookies.holkaCookie === login.secretAdminCookie) {
         next();
     } else {
         res.status(401);
