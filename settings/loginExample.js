@@ -10,3 +10,4 @@ module.exports.secretAdminCookie = 'aksldjfoaisjdf0asjdf0';
 module.exports.sslPath = '/etc/letsencrypt/live/domain.com/';
 module.exports.acmeChallenge ='al;sjdfas0idfjoasjdflksjdfokjasi0dfj0asdjf';
 module.exports.acmeChallengeKey = 'alksjdf0iasjdf0ijas0dfj0iasjdfaskldjflkajsdfja.asjdlfkjaklsdjflkjaslkdjf';
+module.exports.gpsKey = 'gps key goes here';

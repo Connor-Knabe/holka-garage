@@ -15,7 +15,9 @@ var garageTimeout = null,
     garageSensorTimeoutTwo = null,
     garageOpened = false,
     garageOpenAlertTimeout = null,
-    garageOpenAlertMessageTimeout = null;
+    garageOpenAlertMessageTimeout = null,
+    garageOpenAlertEnabled,
+    garageOpenAlertManualEnable = true;
 
 module.exports = function (app, debugMode, io, logger) {
     var hasBeenOpened = garageIsOpen();
@@ -68,7 +70,7 @@ module.exports = function (app, debugMode, io, logger) {
                 }
             }, options.garageOpenAlertMins * 60 * 1000);
 
-            if (shouldSendGarageDoorAlertOne) {
+            if (shouldSendGarageDoorAlertOne && garageOpenAlertManualEnable) {
                 if (options.alertButtonPressTexts) {
                     messenger.send(true, messengerInfo.toNumbers, msg, false, false);
                 }
@@ -86,7 +88,7 @@ module.exports = function (app, debugMode, io, logger) {
                 shouldSendGarageDoorAlertTwo = true;
             }, 1 * 60 * 10000);
 
-            if (shouldSendGarageDoorAlertTwo) {
+            if (shouldSendGarageDoorAlertTwo && garageOpenAlertManualEnable) {
                 if (options.alertButtonPressTexts) {
                     messenger.send(true, messengerInfo.toNumbers, msg, false, false);
                 }
@@ -133,10 +135,16 @@ module.exports = function (app, debugMode, io, logger) {
                 garageSwitch.writeSync(0);
             }, 1000);
         }
-
     }
+
+    function toggleGarageOpenAlert(enable){
+        logger.debug('Enable toggleGarageOpenAlert'+ enable);
+        garageOpenAlertManualEnable = enable;
+    }
+
     return {
         garageIsOpen: garageIsOpen,
-        toggleGarageDoor: toggleGarageDoor
+        toggleGarageDoor: toggleGarageDoor,
+        toggleGarageOpenAlert:toggleGarageOpenAlert
     };
 };

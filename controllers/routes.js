@@ -7,6 +7,7 @@ module.exports = function (app, logger, io, debugMode) {
     const hue = require('../services/hue.js')(logger);
     const video = require('../services/video.js')(app, logger, io);
 
+
     var securityMsgTimeout = null;
     var garageErrorStatus = null;
     var shouldSendSecurityAlert = true;
@@ -326,5 +327,25 @@ module.exports = function (app, logger, io, debugMode) {
             res.status(401);
             res.send('not auth');
         }
+    });
+
+    
+    app.get('/gpsOn/:gpsKey', function (req, res) {
+        if(req.params && req.params.gpsKey===login.gpsKey){
+            iot.toggleGarageOpenAlert(true);
+        } else {
+            logger.error('malformed request for /gpsOn');
+        }
+        res.send('Ok');
+    });
+    
+    app.get('/gpsOff/:gpsKey', function (req, res) {
+        if(req.params && req.params.gpsKey===login.gpsKey){
+            iot.toggleGarageOpenAlert(false);
+        } else {
+            logger.error('malformed request for /gpsOff');
+        }
+		res.send('Ok');
+
     });
 };
