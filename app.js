@@ -56,7 +56,7 @@ var nestEnergyUsageOptions = {
     target: 'http://localhost:1235',
     changeOrigin: false,
     pathRewrite: {
-        '^/proxy/hue-energy-usage': ''
+        '^/proxy/nest-energy-usage': ''
     }
 };
 
@@ -64,7 +64,7 @@ var nestEnergyUsageIftttOptions = {
     target: 'http://localhost:1235/ifttt',
     changeOrigin: false,
     pathRewrite: {
-        '^/proxy/hue-energy-usage/ifttt': ''
+        '^/proxy/nest-energy-usage/ifttt': ''
     }
 };
 
@@ -132,9 +132,10 @@ var iot = require('./services/iot.js')(app, options.debugMode, io, logger);
 
 require('./services/certrenewcron.js')(logger);
 
-if (options.enableNestNergyUsageReport) {
+if (options.enableNestEnergyUsageReport) {
 	app.use('/proxy/nest-energy-usage/ifttt', proxy(nestEnergyUsageIftttOptions));
 }
+
 app.use(authChecker);
 
 if (options.enableWebcamStream) {
@@ -143,6 +144,6 @@ if (options.enableWebcamStream) {
 if (options.enableHueEnergyUsageReport) {
     app.use('/proxy/hue-energy-usage', proxy(hueEnergyUsageOptions));
 }
-if (options.enableNestNergyUsageReport) {
+if (options.enableNestEnergyUsageReport) {
 	app.use('/proxy/nest-energy-usage', proxy(nestEnergyUsageOptions));
 }
