@@ -16,6 +16,7 @@ module.exports.alertSendPictureText = true;
 module.exports.iftttSendGarageOpenAlert = false;
 module.exports.numberOfGifFrames = 15;
 module.exports.enableHueEnergyUsageReport = false;
+module.exports.enableNestEnergyUsageReport = false;
 module.exports.enableWebcamStream = false;
 module.exports.enableMotionSensor = false;
 module.exports.enableLightsOnGarageOpen = false;

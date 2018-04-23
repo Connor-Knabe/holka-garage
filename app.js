@@ -52,6 +52,21 @@ var hueEnergyUsageOptions = {
     }
 };
 
+var nestEnergyUsageOptions = {
+    target: 'http://localhost:1235',
+    changeOrigin: false,
+    pathRewrite: {
+        '^/proxy/hue-energy-usage': ''
+    }
+};
+
+var nestEnergyUsageIftttOptions = {
+    target: 'http://localhost:1235/ifttt',
+    changeOrigin: false,
+    pathRewrite: {
+        '^/proxy/hue-energy-usage/ifttt': ''
+    }
+};
 
 function authChecker(req, res, next) {
     var redirectToUrl = req.originalUrl ? req.originalUrl : '/';
@@ -117,6 +132,9 @@ var iot = require('./services/iot.js')(app, options.debugMode, io, logger);
 
 require('./services/certrenewcron.js')(logger);
 
+if (options.enableNestNergyUsageReport) {
+	app.use('/proxy/nest-energy-usage/ifttt', proxy(nestEnergyUsageIftttOptions));
+}
 app.use(authChecker);
 
 if (options.enableWebcamStream) {
@@ -124,4 +142,7 @@ if (options.enableWebcamStream) {
 }
 if (options.enableHueEnergyUsageReport) {
     app.use('/proxy/hue-energy-usage', proxy(hueEnergyUsageOptions));
+}
+if (options.enableNestNergyUsageReport) {
+	app.use('/proxy/nest-energy-usage', proxy(nestEnergyUsageOptions));
 }
