@@ -99,7 +99,7 @@ httpsServer.listen(443, function () {
 
 //settings
 var port = 80;
-logger.level = 'debug';
+logger.level = 'info';
 http.listen(port, function () {
     logger.info('listening on *:', port);
 });
