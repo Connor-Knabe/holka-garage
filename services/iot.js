@@ -17,7 +17,7 @@ var garageTimeout = null,
 	garageOpenAlertTimeout = null,
 	garageOpenAlertMessageTimeout = null,
 	garageOpenAlertEnabled,
-	garageOpenAlertManualEnable = true;
+	garageOpenAlertManualEnable = false;
 
 module.exports = function(app, debugMode, io, logger) {
 	var hasBeenOpened = garageIsOpen();
@@ -110,7 +110,7 @@ module.exports = function(app, debugMode, io, logger) {
 				motionSensorTimeoutOne = setTimeout(function() {
 					hasTurnedLightsOn = true;
 				}, 5 * 1000);
-				hue.garageLightsOnTimed(25);
+				hue.garageLightsOnTimed(100);
 			} else if (value == 0 && hasTurnedLightsOn) {
 				clearTimeout(motionSensorTimeoutTwo);
 				motionSensorTimeoutTwo = setTimeout(function() {
