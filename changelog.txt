@@ -1,4 +1,4 @@
-v1.1.8 - 
+v1.1.8 - removing cert cron, doing it at the server level because it needs to stop the server while running
 v1.1.7 - bug fix in total monthly usage calculation
 v1.1.6 - adding gps tracking to disable alert when garage open for certain people, brightness different for different situations
 v1.1.5 - motion sensor turns garage lights on if hue is enabled 

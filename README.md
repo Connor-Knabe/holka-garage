@@ -60,6 +60,8 @@ Setup:
 
 11.Install ssl certificate <https://github.com/certbot/certbot> use ./certbot-auto certonly --manual --email admin@example.com -d example.com -d www.example.com -d other.example.net note you will need to make sure app.js is running and add a route to routes.js with the specified info to verify this.
 
+11b.If you're using certbot you will want to check to see if you need to renew this script monthly .  You can add a .sh file to /etc/cron.monthly that contains certbot renew --standalone --pre-hook "pm2 stop hg" --post-hook "pm2 start hg" which will run monthly and renew your cert.  Also run sudo chmod +x yourFileName.sh to give permissions to execute it.
+
 12.Change the sslPath variable in login.js to the location of your certificate.
 
 13.Visting https://yourdomain.com should pull up the website.

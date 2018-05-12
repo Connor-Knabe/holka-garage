@@ -52,6 +52,15 @@ var hueEnergyUsageOptions = {
     }
 };
 
+var hueEnergyUsageHealthOptions = {
+    target: 'http://localhost:1234/health',
+    changeOrigin: false,
+    pathRewrite: {
+        '^/proxy/hue-energy-usage/health': ''
+    }
+};
+
+
 var nestEnergyUsageOptions = {
     target: 'http://localhost:1235',
     changeOrigin: false,
@@ -130,10 +139,14 @@ var routes = require('./controllers/routes.js')(app, logger, io, options.debugMo
 
 var iot = require('./services/iot.js')(app, options.debugMode, io, logger);
 
-require('./services/certrenewcron.js')(logger);
 
 if (options.enableNestEnergyUsageReport) {
 	app.use('/proxy/nest-energy-usage/ifttt', proxy(nestEnergyUsageIftttOptions));
+}
+
+
+if (options.enableHueEnergyUsageReport) {
+	app.use('/proxy/hue-energy-usage/health', proxy(hueEnergyUsageHealthOptions));
 }
 
 app.use(authChecker);
