@@ -16,6 +16,7 @@
     "express": "4.16.2",
     "express-session": "1.15.6",
     "geoip-lite": "^1.2.1",
+    "helmet": "^3.12.1",
     "http-proxy-middleware": "0.17.4",
     "log4js": "2.3.10",
     "node-hue-api": "2.4.2",
