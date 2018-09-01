@@ -33,7 +33,7 @@ app.use(cookieParser());
 
 app.use(function(req, res, next) {
 	if (!req.secure) {
-		return res.redirect([ 'https://', req.get('Host'), req.url ].join(''));
+		return res.redirect(['https://', req.get('Host'), req.url].join(''));
 	}
 	next();
 });
@@ -110,7 +110,7 @@ httpsServer.listen(443, function() {
 
 //settings
 var port = 80;
-logger.level = 'info';
+logger.level = 'debug';
 http.listen(port, function() {
 	logger.info('listening on *:', port);
 });
