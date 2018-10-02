@@ -24,6 +24,7 @@
     "onoff": "1.1.8",
     "request": "2.83.0",
     "request-promise": "4.2.2",
+    "serve-favicon": "^2.5.0",
     "socket.io": "2.0.4",
     "twilio": "3.9.1"
   }

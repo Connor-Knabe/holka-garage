@@ -7,6 +7,7 @@ var https = require('https');
 const login = require('./settings/login.js');
 const options = require('./settings/options.js');
 const helmet = require('helmet');
+const favicon = require('serve-favicon')
 
 const messengerInfo = require('./settings/messengerInfo.js');
 // @ts-ignore
@@ -98,6 +99,7 @@ var log4js = require('log4js');
 var logger = log4js.getLogger();
 
 app.use('/', express.static(path.join(__dirname, 'public')));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(
 	bodyParser.urlencoded({
 		extended: true
