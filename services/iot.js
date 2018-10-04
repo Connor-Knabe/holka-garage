@@ -15,9 +15,10 @@ var garageTimeout = null,
 	garageSensorTimeoutTwo = null,
 	garageOpened = false,
 	garageOpenAlertTimeout = null,
-	garageOpenAlertMessageTimeout = null,
-	garageOpenAlertEnabled,
-	garageOpenAlertManualEnable = false;
+    garageOpenAlertManualEnable = false,
+    garageOpenAlertPersonTwoManualEnable = false,
+    manualButtonToggle = true,
+    manualGarageOpenTimeout = null;
 
 module.exports = function(app, debugMode, io, logger) {
 	var hasBeenOpened = garageIsOpen();
@@ -47,7 +48,7 @@ module.exports = function(app, debugMode, io, logger) {
 			clearTimeout(garageOpenAlertTimeout);
 			garageOpenAlertTimeout = setTimeout(() => {
 				if (garageIsOpen()) {
-					garageOpenAlertMessageTimeout = setTimeout(() => {
+					setTimeout(() => {
 						var garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`;
 						logger.debug(garageAlertMsg);
 						if (options.garageOpenMinsAlert) {
@@ -69,13 +70,33 @@ module.exports = function(app, debugMode, io, logger) {
 				}
 			}, options.garageOpenAlertMins * 60 * 1000);
 
-			if (shouldSendGarageDoorAlertOne && garageOpenAlertManualEnable) {
-				if (options.alertButtonPressTexts) {
-					messenger.send(true, messengerInfo.toNumbers, msg, false, false);
-				}
-				messenger.sendIftt(garageOpened);
-				shouldSendGarageDoorAlertOne = false;
-			}
+
+            if(!manualButtonToggle){
+                logger.debug('garage not opened via button');
+                if (shouldSendGarageDoorAlertOne && garageOpenAlertManualEnable) {
+                    logger.debug('sending garage door gps alert');
+    
+                    if(garageOpenAlertPersonTwoManualEnable){
+                        video
+                        .streamVideo()
+                        .then(() => {
+                            var garageAlertMsg = `The garage has been opened but the homeowners are not home!`;
+                            messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
+                            video.stopStreaming();
+                        })
+                        .catch(() => {
+                            var garageAlertMsg = `The garage has been opened but the homeowners are not home! Error taking new video.`;
+                            messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
+                            video.stopStreaming();
+                        });
+                    } else {
+                        messenger.sendIftt(garageOpened);
+                    }
+                    shouldSendGarageDoorAlertOne = false;
+                }
+            }
+            
+
 			logger.debug(msg);
 			io.sockets.emit('garageErrorStatus', null);
 		} else if (value == 0 && hasBeenOpened) {
@@ -127,6 +148,11 @@ module.exports = function(app, debugMode, io, logger) {
 
 	function toggleGarageDoor() {
 		if (!debugMode) {
+            manualButtonToggle = true;
+            clearTimeout(manualGarageOpenTimeout);
+            manualGarageOpenTimeout = setTimeout(()=>{
+                manualButtonToggle = false;
+            },60*1000);
 			logger.debug('Opening/closing door now');
 			garageSwitch.writeSync(1);
 			garageTimeout = setTimeout(function() {
@@ -138,11 +164,18 @@ module.exports = function(app, debugMode, io, logger) {
 	function toggleGarageOpenAlert(enable) {
 		logger.debug('Enable toggleGarageOpenAlert' + enable);
 		garageOpenAlertManualEnable = enable;
-	}
+    }
+    
+    function toggleGarageOpenAlertSecondPerson(enable) {
+		logger.debug('Enable toggleGarageOpenAlertSecondPerson' + enable);
+		garageOpenAlertPersonTwoManualEnable = enable;
+    }
+    
 
 	return {
 		garageIsOpen: garageIsOpen,
 		toggleGarageDoor: toggleGarageDoor,
-		toggleGarageOpenAlert: toggleGarageOpenAlert
+        toggleGarageOpenAlert: toggleGarageOpenAlert,
+        toggleGarageOpenAlertSecondPerson: toggleGarageOpenAlertSecondPerson
 	};
 };

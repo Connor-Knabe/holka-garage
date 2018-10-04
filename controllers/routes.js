@@ -346,6 +346,25 @@ module.exports = function (app, logger, io, debugMode) {
             logger.error('malformed request for /gpsOff');
         }
 		res.send('Ok');
-
     });
+
+        
+    app.get('/gpsPersonTwoOn/:gpsTwoKey', function (req, res) {
+        if(req.params && req.params.gpsKey===login.gpsPersonTwoKey){
+            iot.toggleGarageOpenAlertSecondPerson(true);
+        } else {
+            logger.error('malformed request for /gpsOn');
+        }
+        res.send('Ok');
+    });
+    
+    app.get('/gpsPersonTwoOff/:gpsTwoKey', function (req, res) {
+        if(req.params && req.params.gpsKey===login.gpsPersonTwoKey){
+            iot.toggleGarageOpenAlertSecondPerson(false);
+        } else {
+            logger.error('malformed request for /gpsOff');
+        }
+		res.send('Ok');
+    });
+
 };
