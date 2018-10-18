@@ -20,7 +20,11 @@ module.exports = function(app, logger, io, debugMode) {
 		var authenticated = req && req.cookies && (req.cookies.holkaCookie === login.secretCookie || req.cookies.holkaCookie === login.secretAdminCookie);
 
 		return authenticated;
-	}
+    }
+    
+    function IftttWebHook(req){
+        
+    }
 
 	function vpnAuth(req) {
 		var clientIp = req.connection.remoteAddress;
@@ -157,7 +161,7 @@ module.exports = function(app, logger, io, debugMode) {
 			}
 		];
 
-		if (msg.textMessage.toLowerCase().trim() == 'video') {
+		if (msg.textMessage.toLowerCase().trim() == 'video' || msg.textMessage.toLowerCase().trim() == 'stream') {
 			video.streamVideo().then(() => {
 				var txtMsg = 'Video requested from ' + incomingPhoneNumber;
 				var btnPress = true;
@@ -174,7 +178,25 @@ module.exports = function(app, logger, io, debugMode) {
 
 		res.status(204);
 		res.send('No content');
-	});
+    });
+    
+    app.post('/openViaGps', bodyParser.json(), function(req,res){
+        if(options.iftttGpsGarageOpenKey === req.body.iftttGpsGarageOpenKey){
+            if (!iot.garageIsOpen()) {
+                logger.info(`Opening garage via gps from ip: ${req.connection.remoteAddress}`);
+                iot.toggleGarageDoor();
+                messenger.sendIftt(true, 'Garage open via GPS');
+            } else {
+                logger.info(`Attempted to open garage via gps from ip: ${req.connection.remoteAddress} but garage was closed`); 
+            }
+            res.status(200);
+            res.send('OK');
+        } else {
+            logger.info(`Failed attempt to open garage via gps from ip: ${req.connection.remoteAddress} with body of ${JSON.stringify(req.body)}`);
+            res.status(401);
+            res.send('not auth to open garage');
+        }
+    });
 
 	app.post('/openOrCloseGarage', function(req, res) {
 		logger.debug('body', req.body);

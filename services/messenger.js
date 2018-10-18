@@ -13,13 +13,18 @@ module.exports = function (logger, debugMode) {
         messengerInfo.TWILIO_AUTH_TOKEN
     );
     var minsOpened = 0;
-    function sendIftt(garageOpened) {
+    function sendIftt(garageOpened, message) {
         if (options.enableIfttt) {
+            var iftttMessage = messengerInfo.iftttValue1;
+            if(message){
+                iftttMessage = message;
+            }
             for (var i = 0; i < messengerInfo.iftttRecipients.length; i++) {
                 requestIfttt(
                     garageOpened,
                     messengerInfo.iftttRecipients[i].ApiKey,
-                    minsOpened
+                    minsOpened,
+                    iftttMessage
                 );
             }
         }
@@ -31,13 +36,14 @@ module.exports = function (logger, debugMode) {
                 requestIfttt(
                     null,
                     messengerInfo.iftttRecipients[i].ApiKey,
-                    minsOpened
+                    minsOpened,
+                    messengerInfo.iftttValue1
                 );
             }
         }
     }
 
-    function requestIfttt(garageOpened, apiKey, minsOpened) {
+    function requestIfttt(garageOpened, apiKey, minsOpened, message) {
         logger.debug(`Minutes opened request ifttt ${minsOpened}`);
         var url = messengerInfo.iftttGarageClosedUrl;
         if (garageOpened) {
@@ -51,7 +57,7 @@ module.exports = function (logger, debugMode) {
             method: 'POST',
             uri: url,
             body: {
-                value1: messengerInfo.iftttValue1,
+                value1: message,
                 value2: minsOpened
             },
             json: true

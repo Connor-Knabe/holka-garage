@@ -112,7 +112,7 @@ httpsServer.listen(443, function() {
 
 //settings
 var port = 80;
-logger.level = 'debug';
+logger.level = 'info';
 http.listen(port, function() {
 	logger.info('listening on *:', port);
 });
@@ -135,6 +135,8 @@ if (options.debugMode) {
 }
 
 app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
+
+
 
 var routes = require('./controllers/routes.js')(app, logger, io, options.debugMode);
 

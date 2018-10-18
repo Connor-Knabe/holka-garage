@@ -21,3 +21,4 @@ module.exports.enableWebcamStream = false;
 module.exports.enableMotionSensor = false;
 module.exports.enableLightsOnGarageOpen = false;
 module.exports.garageLightTimeoutMins = 15;
+module.exports.iftttGpsGarageOpenKey = "";
