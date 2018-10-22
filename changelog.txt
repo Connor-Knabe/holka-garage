@@ -1,3 +1,4 @@
+v1.2.3 - support for 2nd person to open garage via gps
 v1.2.2 - can open garage via ifttt webhook using gps location from the app
 v1.2.1 - fixing bug with reqParams for enabling garage alert
 v1.2.0 - adding ability to have two people on gps and alert if neither are home
