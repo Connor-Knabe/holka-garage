@@ -20,11 +20,9 @@ module.exports = function(app, logger, io, debugMode) {
 		var authenticated = req && req.cookies && (req.cookies.holkaCookie === login.secretCookie || req.cookies.holkaCookie === login.secretAdminCookie);
 
 		return authenticated;
-    }
-    
-    function IftttWebHook(req){
-        
-    }
+	}
+
+	function IftttWebHook(req) {}
 
 	function vpnAuth(req) {
 		var clientIp = req.connection.remoteAddress;
@@ -178,25 +176,46 @@ module.exports = function(app, logger, io, debugMode) {
 
 		res.status(204);
 		res.send('No content');
-    });
-    
-    app.post('/openViaGps', bodyParser.json(), function(req,res){
-        if(options.iftttGpsGarageOpenKey === req.body.iftttGpsGarageOpenKey){
-            if (!iot.garageIsOpen()) {
-                logger.info(`Opening garage via gps from ip: ${req.connection.remoteAddress}`);
-                iot.toggleGarageDoor();
-                messenger.sendIftt(true, 'Garage open via GPS');
-            } else {
-                logger.info(`Attempted to open garage via gps from ip: ${req.connection.remoteAddress} but garage was closed`); 
-            }
-            res.status(200);
-            res.send('OK');
-        } else {
-            logger.info(`Failed attempt to open garage via gps from ip: ${req.connection.remoteAddress} with body of ${JSON.stringify(req.body)}`);
-            res.status(401);
-            res.send('not auth to open garage');
-        }
-    });
+	});
+
+	app.post('/openViaGps', bodyParser.json(), function(req, res) {
+		openViaGps(res, req, false);
+	});
+
+	app.post('/openViaGpsTwo', bodyParser.json(), function(req, res) {
+		openViaGps(res, req, true);
+	});
+
+	function openViaGps(res, req, two) {
+		var gpsOpenKey = login.iftttGpsGarageOpenKey;
+		var gpsPerson = 'one';
+		if (two) {
+			gpsOpenKey = login.iftttGpsGarageOpenKeyTwo;
+			gpsPerson = 'two;';
+		}
+
+		if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
+			var theTime = new Date();
+			if (theTime.getHours() >= 8 && theTime.getHours() < 23) {
+				if (!iot.garageIsOpen()) {
+					logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress}`);
+					iot.toggleGarageDoor();
+					messenger.sendIftt(true, 'Garage open via GPS for person ${gpsPerson}');
+				} else {
+					logger.info(`Attempted to open garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress} but garage was closed`);
+				}
+			} else {
+				messenger.sendIftt(true, 'Not opening for person ${gpsPerson} due to time range');
+				logger.info(`Not opening garage for person ${gpsPerson} outside of time range from ip: ${req.connection.remoteAddress}`);
+			}
+			res.status(200);
+			res.send('OK');
+		} else {
+			logger.info(`Failed attempt to open garage for person ${gpsPerson} via gps from ip: ${req.connection.remoteAddress} with body of ${JSON.stringify(req.body)}`);
+			res.status(401);
+			res.send('not auth to open garage');
+		}
+	}
 
 	app.post('/openOrCloseGarage', function(req, res) {
 		logger.debug('body', req.body);
@@ -269,7 +288,7 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	app.get('/gpsOn/:gpsKey', function(req, res) {
-		if (req.params && req.params.gpsKey === login.gpsKey) {
+		if (req.params && req.params.gpsKey === login.gpsAlertKey) {
 			iot.toggleGarageOpenAlert(true);
 			res.send('Ok');
 		} else {
@@ -280,7 +299,7 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	app.get('/gpsOff/:gpsKey', function(req, res) {
-		if (req.params && req.params.gpsKey === login.gpsKey) {
+		if (req.params && req.params.gpsKey === login.gpsAlertKey) {
 			iot.toggleGarageOpenAlert(false);
 			res.send('Ok');
 		} else {
@@ -291,7 +310,7 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	app.get('/gpsPersonTwoOn/:gpsPersonTwoKey', function(req, res) {
-		if (req.params && req.params.gpsPersonTwoKey === login.gpsPersonTwoKey) {
+		if (req.params && req.params.gpsPersonTwoKey === login.gpsAlertPersonTwoKey) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
 			res.send('Ok');
 		} else {
@@ -301,8 +320,8 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	});
 
-	app.get('/gpsPersonTwoOff/:gpsPersonTwoKey', function(req, res) {
-		if (req.params && req.params.gpsPersonTwoKey === login.gpsPersonTwoKey) {
+	app.get('/gpsPersonTwoOff/:gpsAlertPersonTwoKey', function(req, res) {
+		if (req.params && req.params.gpsPersonTwoKey === login.gpsAlertPersonTwoKey) {
 			iot.toggleGarageOpenAlertSecondPerson(false);
 			res.send('Ok');
 		} else {
