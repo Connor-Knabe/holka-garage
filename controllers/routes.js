@@ -196,11 +196,11 @@ module.exports = function(app, logger, io, debugMode) {
 
 		if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
 			var theTime = new Date();
-			if (theTime.getHours() >= 8 && theTime.getHours() < 23) {
+			if (theTime.getHours() >= 11 && theTime.getHours() <= 12  || theTime.getHours() >= 16 && theTime.getHours() <= 17) {
 				if (!iot.garageIsOpen()) {
 					logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress}`);
 					iot.toggleGarageDoor();
-					messenger.sendIftt(true, 'Garage open via GPS for person ${gpsPerson}');
+					messenger.sendIftt(true, `Garage open via GPS for person ${gpsPerson}`);
 				} else {
 					logger.info(`Attempted to open garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress} but garage was closed`);
 				}
@@ -310,7 +310,7 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	app.get('/gpsPersonTwoOn/:gpsPersonTwoKey', function(req, res) {
-		if (req.params && req.params.gpsPersonTwoKey === login.gpsAlertPersonTwoKey) {
+		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
 			res.send('Ok');
 		} else {
@@ -321,7 +321,7 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	app.get('/gpsPersonTwoOff/:gpsAlertPersonTwoKey', function(req, res) {
-		if (req.params && req.params.gpsPersonTwoKey === login.gpsAlertPersonTwoKey) {
+		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
 			iot.toggleGarageOpenAlertSecondPerson(false);
 			res.send('Ok');
 		} else {
