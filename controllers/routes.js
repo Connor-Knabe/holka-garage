@@ -309,7 +309,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	});
 
-	app.get('/gpsPersonTwoOn/:gpsPersonTwoKey', function(req, res) {
+	app.get('/gpsPersonTwoOn/:gpsAlertPersonTwoKey', function(req, res) {
 		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
 			res.send('Ok');
