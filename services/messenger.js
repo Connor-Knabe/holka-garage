@@ -30,6 +30,36 @@ module.exports = function (logger, debugMode) {
         }
     }
 
+
+    function sendGenericIfttt(message){
+        if (options.enableIfttt) {
+            messengerInfo.iftttRecipients.forEach(iftttRecipient => {
+                // @ts-ignore
+                var url = messengerInfo.iftttGarageAlertUrl;
+                url += iftttRecipient.ApiKey;
+                var options = {
+                    method: 'POST',
+                    uri: url,
+                    body: {
+                        value1: message
+                    },
+                    json: true
+                };
+        
+                rp(options)
+                    .then(function (parsedBody) {
+                        // POST succeeded...
+                    })
+                    .catch(function (err) {
+                        // POST failed...
+                    });
+            });
+
+            
+        }
+    }
+
+
     function sendIfttGarageOpenedAlert(shouldSend = true, minsOpened) {
         if (shouldSend && options.enableIfttt) {
             for (var i = 0; i < messengerInfo.iftttRecipients.length; i++) {
@@ -221,6 +251,7 @@ module.exports = function (logger, debugMode) {
     return {
         send: send,
         sendIftt: sendIftt,
-        sendIfttGarageOpenedAlert: sendIfttGarageOpenedAlert
+        sendIfttGarageOpenedAlert: sendIfttGarageOpenedAlert,
+        sendGenericIfttt:sendGenericIfttt
     };
 };

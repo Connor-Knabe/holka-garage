@@ -112,7 +112,7 @@ httpsServer.listen(443, function() {
 
 //settings
 var port = 80;
-logger.level = 'info';
+logger.level = 'debug';
 http.listen(port, function() {
 	logger.info('listening on *:', port);
 });

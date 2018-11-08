@@ -23,6 +23,8 @@ module.exports.iftttGarageClosedUrl =
     'https://maker.ifttt.com/trigger/garage_close_trigger/with/key/';
 module.exports.iftttGarageOpenAlertUrl =
     'https://maker.ifttt.com/trigger/garage_alert/with/key/';
+    module.exports.iftttGarageAlertUrl =
+    'https://maker.ifttt.com/trigger/alert/with/key/';
 
 module.exports.iftttValue1 = 'This will be displayed in the notification';
 

@@ -196,7 +196,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 		if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
 			var theTime = new Date();
-			if (theTime.getHours() >= 11 && theTime.getHours() <= 12  || theTime.getHours() >= 16 && theTime.getHours() <= 17) {
+			if ((theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 17)) {
 				if (!iot.garageIsOpen()) {
 					logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress}`);
 					iot.toggleGarageDoor();
@@ -290,6 +290,8 @@ module.exports = function(app, logger, io, debugMode) {
 	app.get('/gpsOn/:gpsKey', function(req, res) {
 		if (req.params && req.params.gpsKey === login.gpsAlertKey) {
 			iot.toggleGarageOpenAlert(true);
+            logger.debug('/gpsOn/:gpsKey');
+            messenger.sendGenericIfttt(`gpsPersonOneOn`);
 			res.send('Ok');
 		} else {
 			logger.error('malformed request for /gpsOn');
@@ -301,6 +303,8 @@ module.exports = function(app, logger, io, debugMode) {
 	app.get('/gpsOff/:gpsKey', function(req, res) {
 		if (req.params && req.params.gpsKey === login.gpsAlertKey) {
 			iot.toggleGarageOpenAlert(false);
+            logger.debug('/gpsOff/:gpsKey');
+            messenger.sendGenericIfttt(`gpsPersonOneOff`);
 			res.send('Ok');
 		} else {
 			logger.error('malformed request for /gpsOff');
@@ -312,6 +316,8 @@ module.exports = function(app, logger, io, debugMode) {
 	app.get('/gpsPersonTwoOn/:gpsAlertPersonTwoKey', function(req, res) {
 		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
+            logger.debug('/gpsPersonTwoOn/:gpsAlertPersonTwoKey');
+            messenger.sendGenericIfttt(`gpsPersonTwoOn`);
 			res.send('Ok');
 		} else {
 			logger.error('malformed request for /gpsPersonTwoOn');
@@ -323,6 +329,8 @@ module.exports = function(app, logger, io, debugMode) {
 	app.get('/gpsPersonTwoOff/:gpsAlertPersonTwoKey', function(req, res) {
 		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
 			iot.toggleGarageOpenAlertSecondPerson(false);
+            logger.debug('/gpsPersonTwoOff/:gpsAlertPersonTwoKey');
+            messenger.sendGenericIfttt(`gpsPersonTwoOff`);
 			res.send('Ok');
 		} else {
 			logger.error('malformed request for /gpsPersonTwoOff');
