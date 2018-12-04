@@ -1,4 +1,4 @@
-v1.2.4 - sending generic alert around gps location
+v1.2.4 - sending generic alert around gps location, also triggers fireplace on if in gps range
 v1.2.3 - support for 2nd person to open garage via gps, adjusting time garage will autoopen
 v1.2.2 - can open garage via ifttt webhook using gps location from the app
 v1.2.1 - fixing bug with reqParams for enabling garage alert

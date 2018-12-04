@@ -21,3 +21,5 @@ module.exports.enableWebcamStream = false;
 module.exports.enableMotionSensor = false;
 module.exports.enableLightsOnGarageOpen = false;
 module.exports.garageLightTimeoutMins = 15;
+module.exports.fireplaceOn = false;
+module.exports.fireplaceIftttUrl = 'https://maker.ifttt.com/trigger/__fireplaceTriggerNameHere__/with/key/__yourKeyHere__'

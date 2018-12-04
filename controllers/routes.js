@@ -1,11 +1,12 @@
 var messengerInfo = require('../settings/messengerInfo.js');
-const options = require('../settings/options.js');
+var options = require('../settings/options.js');
 var garageOpenStatus = null;
 const geoip = require('geoip-lite');
 module.exports = function(app, logger, io, debugMode) {
 	var iot = require('../services/iot.js')(app, debugMode, io, logger);
 	const hue = require('../services/hue.js')(logger);
 	const video = require('../services/video.js')(app, logger, io);
+    const rp = require('request-promise');
 
 	var securityMsgTimeout = null;
 	var garageErrorStatus = null;
@@ -195,7 +196,29 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 
 		if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
-			var theTime = new Date();
+            var theTime = new Date();
+            //options
+
+            if(options.fireplaceOn && options.fireplaceIftttUrl){
+                // @ts-ignore
+                const fireplaceUrl = options.fireplaceIftttUrl;
+                const options = {
+                    method: 'POST',
+                    uri: fireplaceUrl,
+                    json: true
+                };
+        
+                rp(options)
+                    .then(function (parsedBody) {
+                        // POST succeeded...
+                        logger.info('successfully turned fireplace on for 1 hour');
+                    })
+                    .catch(function (err) {
+                        // POST failed...
+                        logger.error('unsucessfully turned fireplace on for 1 hour');
+                    });
+            }
+
 			if ((theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 17)) {
 				if (!iot.garageIsOpen()) {
 					logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress}`);
