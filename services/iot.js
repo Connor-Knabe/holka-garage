@@ -124,7 +124,7 @@ module.exports = function(app, debugMode, io, logger) {
 			if (err) {
 				logger.error('Error watching motion sensor: ', err);
 			}
-			logger.debug('value:', value);
+			//logger.debug('value:', value);
 			if (value == 1 && !hasTurnedLightsOn) {
 				clearTimeout(motionSensorTimeoutOne);
 				motionSensorTimeoutOne = setTimeout(function() {

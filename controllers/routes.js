@@ -6,7 +6,7 @@ module.exports = function(app, logger, io, debugMode) {
 	var iot = require('../services/iot.js')(app, debugMode, io, logger);
 	const hue = require('../services/hue.js')(logger);
 	const video = require('../services/video.js')(app, logger, io);
-    const rp = require('request-promise');
+	const rp = require('request-promise');
 
 	var securityMsgTimeout = null;
 	var garageErrorStatus = null;
@@ -196,30 +196,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 
 		if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
-            var theTime = new Date();
-            //options
-
-            if(options.fireplaceOn && options.fireplaceIftttUrl){
-                // @ts-ignore
-                const fireplaceUrl = options.fireplaceIftttUrl;
-                const options = {
-                    method: 'POST',
-                    uri: fireplaceUrl,
-                    json: true
-                };
-        
-                rp(options)
-                    .then(function (parsedBody) {
-                        // POST succeeded...
-                        logger.info('successfully turned fireplace on for 1 hour');
-                    })
-                    .catch(function (err) {
-                        // POST failed...
-                        logger.error('unsucessfully turned fireplace on for 1 hour');
-                    });
-            }
-
-			if ((theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 17)) {
+			if (isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime()) {
 				if (!iot.garageIsOpen()) {
 					logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress}`);
 					iot.toggleGarageDoor();
@@ -228,7 +205,7 @@ module.exports = function(app, logger, io, debugMode) {
 					logger.info(`Attempted to open garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress} but garage was closed`);
 				}
 			} else {
-				messenger.sendIftt(true, 'Not opening for person ${gpsPerson} due to time range');
+				messenger.sendIftt(true, `Not opening for person ${gpsPerson} due to time range`);
 				logger.info(`Not opening garage for person ${gpsPerson} outside of time range from ip: ${req.connection.remoteAddress}`);
 			}
 			res.status(200);
@@ -238,6 +215,23 @@ module.exports = function(app, logger, io, debugMode) {
 			res.status(401);
 			res.send('not auth to open garage');
 		}
+	}
+
+	function isFridayAndShouldOpen() {
+		var dayOfWeek = new Date().getDay();
+		var theTime = new Date();
+		return dayOfWeek == 5 && theTime.getHours() >= 6 && theTime.getHours() <= 21;
+	}
+
+	function isTuesdayAndShouldOpen() {
+		var dayOfWeek = new Date().getDay();
+		var theTime = new Date();
+		return (dayOfWeek == 2 && theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 23);
+	}
+
+	function genericShouldOpenBasedOnTime() {
+		var theTime = new Date();
+		return (theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 19);
 	}
 
 	app.post('/openOrCloseGarage', function(req, res) {
@@ -313,8 +307,8 @@ module.exports = function(app, logger, io, debugMode) {
 	app.get('/gpsOn/:gpsKey', function(req, res) {
 		if (req.params && req.params.gpsKey === login.gpsAlertKey) {
 			iot.toggleGarageOpenAlert(true);
-            logger.debug('/gpsOn/:gpsKey');
-            messenger.sendGenericIfttt(`gpsPersonOneOn`);
+			logger.debug('/gpsOn/:gpsKey');
+			messenger.sendGenericIfttt(`gpsPersonOneOn`);
 			res.send('Ok');
 		} else {
 			logger.error('malformed request for /gpsOn');
@@ -326,8 +320,8 @@ module.exports = function(app, logger, io, debugMode) {
 	app.get('/gpsOff/:gpsKey', function(req, res) {
 		if (req.params && req.params.gpsKey === login.gpsAlertKey) {
 			iot.toggleGarageOpenAlert(false);
-            logger.debug('/gpsOff/:gpsKey');
-            messenger.sendGenericIfttt(`gpsPersonOneOff`);
+			logger.debug('/gpsOff/:gpsKey');
+			messenger.sendGenericIfttt(`gpsPersonOneOff`);
 			res.send('Ok');
 		} else {
 			logger.error('malformed request for /gpsOff');
@@ -339,8 +333,8 @@ module.exports = function(app, logger, io, debugMode) {
 	app.get('/gpsPersonTwoOn/:gpsAlertPersonTwoKey', function(req, res) {
 		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
-            logger.debug('/gpsPersonTwoOn/:gpsAlertPersonTwoKey');
-            messenger.sendGenericIfttt(`gpsPersonTwoOn`);
+			logger.debug('/gpsPersonTwoOn/:gpsAlertPersonTwoKey');
+			messenger.sendGenericIfttt(`gpsPersonTwoOn`);
 			res.send('Ok');
 		} else {
 			logger.error('malformed request for /gpsPersonTwoOn');
@@ -352,8 +346,8 @@ module.exports = function(app, logger, io, debugMode) {
 	app.get('/gpsPersonTwoOff/:gpsAlertPersonTwoKey', function(req, res) {
 		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
 			iot.toggleGarageOpenAlertSecondPerson(false);
-            logger.debug('/gpsPersonTwoOff/:gpsAlertPersonTwoKey');
-            messenger.sendGenericIfttt(`gpsPersonTwoOff`);
+			logger.debug('/gpsPersonTwoOff/:gpsAlertPersonTwoKey');
+			messenger.sendGenericIfttt(`gpsPersonTwoOff`);
 			res.send('Ok');
 		} else {
 			logger.error('malformed request for /gpsPersonTwoOff');
