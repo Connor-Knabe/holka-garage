@@ -211,7 +211,6 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 
 		if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
-			var theTime = new Date();
 			if (isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime()) {
 				if (!iot.garageIsOpen()) {
 					logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress}`);
