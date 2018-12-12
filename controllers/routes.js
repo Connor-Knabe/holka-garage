@@ -22,8 +22,6 @@ module.exports = function(app, logger, io, debugMode) {
 		return authenticated;
 	}
 
-	function IftttWebHook(req) {}
-
 	function vpnAuth(req) {
 		var clientIp = req.connection.remoteAddress;
 		var isOnVpn = clientIp.includes(options.vpnIp) || clientIp.includes(options.localIp) || debugMode || (options.vpnIp === '' && options.localIp === '');

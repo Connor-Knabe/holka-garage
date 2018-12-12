@@ -29,6 +29,8 @@ var cookieParser = require('cookie-parser');
 // @ts-ignore
 var basicAuth = require('basic-auth-connect');
 
+
+
 app.use(helmet());
 app.use(cookieParser());
 
@@ -98,6 +100,7 @@ var io = require('socket.io')(httpsServer);
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 
+
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(
@@ -106,13 +109,21 @@ app.use(
 	})
 );
 
+//settings
+var port = 80;
+logger.level = 'debug';
+
+process.on('uncaughtException', (e)=>{
+	logger.error(`Exception thrown`, e);
+
+
+});
+
 httpsServer.listen(443, function() {
 	logger.info('listening on *:', 443);
 });
 
-//settings
-var port = 80;
-logger.level = 'debug';
+
 http.listen(port, function() {
 	logger.info('listening on *:', port);
 });
