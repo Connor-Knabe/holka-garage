@@ -114,8 +114,12 @@ var port = 80;
 logger.level = 'debug';
 
 process.on('uncaughtException', (e)=>{
-	logger.error(`Exception thrown`, e);
+	logger.error('Exception thrown', e);
+});
 
+process.on('unhandledRejection', (reason,p) => {
+
+	logger.error('Unhandled rejection for Promise:', p, 'With a reason of:', reason);
 
 });
 
