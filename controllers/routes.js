@@ -23,8 +23,6 @@ module.exports = function(app, logger, io, debugMode) {
 		return authenticated;
 	}
 
-	function IftttWebHook(req) {}
-
 	function vpnAuth(req) {
 		var clientIp = req.connection.remoteAddress;
 		var isOnVpn = clientIp.includes(options.vpnIp) || clientIp.includes(options.localIp) || debugMode || (options.vpnIp === '' && options.localIp === '');
@@ -122,22 +120,30 @@ module.exports = function(app, logger, io, debugMode) {
 
 	app.post('/video', function(req, res) {
 		io.sockets.emit('garageOpenStatus', 'Recording video');
-		video.streamVideo().then(() => {
-			var msg = 'Sending video via website';
-			var btnPress = true;
-			messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
-			io.sockets.emit('garageOpenStatus', 'Video sent');
-		});
+		video
+			.streamVideo()
+			.then(() => {
+				var msg = 'Sending video via website';
+				var btnPress = true;
+				messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
+				io.sockets.emit('garageOpenStatus', 'Video sent');
+			})
+			.catch(() => {});
 		res.send('Ok');
 	});
 
 	app.post('/lights/:brightness', function(req, res) {
 		io.sockets.emit('garageOpenStatus', 'Changing light brightness');
-		hue.lightsOn(req.params.brightness).then(() => {
-			setTimeout(() => {
-				io.sockets.emit('garageOpenStatus', 'Light brightness changed, wait for image to update');
-			}, 2 * 1000);
-		});
+		hue
+			.lightsOn(req.params.brightness)
+			.then(() => {
+				setTimeout(() => {
+					io.sockets.emit('garageOpenStatus', 'Light brightness changed, wait for image to update');
+				}, 2 * 1000);
+			})
+			.catch((e) => {
+				logger.error('Error setting light brightness:', e);
+			});
 		res.send(`Set to brightness ${req.params.brightness}`);
 	});
 
@@ -161,14 +167,20 @@ module.exports = function(app, logger, io, debugMode) {
 		];
 
 		if (msg.textMessage.toLowerCase().trim() == 'video' || msg.textMessage.toLowerCase().trim() == 'stream') {
-			video.streamVideo().then(() => {
-				var txtMsg = 'Video requested from ' + incomingPhoneNumber;
-				var btnPress = true;
-				video.streamVideo().then(() => {
-					messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, txtMsg, options.alertSendPictureText, btnPress);
-				});
-				io.sockets.emit('garageOpenStatus', 'Video sent');
-			});
+			video
+				.streamVideo()
+				.then(() => {
+					var txtMsg = 'Video requested from ' + incomingPhoneNumber;
+					var btnPress = true;
+					video
+						.streamVideo()
+						.then(() => {
+							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, txtMsg, options.alertSendPictureText, btnPress);
+						})
+						.catch(() => {});
+					io.sockets.emit('garageOpenStatus', 'Video sent');
+				})
+				.catch(() => {});
 		} else {
 			var txtMsg = 'Unrecognized command: ' + msg.textMessage + '. Video is the only recognized command at the moment.';
 			logger.info('here');
@@ -183,9 +195,11 @@ module.exports = function(app, logger, io, debugMode) {
 		openViaGps(res, req, false);
 	});
 
+	/*
 	app.post('/openViaGpsTwo', bodyParser.json(), function(req, res) {
 		openViaGps(res, req, true);
 	});
+*/
 
 	function openViaGps(res, req, two) {
 		var gpsOpenKey = login.iftttGpsGarageOpenKey;
@@ -196,7 +210,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 
 		if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
-			if (isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime()) {
+			if (isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime() || isWeekendAndShouldOpen()) {
 				if (!iot.garageIsOpen()) {
 					logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress}`);
 					iot.toggleGarageDoor();
@@ -229,6 +243,14 @@ module.exports = function(app, logger, io, debugMode) {
 		return (dayOfWeek == 2 && theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 23);
 	}
 
+	function isWeekendAndShouldOpen() {
+		var dayOfWeek = new Date().getDay();
+		var theTime = new Date();
+		return (
+			dayOfWeek == 5 || (dayOfWeek == 6 && (theTime.getHours() >= 8 && theTime.getHours() <= 23)) || (dayOfWeek == 7 && (theTime.getHours() >= 8 && theTime.getHours() <= 20))
+		);
+	}
+
 	function genericShouldOpenBasedOnTime() {
 		var theTime = new Date();
 		return (theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 19);
@@ -245,9 +267,12 @@ module.exports = function(app, logger, io, debugMode) {
 					io.sockets.emit('garageOpenStatus', garageOpenStatus);
 					var msg = garageOpenStatus + ' garage via button';
 					var btnPress = true;
-					video.streamVideo().then(() => {
-						messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
-					});
+					video
+						.streamVideo()
+						.then(() => {
+							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
+						})
+						.catch(() => {});
 
 					io.sockets.emit('garageErrorStatus', null);
 				} else {
@@ -264,9 +289,12 @@ module.exports = function(app, logger, io, debugMode) {
 					io.sockets.emit('garageOpenStatus', garageOpenStatus);
 					var msg = garageOpenStatus + ' garage via button';
 					var btnPress = true;
-					video.streamVideo().then(() => {
-						messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
-					});
+					video
+						.streamVideo()
+						.then(() => {
+							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
+						})
+						.catch(() => {});
 					io.sockets.emit('garageErrorStatus', null);
 				} else {
 					logger.debug('err');
@@ -330,6 +358,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	});
 
+	/*
 	app.get('/gpsPersonTwoOn/:gpsAlertPersonTwoKey', function(req, res) {
 		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
@@ -342,7 +371,9 @@ module.exports = function(app, logger, io, debugMode) {
 			res.send('None shall pass');
 		}
 	});
+*/
 
+	/*
 	app.get('/gpsPersonTwoOff/:gpsAlertPersonTwoKey', function(req, res) {
 		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
 			iot.toggleGarageOpenAlertSecondPerson(false);
@@ -355,4 +386,5 @@ module.exports = function(app, logger, io, debugMode) {
 			res.send('None shall pass');
 		}
 	});
+*/
 };

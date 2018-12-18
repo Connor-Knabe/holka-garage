@@ -14,7 +14,9 @@ var HueApi = hue.HueApi,
 module.exports = function(logger) {
 	function garageLightsOnTimed(brightness) {
 		if (options.enableHue) {
-			lightsOn(brightness).then();
+			lightsOn(brightness)
+				.then(() => {})
+				.catch(() => {});
 			logger.debug('Lights on for ' + options.garageLightTimeoutMins + ' mins');
 			clearTimeout(lightsOffTimeout);
 			lightsOffTimeout = setTimeout(function() {
@@ -62,7 +64,10 @@ module.exports = function(logger) {
 	}
 
 	function lightsOff() {
-		api.setGroupLightState(8, state.off()).then();
+		api
+			.setGroupLightState(8, state.off())
+			.then(() => {})
+			.catch(() => {});
 	}
 
 	return {

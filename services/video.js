@@ -104,43 +104,50 @@ module.exports = (app, logger, io) => {
 			if (!app.get('takingVideo')) {
 				pictureCounter = 0;
 				startCamera();
-				remove.deleteStream().then(() => {
-					app.set('takingVideo', true);
-					fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
-						fs.stat('./stream/image_stream.jpg', function(err, stats) {
-							if (stats && app.get('takingVideo')) {
-								var mtime = new Date(stats.mtime);
-								fs.createReadStream('./stream/image_stream.jpg').pipe(fs.createWriteStream('./stream/video/' + pictureCounter++ + '.jpg'));
+				remove
+					.deleteStream()
+					.then(() => {
+						app.set('takingVideo', true);
+						fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
+							fs.stat('./stream/image_stream.jpg', function(err, stats) {
+								if (stats && app.get('takingVideo')) {
+									var mtime = new Date(stats.mtime);
+									fs.createReadStream('./stream/image_stream.jpg').pipe(fs.createWriteStream('./stream/video/' + pictureCounter++ + '.jpg'));
 
-								if (pictureCounter > options.numberOfGifFrames && needsToConvert) {
-									needsToConvert = false;
-									logger.debug(`count greater than ${options.numberOfGifFrames}`);
-									var args = ['-loop', '0', './stream/video/*.jpg', '-resize', '50%', './stream/video.gif'];
+									if (pictureCounter > options.numberOfGifFrames && needsToConvert) {
+										needsToConvert = false;
+										logger.debug(`count greater than ${options.numberOfGifFrames}`);
+										var args = ['-loop', '0', './stream/video/*.jpg', '-resize', '50%', './stream/video.gif'];
 
-									convertProc = spawn('convert', args);
-									convertProc.stdout.on('data', data => {
-										logger.debug(`stdout: ${data}`);
-									});
-
-									convertProc.stderr.on('data', data => {
-										logger.error(`stderr: ${data}`);
-									});
-									convertProc.on('exit', () => {
-										pictureCounter = 0;
-										remove.deleteStream().then(() => {
-											logger.debug('taking video now set to false');
-											app.set('takingVideo', false);
-											stopStreaming();
-											needsToConvert = true;
-											resolve();
+										convertProc = spawn('convert', args);
+										convertProc.stdout.on('data', data => {
+											logger.debug(`stdout: ${data}`);
 										});
-									});
+
+										convertProc.stderr.on('data', data => {
+											logger.error(`stderr: ${data}`);
+										});
+										convertProc.on('exit', () => {
+											pictureCounter = 0;
+											remove
+												.deleteStream()
+												.then(() => {
+													logger.debug('taking video now set to false');
+													app.set('takingVideo', false);
+													stopStreaming();
+													needsToConvert = true;
+													resolve();
+												})
+												.catch(() => {});
+										});
+									}
 								}
-							}
+							});
 						});
-					});
-				});
+					})
+					.catch(() => {});
 			} else {
+				logger.error('rejecting stream video');
 				reject();
 			}
 		});
