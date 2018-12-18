@@ -1,6 +1,6 @@
 {
 	"apps":[{
-		"name":"hg",
+		"name":"hg1",
 		"script":"app.js",
 		"log_date_format":"MM/DD/YYYY HH:mm:ss"
 	}]

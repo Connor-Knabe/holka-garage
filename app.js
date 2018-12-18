@@ -19,6 +19,7 @@ const sslSettings = {
 	cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
 };
 
+
 var path = require('path');
 // @ts-ignore
 var bodyParser = require('body-parser');
@@ -112,6 +113,7 @@ app.use(
 //settings
 var port = 80;
 logger.level = 'debug';
+
 
 process.on('uncaughtException', (e)=>{
 	logger.error('Exception thrown', e);

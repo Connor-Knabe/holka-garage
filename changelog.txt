@@ -1,3 +1,4 @@
+v1.2.9 - updating npm packages
 v1.2.8 - adding check to open garage via GPS on weekend
 v1.2.4 - sending generic alert around gps location
 v1.2.3 - support for 2nd person to open garage via gps, adjusting time garage will autoopen
