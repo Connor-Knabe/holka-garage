@@ -141,7 +141,7 @@ module.exports = function(app, logger, io, debugMode) {
 					io.sockets.emit('garageOpenStatus', 'Light brightness changed, wait for image to update');
 				}, 2 * 1000);
 			})
-			.catch((e) => {
+			.catch(e => {
 				logger.error('Error setting light brightness:', e);
 			});
 		res.send(`Set to brightness ${req.params.brightness}`);
@@ -246,9 +246,7 @@ module.exports = function(app, logger, io, debugMode) {
 	function isWeekendAndShouldOpen() {
 		var dayOfWeek = new Date().getDay();
 		var theTime = new Date();
-		return (
-			dayOfWeek == 5 || (dayOfWeek == 6 && (theTime.getHours() >= 8 && theTime.getHours() <= 23)) || (dayOfWeek == 7 && (theTime.getHours() >= 8 && theTime.getHours() <= 20))
-		);
+		return (dayOfWeek == 6 && (theTime.getHours() >= 8 && theTime.getHours() <= 23)) || (dayOfWeek == 7 && (theTime.getHours() >= 8 && theTime.getHours() <= 20));
 	}
 
 	function genericShouldOpenBasedOnTime() {
