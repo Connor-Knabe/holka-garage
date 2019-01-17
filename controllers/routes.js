@@ -234,7 +234,7 @@ module.exports = function(app, logger, io, debugMode) {
 	function isFridayAndShouldOpen() {
 		var dayOfWeek = new Date().getDay();
 		var theTime = new Date();
-		return dayOfWeek == 5 && theTime.getHours() >= 6 && theTime.getHours() <= 21;
+		return dayOfWeek == 5 && theTime.getHours() >= 11 && theTime.getHours() <= 21;
 	}
 
 	function isTuesdayAndShouldOpen() {
@@ -246,7 +246,7 @@ module.exports = function(app, logger, io, debugMode) {
 	function isWeekendAndShouldOpen() {
 		var dayOfWeek = new Date().getDay();
 		var theTime = new Date();
-		return ((dayOfWeek == 6 && (theTime.getHours() >= 8 && theTime.getHours() <= 23)) || (dayOfWeek == 0 && (theTime.getHours() >= 8 && theTime.getHours() <= 20)));
+		return ((dayOfWeek == 6 && (theTime.getHours() >= 11 && theTime.getHours() <= 23)) || (dayOfWeek == 0 && (theTime.getHours() >= 8 && theTime.getHours() <= 20)));
 	}
 
 	function genericShouldOpenBasedOnTime() {
