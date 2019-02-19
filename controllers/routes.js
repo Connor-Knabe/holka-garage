@@ -141,7 +141,7 @@ module.exports = function(app, logger, io, debugMode) {
 					io.sockets.emit('garageOpenStatus', 'Light brightness changed, wait for image to update');
 				}, 2 * 1000);
 			})
-			.catch(e => {
+			.catch((e) => {
 				logger.error('Error setting light brightness:', e);
 			});
 		res.send(`Set to brightness ${req.params.brightness}`);
@@ -242,11 +242,11 @@ module.exports = function(app, logger, io, debugMode) {
 		var theTime = new Date();
 		return (dayOfWeek == 2 && theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 23);
 	}
-	
+
 	function isWeekendAndShouldOpen() {
 		var dayOfWeek = new Date().getDay();
 		var theTime = new Date();
-		return ((dayOfWeek == 6 && (theTime.getHours() >= 11 && theTime.getHours() <= 23)) || (dayOfWeek == 0 && (theTime.getHours() >= 8 && theTime.getHours() <= 20)));
+		return (dayOfWeek == 6 && (theTime.getHours() >= 11 && theTime.getHours() <= 23)) || (dayOfWeek == 0 && (theTime.getHours() >= 8 && theTime.getHours() <= 20));
 	}
 
 	function genericShouldOpenBasedOnTime() {
@@ -256,7 +256,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 	app.post('/openOrCloseGarage', function(req, res) {
 		logger.debug('body', req.body);
-		if (auth(req) && (vpnAuth(req) || regionAuth(req))) {
+		if (auth(req) && vpnAuth(req)) {
 			if (req.body && req.body.garageSwitch == 'open') {
 				if (!iot.garageIsOpen()) {
 					iot.toggleGarageDoor();
