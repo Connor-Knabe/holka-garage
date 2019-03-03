@@ -256,7 +256,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 	app.post('/openOrCloseGarage', function(req, res) {
 		logger.debug('body', req.body);
-		if (auth(req) && vpnAuth(req)) {
+		if (auth(req)) {
 			if (req.body && req.body.garageSwitch == 'open') {
 				if (!iot.garageIsOpen()) {
 					iot.toggleGarageDoor();
