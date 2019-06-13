@@ -378,33 +378,29 @@ module.exports = function(app, logger, io, debugMode) {
         }
     });
 
-    /*
-	app.get('/gpsPersonTwoOn/:gpsAlertPersonTwoKey', function(req, res) {
-		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
-			iot.toggleGarageOpenAlertSecondPerson(true);
-			logger.debug('/gpsPersonTwoOn/:gpsAlertPersonTwoKey');
-			messenger.sendGenericIfttt(`gpsPersonTwoOn`);
-			res.send('Ok');
-		} else {
-			logger.error('malformed request for /gpsPersonTwoOn');
-			res.status(401);
-			res.send('None shall pass');
-		}
-	});
-*/
+    app.get('/gpsPersonTwoOn/:gpsAlertPersonTwoKey', function(req, res) {
+        if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
+            iot.toggleGarageOpenAlertSecondPerson(true);
+            logger.debug('/gpsPersonTwoOn/:gpsAlertPersonTwoKey');
+            messenger.sendGenericIfttt(`gpsPersonTwoOn`);
+            res.send('Ok');
+        } else {
+            logger.error('malformed request for /gpsPersonTwoOn');
+            res.status(401);
+            res.send('None shall pass');
+        }
+    });
 
-    /*
-	app.get('/gpsPersonTwoOff/:gpsAlertPersonTwoKey', function(req, res) {
-		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
-			iot.toggleGarageOpenAlertSecondPerson(false);
-			logger.debug('/gpsPersonTwoOff/:gpsAlertPersonTwoKey');
-			messenger.sendGenericIfttt(`gpsPersonTwoOff`);
-			res.send('Ok');
-		} else {
-			logger.error('malformed request for /gpsPersonTwoOff');
-			res.status(401);
-			res.send('None shall pass');
-		}
-	});
-*/
+    app.get('/gpsPersonTwoOff/:gpsAlertPersonTwoKey', function(req, res) {
+        if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
+            iot.toggleGarageOpenAlertSecondPerson(false);
+            logger.debug('/gpsPersonTwoOff/:gpsAlertPersonTwoKey');
+            messenger.sendGenericIfttt(`gpsPersonTwoOff`);
+            res.send('Ok');
+        } else {
+            logger.error('malformed request for /gpsPersonTwoOff');
+            res.status(401);
+            res.send('None shall pass');
+        }
+    });
 };
