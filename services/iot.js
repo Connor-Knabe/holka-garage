@@ -20,7 +20,8 @@ var garageTimeout = null,
     manualButtonToggle = false,
     manualGarageOpenTimeout = null,
     homeIsOccupied = true,
-    isHomeEnabled = true;
+    isHomeAwayEnabled = true,
+    homeEnabledTimeout = null;
 
 module.exports = function(app, debugMode, io, logger) {
     var hasBeenOpened = garageIsOpen();
@@ -29,6 +30,7 @@ module.exports = function(app, debugMode, io, logger) {
     const options = require('../settings/options.js');
     const hue = require('./hue.js')(logger);
     const video = require('./video.js')(app, logger, io);
+    const rp = require('request-promise');
     app.set('takingVideo', false);
 
     garageSensor.watch(function(err, value) {
@@ -175,23 +177,51 @@ module.exports = function(app, debugMode, io, logger) {
     }
 
     function setHome() {
-        if (isHomeEnabled) {
+        if (isHomeAwayEnabled) {
             if (garageOpenAlertManualEnable && garageOpenAlertPersonTwoManualEnable) {
                 homeIsOccupied = false;
             } else {
                 homeIsOccupied = true;
             }
+            updateIftttWithHomeStatus(isHomeAwayEnabled);
         }
     }
 
-    function setIsHomeEnabled(enabled) {
-        isHomeEnabled = enabled;
+    function setIsHomeEnabled(enabled, hoursToPause) {
+        isHomeAwayEnabled = enabled;
+        if (hoursToPause) {
+            clearTimeout(homeEnabledTimeout);
+            homeEnabledTimeout = setTimeout(function() {
+                isHomeAwayEnabled = true;
+                updateIftttWithHomeStatus(isHomeAwayEnabled);
+            }, hoursToPause * 60 * 1000);
+        }
+    }
+
+    function updateIftttWithHomeStatus(isHome) {
+        var homeAwayText = isHome ? 'home' : 'away';
+        var url = messengerInfo.iftttHomeAway.baseUrl + `${homeAwayText}/with/key/`;
+        url += messengerInfo.iftttHomeAway.ApiKey;
+        var options = {
+            method: 'POST',
+            uri: url,
+            json: true
+        };
+
+        rp(options)
+            .then(function(parsedBody) {
+                // POST succeeded...
+            })
+            .catch(function(err) {
+                // POST failed...
+            });
     }
 
     return {
         garageIsOpen: garageIsOpen,
         toggleGarageDoor: toggleGarageDoor,
         toggleGarageOpenAlert: toggleGarageOpenAlert,
-        toggleGarageOpenAlertSecondPerson: toggleGarageOpenAlertSecondPerson
+        toggleGarageOpenAlertSecondPerson: toggleGarageOpenAlertSecondPerson,
+        setIsHomeEnabled: setIsHomeEnabled
     };
 };

@@ -180,9 +180,14 @@ module.exports = function(app, logger, io, debugMode) {
                     io.sockets.emit('garageOpenStatus', 'Video sent');
                 })
                 .catch(() => {});
-        } else if (msg.textMessage.toLowerCase().trim() == 'pause') {
-            iot.setIsHomeEnabled(false);
-            var txtMsg = 'Pausing home/away trigger for 12 hours';
+        } else if (containsString(msg.textMessage.toLowerCase(), 'pause')) {
+            var parsedTime = msg.textMessage.toLowerCase().split(' ')[1];
+
+            var hoursToPause = isInt(parsedTime) ? parsedTime : 12;
+
+            iot.setIsHomeEnabled(false, hoursToPause);
+
+            var txtMsg = `Pausing home/away trigger for ${hoursToPause} hours`;
             messenger.send(true, alertInfo, txtMsg, false, true);
         } else if (msg.textMessage.toLowerCase().trim() == 'resume') {
             iot.setIsHomeEnabled(true);
@@ -206,6 +211,15 @@ module.exports = function(app, logger, io, debugMode) {
 		openViaGps(res, req, true);
 	});
 */
+
+    function containsString(str, containsStr) {
+        return str.indexOf(containsStr) > -1;
+    }
+
+    function isInt(value) {
+        var x = parseFloat(value);
+        return !isNaN(value) && (x | 0) === x;
+    }
 
     function openViaGps(res, req, two) {
         var gpsOpenKey = login.iftttGpsGarageOpenKey;

@@ -6,7 +6,7 @@ module.exports.toNumbers = [
         email: 'myemailaddress@gmail.com'
     }
 ];
-//For gmail emails must enable less secure apps.... 
+//For gmail emails must enable less secure apps....
 //https://support.google.com/accounts/answer/6010255?hl=en
 module.exports.gmailUsername = 'mygmailsendingemail@gmail.com';
 module.exports.gmailPass = 'mygmailsendingemailPassword';
@@ -14,22 +14,16 @@ module.exports.TWILIO_AUTH_TOKEN = 'authtokenLKAJSLKFDJSSDF';
 module.exports.TWILIO_ACCOUNT_SID = 'accountSIDlkasjdf0jSIDFJ11DF';
 module.exports.photoTextTimeoutSeconds = 20;
 
-module.exports.iftttRecipients = [
-    { Name: 'Connor', ApiKey: 'apiKeylaksdjf09sdjf' }
-];
-module.exports.iftttGarageOpenedUrl =
-    'https://maker.ifttt.com/trigger/garage_open_trigger/with/key/';
-module.exports.iftttGarageClosedUrl =
-    'https://maker.ifttt.com/trigger/garage_close_trigger/with/key/';
-module.exports.iftttGarageOpenAlertUrl =
-    'https://maker.ifttt.com/trigger/garage_alert/with/key/';
-    module.exports.iftttGarageAlertUrl =
-    'https://maker.ifttt.com/trigger/alert/with/key/';
+module.exports.iftttRecipients = [{ Name: 'Connor', ApiKey: 'apiKeylaksdjf09sdjf' }];
+module.exports.iftttHomeAwayAccount = { ApiKey: 'lkajsdfj02ijf0', baseUrl: 'https://maker.ifttt.com/trigger/' };
+
+module.exports.iftttGarageOpenedUrl = 'https://maker.ifttt.com/trigger/garage_open_trigger/with/key/';
+module.exports.iftttGarageClosedUrl = 'https://maker.ifttt.com/trigger/garage_close_trigger/with/key/';
+module.exports.iftttGarageOpenAlertUrl = 'https://maker.ifttt.com/trigger/garage_alert/with/key/';
+module.exports.iftttGarageAlertUrl = 'https://maker.ifttt.com/trigger/alert/with/key/';
 
 module.exports.iftttValue1 = 'This will be displayed in the notification';
 
-module.exports.twilioPictureUser =
-    'make this a random string like -> alksjdfiajsd0fjsd';
-module.exports.twilioPicturePass =
-    'make this a random string like -> ksldjf0j2jf0';
+module.exports.twilioPictureUser = 'make this a random string like -> alksjdfiajsd0fjsd';
+module.exports.twilioPicturePass = 'make this a random string like -> ksldjf0j2jf0';
 module.exports.serverPictureUrl = '/pictures';
