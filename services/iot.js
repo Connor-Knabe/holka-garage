@@ -198,6 +198,8 @@ module.exports = function(app, debugMode, io, logger) {
         }
     }
 
+    updateIftttWithHomeStatus(false);
+
     function updateIftttWithHomeStatus(isHome) {
         var homeAwayText = isHome ? 'home' : 'away';
         var url = messengerInfo.iftttHomeAway.baseUrl + `${homeAwayText}/with/key/`;
@@ -211,9 +213,11 @@ module.exports = function(app, debugMode, io, logger) {
         rp(options)
             .then(function(parsedBody) {
                 // POST succeeded...
+                logger.debug(`Update ifttt with status ${homeAwayText}`);
             })
             .catch(function(err) {
                 // POST failed...
+                logger.error(`Failed: Update ifttt with status ${homeAwayText}`);
             });
     }
 
