@@ -1,4 +1,4 @@
-v1.4.2 - 
+v1.4.3 - not sending mms when open garage via button
 v1.4.0 - adding home/away logic for ifttt to replace nest's home/away 
 v1.3.0 - not opening garage until atleast 11am automatically
 v1.2.9 - updating npm packages
