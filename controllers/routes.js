@@ -288,7 +288,7 @@ module.exports = function(app, logger, io, debugMode) {
                     video
                         .streamVideo()
                         .then(() => {
-                            messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
+                            messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
                         })
                         .catch(() => {});
 
@@ -310,7 +310,7 @@ module.exports = function(app, logger, io, debugMode) {
                     video
                         .streamVideo()
                         .then(() => {
-                            messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
+                            messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
                         })
                         .catch(() => {});
                     io.sockets.emit('garageErrorStatus', null);
