@@ -247,7 +247,18 @@ module.exports = function (app, logger, io, debugMode) {
         }
 
         if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
-            if (options.garageGpsEnabled && (isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime() || isWeekendAndShouldOpen())) {
+
+
+			if(!options.garageGpsEnabled){
+				messenger.sendIftt(true, `NOT opening GPS open disabled`)
+				res.status(200);
+				res.send('OK)'	
+				return;
+			}
+
+
+
+            if (isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime() || isWeekendAndShouldOpen()) {
                 if (!iot.garageIsOpen()) {
                     logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress}`);
                     iot.toggleGarageDoor();
