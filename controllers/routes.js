@@ -2,7 +2,7 @@ var messengerInfo = require('../settings/messengerInfo.js');
 var options = require('../settings/options.js');
 var garageOpenStatus = null;
 const geoip = require('geoip-lite');
-module.exports = function(app, logger, io, debugMode) {
+module.exports = function (app, logger, io, debugMode) {
     var iot = require('../services/iot.js')(app, debugMode, io, logger);
     const hue = require('../services/hue.js')(logger);
     const video = require('../services/video.js')(app, logger, io);
@@ -36,7 +36,7 @@ module.exports = function(app, logger, io, debugMode) {
         return options.geoIpFilter.includes(geo.region) || options.geoIpFilter === '';
     }
 
-    app.get('/', function(req, res) {
+    app.get('/', function (req, res) {
         if (auth(req)) {
             res.sendFile('admin.html', { root: './views/' });
         } else {
@@ -45,23 +45,23 @@ module.exports = function(app, logger, io, debugMode) {
     });
 
     //Used to verify letsencrypt manually
-    app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey.split('.')[0], function(req, res) {
+    app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey.split('.')[0], function (req, res) {
         res.send(login.acmeChallengeKey);
     });
 
     //Used to verify letsencrypt manually
-    app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey2.split('.')[0], function(req, res) {
+    app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey2.split('.')[0], function (req, res) {
         res.send(login.acmeChallengeKey2);
     });
 
     //Used to verify letsencrypt manually
-    app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey3.split('.')[0], function(req, res) {
+    app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey3.split('.')[0], function (req, res) {
         res.send(login.acmeChallengeKey3);
     });
 
-    app.get('/stream/image_stream.jpg', function(req, res) {
+    app.get('/stream/image_stream.jpg', function (req, res) {
         if (auth(req)) {
-            fs.readFile('./stream/image_stream.jpg', function(err, data) {
+            fs.readFile('./stream/image_stream.jpg', function (err, data) {
                 if (err) logger.error('failed to read image stream', err); // Fail if the file can't be read.
                 res.writeHead(200, { 'Content-Type': 'image/jpeg' });
                 res.end(data); // Send the file data to the browser.
@@ -73,15 +73,15 @@ module.exports = function(app, logger, io, debugMode) {
         }
     });
 
-    app.get('/pictures', function(req, res) {
-        fs.readFile('./stream/video.gif', function(err, data) {
+    app.get('/pictures', function (req, res) {
+        fs.readFile('./stream/video.gif', function (err, data) {
             if (err) logger.error('error reading image_stream', err); // Fail if the file can't be read.
             res.writeHead(200, { 'Content-Type': 'image/gif' });
             res.end(data); // Send the file data to the browser.
         });
     });
 
-    app.post('/', function(req, res) {
+    app.post('/', function (req, res) {
         var options = {
             maxAge: 1000 * 60 * 60 * 24 * 180,
             httpOnly: true
@@ -118,7 +118,7 @@ module.exports = function(app, logger, io, debugMode) {
         return username.toLowerCase() === login.username.toLowerCase() && password === login.password;
     }
 
-    app.post('/video', function(req, res) {
+    app.post('/video', function (req, res) {
         io.sockets.emit('garageOpenStatus', 'Recording video');
         video
             .streamVideo()
@@ -128,11 +128,28 @@ module.exports = function(app, logger, io, debugMode) {
                 messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
                 io.sockets.emit('garageOpenStatus', 'Video sent');
             })
-            .catch(() => {});
+            .catch(() => { });
         res.send('Ok');
     });
 
-    app.post('/lights/:brightness', function(req, res) {
+
+    app.post('/gpsToggle', function (req, res) {
+
+        if (options.garageGpsEnabled) {
+            options.garageGpsEnabled = false;
+        } else {
+            options.garageGpsEnabled = true;
+        }
+
+        var garageGPSStatus = options.garageGpsEnabled ? "enabled" : "disabled";
+
+        io.sockets.emit('garageGPSStatus', garageGPSStatus);
+
+        res.send('Ok');
+    });
+
+
+    app.post('/lights/:brightness', function (req, res) {
         io.sockets.emit('garageOpenStatus', 'Changing light brightness');
         hue.lightsOn(req.params.brightness)
             .then(() => {
@@ -146,7 +163,7 @@ module.exports = function(app, logger, io, debugMode) {
         res.send(`Set to brightness ${req.params.brightness}`);
     });
 
-    app.post('/sms', function(req, res) {
+    app.post('/sms', function (req, res) {
         var incomingPhoneNumber = req.body.From;
 
         var msg = {
@@ -176,10 +193,10 @@ module.exports = function(app, logger, io, debugMode) {
                         .then(() => {
                             messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, txtMsg, options.alertSendPictureText, btnPress);
                         })
-                        .catch(() => {});
+                        .catch(() => { });
                     io.sockets.emit('garageOpenStatus', 'Video sent');
                 })
-                .catch(() => {});
+                .catch(() => { });
         } else if (containsString(msg.textMessage.toLowerCase(), 'pause')) {
             var parsedTime = msg.textMessage.toLowerCase().split(' ')[1];
 
@@ -202,7 +219,7 @@ module.exports = function(app, logger, io, debugMode) {
         res.send('No content');
     });
 
-    app.post('/openViaGps', bodyParser.json(), function(req, res) {
+    app.post('/openViaGps', bodyParser.json(), function (req, res) {
         openViaGps(res, req, false);
     });
 
@@ -230,7 +247,7 @@ module.exports = function(app, logger, io, debugMode) {
         }
 
         if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
-            if (isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime() || isWeekendAndShouldOpen()) {
+            if (options.garageGpsEnabled && (isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime() || isWeekendAndShouldOpen())) {
                 if (!iot.garageIsOpen()) {
                     logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress}`);
                     iot.toggleGarageDoor();
@@ -274,7 +291,7 @@ module.exports = function(app, logger, io, debugMode) {
         return (theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 19);
     }
 
-    app.post('/openOrCloseGarage', function(req, res) {
+    app.post('/openOrCloseGarage', function (req, res) {
         logger.debug('body', req.body);
         if (auth(req)) {
             if (req.body && req.body.garageSwitch == 'open') {
@@ -290,7 +307,7 @@ module.exports = function(app, logger, io, debugMode) {
                         .then(() => {
                             messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
                         })
-                        .catch(() => {});
+                        .catch(() => { });
 
                     io.sockets.emit('garageErrorStatus', null);
                 } else {
@@ -312,7 +329,7 @@ module.exports = function(app, logger, io, debugMode) {
                         .then(() => {
                             messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
                         })
-                        .catch(() => {});
+                        .catch(() => { });
                     io.sockets.emit('garageErrorStatus', null);
                 } else {
                     logger.debug('err');
@@ -335,7 +352,7 @@ module.exports = function(app, logger, io, debugMode) {
             var securityMsg = 'SECURITY: tried to ' + garageStatus + ' garage via post without being authenticated!! From ip: ' + req.connection.remoteAddress;
 
             clearTimeout(securityMsgTimeout);
-            securityMsgTimeout = setTimeout(function() {
+            securityMsgTimeout = setTimeout(function () {
                 shouldSendSecurityAlert = true;
             }, hoursToWaitBeforeNextSecurityAlert * 60 * 60 * 10000);
             var btnPress = true;
@@ -350,7 +367,7 @@ module.exports = function(app, logger, io, debugMode) {
         }
     });
 
-    app.get('/gpsOn/:gpsKey', function(req, res) {
+    app.get('/gpsOn/:gpsKey', function (req, res) {
         //away from home turn alert on
         if (req.params && req.params.gpsKey === login.gpsAlertKey) {
             iot.toggleGarageOpenAlert(true);
@@ -364,7 +381,7 @@ module.exports = function(app, logger, io, debugMode) {
         }
     });
 
-    app.get('/gpsOff/:gpsKey', function(req, res) {
+    app.get('/gpsOff/:gpsKey', function (req, res) {
         //close to home turn alert off
         if (req.params && req.params.gpsKey === login.gpsAlertKey) {
             iot.toggleGarageOpenAlert(false);
@@ -378,7 +395,7 @@ module.exports = function(app, logger, io, debugMode) {
         }
     });
 
-    app.get('/gpsPersonTwoOn/:gpsAlertPersonTwoKey', function(req, res) {
+    app.get('/gpsPersonTwoOn/:gpsAlertPersonTwoKey', function (req, res) {
         //away from home turn alert on
         if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
             iot.toggleGarageOpenAlertSecondPerson(true);
@@ -392,7 +409,7 @@ module.exports = function(app, logger, io, debugMode) {
         }
     });
 
-    app.get('/gpsPersonTwoOff/:gpsAlertPersonTwoKey', function(req, res) {
+    app.get('/gpsPersonTwoOff/:gpsAlertPersonTwoKey', function (req, res) {
         //close to home turn alert off
         if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
             iot.toggleGarageOpenAlertSecondPerson(false);

@@ -17,6 +17,10 @@ margin-right: 150px;*/
     display: inline;
 }
 
+#garageGPSStatus {
+    display: inline;
+}
+
 #garageErrorStatus {
     color: red;
 }

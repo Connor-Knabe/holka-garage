@@ -34,6 +34,18 @@ $(document).ready(function () {
             }
         });
     });
+
+    $('#gps').click(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: '/gpsToggle',
+            success: function (result) {
+                $('#status').html(result);
+            }
+        });
+    });
+
     $('#lights25').click(function (e) {
         e.preventDefault();
         $.ajax({
