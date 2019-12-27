@@ -94,11 +94,7 @@ module.exports = function(logger, debugMode) {
             messageCount = 0;
         }, 1 * 60 * 60 * 1000);
         messageCount++;
-        logger.debug(
-            `Sending message? -> msgContent:${msgContent} messageCount:${messageCount} generalTexts:${options.generalTexts}alertButtonPressTexts:${
-                options.alertButtonPressTexts
-            } btnPress:${btnPress} sendPicture:${sendPicture}`
-        );
+        logger.debug(`Sending message? -> msgContent:${msgContent} messageCount:${messageCount} generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress} sendPicture:${sendPicture}`);
 
         if (numbers && messageCount < 10) {
             for (var i = 0; i < numbers.length; i++) {
@@ -110,11 +106,7 @@ module.exports = function(logger, debugMode) {
                     if (options.generalTexts || (options.alertButtonPressTexts && btnPress)) {
                         sendText(numbers[i], msgContent, sendPicture);
                     } else {
-                        logger.debug(
-                            `Not sending texts generalTexts:${options.generalTexts}alertButtonPressTexts:${
-                                options.alertButtonPressTexts
-                            } btnPress:${btnPress} sendPicture:${sendPicture}`
-                        );
+                        logger.debug(`Not sending texts generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress} sendPicture:${sendPicture}`);
                     }
                 }
             }

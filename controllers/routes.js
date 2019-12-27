@@ -351,7 +351,7 @@ module.exports = function(app, logger, io, debugMode) {
     });
 
     app.get('/gpsOn/:gpsKey', function(req, res) {
-        //away home turn alert on
+        //away from home turn alert on
         if (req.params && req.params.gpsKey === login.gpsAlertKey) {
             iot.toggleGarageOpenAlert(true);
             logger.debug('/gpsOn/:gpsKey');
@@ -379,6 +379,7 @@ module.exports = function(app, logger, io, debugMode) {
     });
 
     app.get('/gpsPersonTwoOn/:gpsAlertPersonTwoKey', function(req, res) {
+        //away from home turn alert on
         if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
             iot.toggleGarageOpenAlertSecondPerson(true);
             logger.debug('/gpsPersonTwoOn/:gpsAlertPersonTwoKey');
@@ -392,6 +393,7 @@ module.exports = function(app, logger, io, debugMode) {
     });
 
     app.get('/gpsPersonTwoOff/:gpsAlertPersonTwoKey', function(req, res) {
+        //close to home turn alert off
         if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
             iot.toggleGarageOpenAlertSecondPerson(false);
             logger.debug('/gpsPersonTwoOff/:gpsAlertPersonTwoKey');
