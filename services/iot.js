@@ -14,7 +14,8 @@ var garageTimeout = null,
 	garageSensorTimeoutOne = null,
 	garageSensorTimeoutTwo = null,
 	garageOpened = false,
-	garageOpenAlertTimeout = null,
+	garageOpenAlertOneTimeout = null,
+	garageOpenAlertTwoTimeout = null,
 	garageOpenAlertManualEnable = false,
 	garageOpenAlertPersonTwoManualEnable = false,
 	manualButtonToggle = false,
@@ -33,6 +34,7 @@ module.exports = function(app, debugMode, io, logger) {
 	const rp = require('request-promise');
 	app.set('takingVideo', false);
 
+	console.log('YO');
 	garageSensor.watch(function(err, value) {
 		if (err) {
 			logger.error('Error watching garage sensor: ', err);
@@ -49,30 +51,9 @@ module.exports = function(app, debugMode, io, logger) {
 				shouldSendGarageDoorAlertOne = true;
 			}, 1 * 60 * 10000);
 			logger.debug('garage open');
-			clearTimeout(garageOpenAlertTimeout);
-			garageOpenAlertTimeout = setTimeout(() => {
-				if (garageIsOpen()) {
-					setTimeout(() => {
-						var garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes!`;
-						logger.debug(garageAlertMsg);
-						if (options.garageOpenMinsAlert) {
-							logger.debug(garageAlertMsg);
-							video
-								.streamVideo()
-								.then(() => {
-									messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
-									video.stopStreaming();
-								})
-								.catch(() => {
-									garageAlertMsg = `Garage has been open for more than: ${options.garageOpenAlertMins} minutes! Error taking new video.`;
-									messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
-									video.stopStreaming();
-								});
-						}
-						messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert, options.garageOpenAlertMins);
-					}, 30 * 1000);
-				}
-			}, options.garageOpenAlertMins * 60 * 1000);
+
+			garageAlertOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
+			garageAlertOpenCheck(options.garageOpenAlertTwoMins, garageOpenAlertTwoTimeout, true);
 
 			if (!manualButtonToggle) {
 				logger.debug('garage not opened via button');
@@ -142,6 +123,39 @@ module.exports = function(app, debugMode, io, logger) {
 				}, 5 * 1000);
 			}
 		});
+	}
+
+	function garageAlertOpenCheck(timeUntilAlert, timeOut, shouldCall) {
+		clearTimeout(timeOut);
+		timeOut = setTimeout(() => {
+			if (garageIsOpen()) {
+				setTimeout(() => {
+					var garageAlertMsg = `Garage has been open for more than: ${timeUntilAlert} minutes!`;
+					logger.debug(garageAlertMsg);
+					if (options.garageOpenMinsAlert) {
+						logger.debug(garageAlertMsg);
+						video
+							.streamVideo()
+							.then(() => {
+								if (shouldCall) {
+									messenger.sendCallAlert();
+								}
+								messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
+								video.stopStreaming();
+							})
+							.catch(() => {
+								if (shouldCall) {
+									messenger.sendCallAlert();
+								}
+								garageAlertMsg = `Garage has been open for more than: ${timeUntilAlert} minutes! Error taking new video.`;
+								messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
+								video.stopStreaming();
+							});
+					}
+					messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert, timeUntilAlert);
+				}, 30 * 1000);
+			}
+		}, timeUntilAlert * 60 * 1000);
 	}
 
 	function garageIsOpen() {

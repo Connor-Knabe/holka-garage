@@ -1,10 +1,11 @@
+module.exports.voiceXmlUrl = 'https://example.com/voice.xml';
 module.exports.fromNumber = '5735550333';
 module.exports.toNumbers = [
-    {
-        name: 'Connor',
-        number: '314-555-0333',
-        email: 'myemailaddress@gmail.com'
-    }
+	{
+		name: 'Connor',
+		number: '314-555-0333',
+		email: 'myemailaddress@gmail.com'
+	}
 ];
 //For gmail emails must enable less secure apps....
 //https://support.google.com/accounts/answer/6010255?hl=en
@@ -14,7 +15,7 @@ module.exports.TWILIO_AUTH_TOKEN = 'authtokenLKAJSLKFDJSSDF';
 module.exports.TWILIO_ACCOUNT_SID = 'accountSIDlkasjdf0jSIDFJ11DF';
 module.exports.photoTextTimeoutSeconds = 20;
 
-module.exports.iftttRecipients = [{ Name: 'Connor', ApiKey: 'apiKeylaksdjf09sdjf' }];
+module.exports.iftttRecipients = [ { Name: 'Connor', ApiKey: 'apiKeylaksdjf09sdjf' } ];
 module.exports.iftttHomeAwayAccount = { ApiKey: 'lkajsdfj02ijf0', baseUrl: 'https://maker.ifttt.com/trigger/' };
 
 module.exports.iftttGarageOpenedUrl = 'https://maker.ifttt.com/trigger/garage_open_trigger/with/key/';

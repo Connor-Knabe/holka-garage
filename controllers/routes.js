@@ -252,7 +252,7 @@ module.exports = function (app, logger, io, debugMode) {
 			if(!options.garageGpsEnabled){
 				messenger.sendIftt(true, `NOT opening GPS open disabled`)
 				res.status(200);
-				res.send('OK)'	
+				res.send('OK');
 				return;
 			}
 
