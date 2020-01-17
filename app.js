@@ -4,10 +4,12 @@ var app = express();
 // @ts-ignore
 var http = require('http').Server(app);
 var https = require('https');
+const { constants } = require('crypto');
+
 const login = require('./settings/login.js');
 const options = require('./settings/options.js');
 const helmet = require('helmet');
-const favicon = require('serve-favicon')
+const favicon = require('serve-favicon');
 
 const messengerInfo = require('./settings/messengerInfo.js');
 // @ts-ignore
@@ -19,7 +21,6 @@ const sslSettings = {
 	cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
 };
 
-
 var path = require('path');
 // @ts-ignore
 var bodyParser = require('body-parser');
@@ -30,14 +31,12 @@ var cookieParser = require('cookie-parser');
 // @ts-ignore
 var basicAuth = require('basic-auth-connect');
 
-
-
 app.use(helmet());
 app.use(cookieParser());
 
 app.use(function(req, res, next) {
 	if (!req.secure) {
-		return res.redirect(['https://', req.get('Host'), req.url].join(''));
+		return res.redirect([ 'https://', req.get('Host'), req.url ].join(''));
 	}
 	next();
 });
@@ -94,16 +93,22 @@ function authChecker(req, res, next) {
 	}
 }
 
-var httpsServer = https.createServer(sslSettings, app);
+var httpsServer = https.createServer(
+	{
+		secureOptions: constants.SSL_OP_NO_TLSv1 | constants.SSL_OP_NO_TLSv1_1,
+		key: fs.readFileSync(login.sslPath + 'privkey.pem'),
+		cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
+	},
+	app
+);
 
 var io = require('socket.io')(httpsServer);
 // @ts-ignore
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 
-
 app.use('/', express.static(path.join(__dirname, 'public')));
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(
 	bodyParser.urlencoded({
 		extended: true
@@ -114,21 +119,17 @@ app.use(
 var port = 80;
 logger.level = 'debug';
 
-
-process.on('uncaughtException', (e)=>{
+process.on('uncaughtException', (e) => {
 	logger.error('Exception thrown', e);
 });
 
-process.on('unhandledRejection', (reason,p) => {
-
+process.on('unhandledRejection', (reason, p) => {
 	logger.error('Unhandled rejection for Promise:', p, 'With a reason of:', reason);
-
 });
 
 httpsServer.listen(443, function() {
 	logger.info('listening on *:', 443);
 });
-
 
 http.listen(port, function() {
 	logger.info('listening on *:', port);
@@ -152,8 +153,6 @@ if (options.debugMode) {
 }
 
 app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
-
-
 
 var routes = require('./controllers/routes.js')(app, logger, io, options.debugMode);
 

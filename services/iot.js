@@ -34,7 +34,6 @@ module.exports = function(app, debugMode, io, logger) {
 	const rp = require('request-promise');
 	app.set('takingVideo', false);
 
-	console.log('YO');
 	garageSensor.watch(function(err, value) {
 		if (err) {
 			logger.error('Error watching garage sensor: ', err);
