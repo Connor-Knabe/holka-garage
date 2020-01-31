@@ -180,71 +180,17 @@ module.exports = function(app, debugMode, io, logger) {
 	function toggleGarageOpenAlert(enable) {
 		logger.debug('Enable toggleGarageOpenAlert' + enable);
 		garageOpenAlertManualEnable = enable;
-		setHome();
 	}
 
 	function toggleGarageOpenAlertSecondPerson(enable) {
 		logger.debug('Enable toggleGarageOpenAlertSecondPerson' + enable);
 		garageOpenAlertPersonTwoManualEnable = enable;
-		setHome();
-	}
-
-	function setHome() {
-		if (isHomeAwayEnabled) {
-			if (garageOpenAlertManualEnable && garageOpenAlertPersonTwoManualEnable) {
-				if (homeIsOccupied) {
-					homeIsOccupied = false;
-					updateIftttWithHomeStatus(homeIsOccupied);
-				}
-			} else {
-				if (!homeIsOccupied) {
-					homeIsOccupied = true;
-					updateIftttWithHomeStatus(homeIsOccupied);
-				}
-			}
-		}
-	}
-
-	function setIsHomeEnabled(enabled, hoursToPause) {
-		isHomeAwayEnabled = enabled;
-
-		if (hoursToPause) {
-			clearTimeout(homeEnabledTimeout);
-			homeEnabledTimeout = setTimeout(function() {
-				isHomeAwayEnabled = true;
-				updateIftttWithHomeStatus(isHomeAwayEnabled);
-			}, hoursToPause * 60 * 1000);
-		}
-	}
-
-	//updateIftttWithHomeStatus(false);
-
-	function updateIftttWithHomeStatus(isHome) {
-		var homeAwayText = isHome ? 'home' : 'away';
-		var url = messengerInfo.iftttHomeAway.baseUrl + `${homeAwayText}/with/key/`;
-		url += messengerInfo.iftttHomeAway.ApiKey;
-		var options = {
-			method: 'POST',
-			uri: url,
-			json: true
-		};
-
-		rp(options)
-			.then(function(parsedBody) {
-				// POST succeeded...
-				logger.debug(`Update ifttt with status ${homeAwayText}`);
-			})
-			.catch(function(err) {
-				// POST failed...
-				logger.error(`Failed: Update ifttt with status ${homeAwayText}`);
-			});
 	}
 
 	return {
 		garageIsOpen: garageIsOpen,
 		toggleGarageDoor: toggleGarageDoor,
 		toggleGarageOpenAlert: toggleGarageOpenAlert,
-		toggleGarageOpenAlertSecondPerson: toggleGarageOpenAlertSecondPerson,
-		setIsHomeEnabled: setIsHomeEnabled
+		toggleGarageOpenAlertSecondPerson: toggleGarageOpenAlertSecondPerson
 	};
 };
