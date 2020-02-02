@@ -1,5 +1,4 @@
 const Gpio = require('onoff').Gpio;
-const path = require('path');
 
 const motionSensor = new Gpio(15, 'in', 'both');
 const garageSensor = new Gpio(4, 'in', 'both');
@@ -19,10 +18,7 @@ var garageTimeout = null,
 	garageOpenAlertManualEnable = false,
 	garageOpenAlertPersonTwoManualEnable = false,
 	manualButtonToggle = false,
-	manualGarageOpenTimeout = null,
-	homeIsOccupied = true,
-	isHomeAwayEnabled = true,
-	homeEnabledTimeout = null;
+	manualGarageOpenTimeout = null;
 
 module.exports = function(app, debugMode, io, logger) {
 	var hasBeenOpened = garageIsOpen();
@@ -52,7 +48,6 @@ module.exports = function(app, debugMode, io, logger) {
 			logger.debug('garage open');
 
 			garageAlertOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
-			garageAlertOpenCheck(options.garageOpenAlertTwoMins, garageOpenAlertTwoTimeout, true);
 
 			if (!manualButtonToggle) {
 				logger.debug('garage not opened via button');
@@ -126,6 +121,7 @@ module.exports = function(app, debugMode, io, logger) {
 
 	function garageAlertOpenCheck(timeUntilAlert, timeOut, shouldCall) {
 		clearTimeout(timeOut);
+		logger.debug('garage alert open check');
 		timeOut = setTimeout(() => {
 			if (garageIsOpen()) {
 				setTimeout(() => {
@@ -138,21 +134,26 @@ module.exports = function(app, debugMode, io, logger) {
 							.then(() => {
 								if (shouldCall) {
 									messenger.sendCallAlert();
+								} else {
+									messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
 								}
-								messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
 								video.stopStreaming();
 							})
 							.catch(() => {
 								if (shouldCall) {
 									messenger.sendCallAlert();
+								} else {
+									garageAlertMsg = `Garage has been open for more than: ${timeUntilAlert} minutes! Error taking new video.`;
+									messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
 								}
-								garageAlertMsg = `Garage has been open for more than: ${timeUntilAlert} minutes! Error taking new video.`;
-								messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
 								video.stopStreaming();
 							});
+						if (!shouldCall) {
+							garageAlertOpenCheck(options.garageOpenAlertTwoMins, garageOpenAlertTwoTimeout, true);
+						}
 					}
 					messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert, timeUntilAlert);
-				}, 30 * 1000);
+				}, 45 * 1000);
 			}
 		}, timeUntilAlert * 60 * 1000);
 	}

@@ -126,7 +126,7 @@ module.exports = function(logger, debugMode) {
 					from: messengerInfo.fromNumber,
 					method: 'get'
 				})
-				.then((call) => logger.info(`Succesfully called ${numbers[i]} with call.sid: ${call.sid}`))
+				.then((call) => logger.info(`Succesfully called ${call} with call.sid: ${call.sid}`))
 				.catch((err) => {
 					logger.error(`Failed to call via twilio`, err);
 				});
