@@ -11,15 +11,14 @@ const options = require('./settings/options.js');
 const helmet = require('helmet');
 const favicon = require('serve-favicon');
 
+// @ts-ignore
+var log4js = require('log4js');
+var logger = log4js.getLogger();
+
 const messengerInfo = require('./settings/messengerInfo.js');
 // @ts-ignore
 const proxy = require('http-proxy-middleware');
 const fs = require('fs');
-
-const sslSettings = {
-	key: fs.readFileSync(login.sslPath + 'privkey.pem'),
-	cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
-};
 
 var path = require('path');
 // @ts-ignore
@@ -102,11 +101,6 @@ var httpsServer = https.createServer(
 	app
 );
 
-var io = require('socket.io')(httpsServer);
-// @ts-ignore
-var log4js = require('log4js');
-var logger = log4js.getLogger();
-
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(
@@ -153,10 +147,6 @@ if (options.debugMode) {
 }
 
 app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
-
-var routes = require('./controllers/routes.js')(app, logger, io, options.debugMode);
-
-var iot = require('./services/iot.js')(app, options.debugMode, io, logger);
 
 if (options.enableNestEnergyUsageReport) {
 	app.use('/proxy/nest-energy-usage/ifttt', proxy(nestEnergyUsageIftttOptions));
