@@ -14,7 +14,6 @@ const favicon = require('serve-favicon');
 // @ts-ignore
 var log4js = require('log4js');
 var logger = log4js.getLogger();
-var io = require('socket.io')(httpsServer);
 
 const messengerInfo = require('./settings/messengerInfo.js');
 // @ts-ignore
@@ -101,6 +100,7 @@ var httpsServer = https.createServer(
 	},
 	app
 );
+var io = require('socket.io')(httpsServer);
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
