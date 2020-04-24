@@ -4,8 +4,7 @@ const motionSensor = new Gpio(15, 'in', 'both');
 const garageSensor = new Gpio(4, 'in', 'both');
 const garageSwitch = new Gpio(21, 'out');
 
-var garageTimeout = null,
-	motionSensorTimeoutOne = null,
+var motionSensorTimeoutOne = null,
 	motionSensorTimeoutTwo = null,
 	hasTurnedLightsOn = false,
 	shouldSendGarageDoorAlertOne = true,
@@ -27,7 +26,6 @@ module.exports = function(app, debugMode, io, logger) {
 	const options = require('../settings/options.js');
 	const hue = require('./hue.js')(logger);
 	const video = require('./video.js')(app, logger, io);
-	const rp = require('request-promise');
 	app.set('takingVideo', false);
 
 	garageSensor.watch(function(err, value) {
@@ -172,9 +170,6 @@ module.exports = function(app, debugMode, io, logger) {
 			}, 60 * 1000);
 			logger.debug('Opening/closing door now');
 			garageSwitch.writeSync(1);
-			garageTimeout = setTimeout(function() {
-				garageSwitch.writeSync(0);
-			}, 1000);
 		}
 	}
 
