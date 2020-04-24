@@ -14,6 +14,7 @@ const favicon = require('serve-favicon');
 // @ts-ignore
 var log4js = require('log4js');
 var logger = log4js.getLogger();
+var io = require('socket.io')(httpsServer);
 
 const messengerInfo = require('./settings/messengerInfo.js');
 // @ts-ignore
@@ -145,6 +146,7 @@ if (options.debugMode) {
 	logger.debug('In debug mode not sending texts!!!');
 	logger.debug('___________________________________');
 }
+var routes = require('./controllers/routes.js')(app, logger, io, options.debugMode);
 
 app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
 
