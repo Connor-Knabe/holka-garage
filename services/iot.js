@@ -170,6 +170,9 @@ module.exports = function(app, debugMode, io, logger) {
 			}, 60 * 1000);
 			logger.debug('Opening/closing door now');
 			garageSwitch.writeSync(1);
+			setTimeout(function() {
+				garageSwitch.writeSync(0);
+			}, 1000);
 		}
 	}
 
