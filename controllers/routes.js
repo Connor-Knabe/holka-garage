@@ -221,11 +221,9 @@ module.exports = function(app, logger, io, debugMode) {
 		openViaGps(res, req, false);
 	});
 
-	/*
 	app.post('/openViaGpsTwo', bodyParser.json(), function(req, res) {
 		openViaGps(res, req, true);
 	});
-*/
 
 	function containsString(str, containsStr) {
 		return str.indexOf(containsStr) > -1;
