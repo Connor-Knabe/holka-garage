@@ -218,10 +218,13 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	app.post('/openViaGps', bodyParser.json(), function(req, res) {
+		logger.debug('openViaGps called');
 		openViaGps(res, req, false);
 	});
 
 	app.post('/openViaGpsTwo', bodyParser.json(), function(req, res) {
+		logger.debug('openViaGpsTwo called');
+
 		openViaGps(res, req, true);
 	});
 
@@ -295,7 +298,6 @@ module.exports = function(app, logger, io, debugMode) {
 	}
 
 	app.post('/openOrCloseGarage', function(req, res) {
-		logger.debug('body', req.body);
 		if (auth(req)) {
 			if (req.body && req.body.garageSwitch == 'open') {
 				if (!iot.garageIsOpen()) {
