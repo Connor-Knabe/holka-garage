@@ -30,10 +30,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 	const hue = require('./hue.js')(logger);
 	app.set('takingVideo', false);
 
-	//DEBUG REMOVE
-	//ALSO ENABLE E texts in messengerInfo file on server
-	//SET TO 15 min for timer in options.js
-
 	garageSensor.watch(function(err, value) {
 		if (err) {
 			logger.error('Error watching garage sensor: ', err);
