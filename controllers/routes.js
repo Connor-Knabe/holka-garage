@@ -279,7 +279,7 @@ module.exports = function(app, logger, io, debugMode) {
 		if (auth(req)) {
 			if (req.body && req.body.garageSwitch == 'open') {
 				if (!iot.garageIsOpen()) {
-					iot.toggleGarageDoor('website', req.connection.remoteAddress);
+					iot.openGarageDoor();
 					garageOpenStatus = 'Opening...';
 					video.updateGarageStatus(garageOpenStatus);
 					io.sockets.emit('garageOpenStatus', garageOpenStatus);
