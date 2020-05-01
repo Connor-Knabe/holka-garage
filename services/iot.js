@@ -217,17 +217,22 @@ module.exports = function(app, debugMode, io, logger, video) {
 	}
 
 	function garageDoorOpenHandler(isPersonTwo, gpsPerson, remoteAddress) {
+		var shouldLogAlert = false;
 		if (personTwoShouldOpenTimer && isPersonTwo) {
 			personTwoShouldOpenTimer = false;
 			toggleGarageDoor(gpsPerson, remoteAddress);
 		} else {
-			logger.debug(`Not opening for person ${gpsPerson} due to timer`);
+			shouldLogAlert = true;
 		}
 
 		if (personOneShouldOpenTimer && !isPersonTwo) {
 			personOneShouldOpenTimer = false;
 			toggleGarageDoor(gpsPerson, remoteAddress);
 		} else {
+			shouldLogAlert = true;
+		}
+
+		if (shouldLogAlert) {
 			logger.debug(`Not opening for person ${gpsPerson} due to timer`);
 		}
 	}
