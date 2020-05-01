@@ -234,7 +234,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 		if (shouldLogAlert) {
 			const logMsg = `Not opening for person ${gpsPerson} due to timer`;
 			logger.debug(logMsg);
-			messenger.sendIftt(true, logMsg);
+			messenger.sendGenericIfttt(true, logMsg);
 		}
 	}
 

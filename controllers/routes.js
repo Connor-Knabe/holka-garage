@@ -258,7 +258,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 		if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
 			if (!options.garageGpsEnabledMain) {
-				messenger.sendIftt(true, `NOT opening GPS open disabled person:${gpsPerson}`);
+				messenger.sendGenericIfttt(`NOT opening GPS open disabled person:${gpsPerson}`);
 				res.status(200);
 				res.send('OK');
 				return;
