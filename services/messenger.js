@@ -10,7 +10,6 @@ module.exports = function(logger, debugMode) {
 	const client = twilio(messengerInfo.TWILIO_ACCOUNT_SID, messengerInfo.TWILIO_AUTH_TOKEN);
 	var minsOpened = 0;
 
-	logger.debug('messenger start');
 	send(true, messengerInfo.toNumbers, 'The Garage Software Has Rebooted.  Garage Open Alerts Disabled Until You Leave Home!!');
 
 	function sendIftt(garageOpened, message) {
@@ -109,7 +108,10 @@ module.exports = function(logger, debugMode) {
 				}
 				if (numbers[i].number) {
 					logger.debug('number', numbers[i].number);
-					if (options.generalTexts || (options.alertButtonPressTexts && btnPress)) {
+
+					if (options.generalTexts) {
+						sendText(numbers[i], msgContent, sendPicture);
+					} else if (options.alertButtonPressTexts && btnPress) {
 						sendText(numbers[i], msgContent, sendPicture);
 					} else {
 						logger.debug(`Not sending texts generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress} sendPicture:${sendPicture}`);
