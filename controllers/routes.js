@@ -3,9 +3,9 @@ var options = require('../settings/options.js');
 var garageOpenStatus = null;
 const geoip = require('geoip-lite');
 module.exports = function(app, logger, io, debugMode) {
-	var iot = require('../services/iot.js')(app, debugMode, io, logger);
 	const hue = require('../services/hue.js')(logger);
 	const video = require('../services/video.js')(app, logger, io);
+	var iot = require('../services/iot.js')(app, debugMode, io, logger, video);
 	const rp = require('request-promise');
 
 	var securityMsgTimeout = null;

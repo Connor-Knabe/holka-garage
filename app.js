@@ -146,7 +146,7 @@ if (options.debugMode) {
 	logger.debug('In debug mode not sending texts!!!');
 	logger.debug('___________________________________');
 }
-var routes = require('./controllers/routes.js')(app, logger, io, options.debugMode);
+require('./controllers/routes.js')(app, logger, io, options.debugMode);
 
 app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
 
