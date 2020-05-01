@@ -5,14 +5,14 @@ const geoip = require('geoip-lite');
 module.exports = function(app, logger, io, debugMode) {
 	const hue = require('../services/hue.js')(logger);
 	const video = require('../services/video.js')(app, logger, io);
-	var iot = require('../services/iot.js')(app, debugMode, io, logger, video);
+	var messenger = require('../services/messenger.js')(logger, debugMode);
+	var iot = require('../services/iot.js')(app, debugMode, io, logger, video, messenger);
 	const rp = require('request-promise');
 
 	var securityMsgTimeout = null;
 	var garageErrorStatus = null;
 	var shouldSendSecurityAlert = true;
 
-	var messenger = require('../services/messenger.js')(logger, debugMode);
 	var fs = require('fs');
 	var bodyParser = require('body-parser');
 	var login = require('../settings/login.js');

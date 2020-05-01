@@ -56,7 +56,7 @@ module.exports = function(logger, debugMode) {
 	}
 
 	function requestIfttt(garageOpened, apiKey, minsOpened, message) {
-		logger.debug(`Minutes opened request ifttt ${minsOpened}`);
+		logger.debug(`Minutes opened request ifttt ${minsOpened}, with message ${message}`);
 		var url = messengerInfo.iftttGarageClosedUrl;
 		if (garageOpened) {
 			url = messengerInfo.iftttGarageOpenedUrl;
