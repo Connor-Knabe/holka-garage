@@ -26,3 +26,4 @@ module.exports.openViaButtonAlertSendPictureText = false;
 module.exports.garageGpsEnabledMain = true;
 module.exports.garageGpsEnabledPersonOne = true;
 module.exports.garageGpsEnabledPersonTwo = true;
+module.exports.minsToWaitAfterLeavingHouseForGPSOpen = 1;
