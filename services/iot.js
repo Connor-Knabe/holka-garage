@@ -215,7 +215,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 			personOneShouldOpenTimerTimeout = setTimeout(() => {
 				personOneShouldOpenTimer = true;
 				logger.debug('personOneTimer Active');
-			}, options.minsToWaitAfterLeavingHouseForGPSOpen * 60 * 60 * 1000);
+			}, options.minsToWaitAfterLeavingHouseForGPSOpen * 60 * 1000);
 		}
 		logger.debug('Enable toggleGarageOpenAlertPersonOne: ' + enable);
 		garageOpenAlertManualEnable = enable;
@@ -226,7 +226,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 			clearTimeout(personTwoShouldOpenTimerTimeout);
 			personTwoShouldOpenTimerTimeout = setTimeout(() => {
 				personTwoShouldOpenTimer = true;
-			}, options.minsToWaitAfterLeavingHouseForGPSOpen * 60 * 60 * 1000);
+			}, options.minsToWaitAfterLeavingHouseForGPSOpen * 60 * 1000);
 		}
 		logger.debug('Enable toggleGarageOpenAlertSecondPerson: ' + enable);
 		garageOpenAlertPersonTwoManualEnable = enable;
