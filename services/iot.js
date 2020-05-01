@@ -34,10 +34,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 	//ALSO ENABLE E texts in messengerInfo file on server
 	//SET TO 15 min for timer in options.js
 	//REMOVE DEBUG MODE
-	setTimeout(() => {
-		logger.debug('about to alert ');
-		shouldAlertHomeOwners();
-	}, 1 * 60 * 1000);
+	// setTimeout(() => {
+	// 	logger.debug('about to alert ');
+	// 	shouldAlertHomeOwners();
+	// }, 1 * 60 * 1000);
 
 	garageSensor.watch(function(err, value) {
 		if (err) {
