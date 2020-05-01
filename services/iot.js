@@ -233,20 +233,17 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 	}
 
 	function garageDoorOpenHandler(isPersonTwo, gpsPerson, remoteAddress) {
-		var shouldLogAlert = false;
+		var shouldLogAlert = true;
 		if (personTwoShouldOpenTimer && isPersonTwo) {
 			personTwoShouldOpenTimer = false;
+			shouldLogAlert = false;
 			toggleGarageDoor(gpsPerson, remoteAddress);
-		} else {
-			shouldLogAlert = true;
 		}
 
 		if (personOneShouldOpenTimer && !isPersonTwo) {
 			personOneShouldOpenTimer = false;
-			toggleGarageDoor(gpsPerson, remoteAddress);
 			shouldLogAlert = false;
-		} else {
-			shouldLogAlert = true;
+			toggleGarageDoor(gpsPerson, remoteAddress);
 		}
 
 		if (shouldLogAlert) {
