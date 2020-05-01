@@ -14,8 +14,8 @@ var motionSensorTimeoutOne = null,
 	garageOpened = false,
 	garageOpenAlertOneTimeout = null,
 	garageOpenAlertTwoTimeout = null,
-	garageOpenAlertManualEnable = false,
-	garageOpenAlertPersonTwoManualEnable = false,
+	garageOpenAlertManualEnable = true,
+	garageOpenAlertPersonTwoManualEnable = true,
 	expectedGarageOpen = false,
 	manualGarageOpenTimeout = null,
 	personOneShouldOpenTimer = false,
@@ -32,7 +32,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 
 	setTimeout(() => {
 		logger.debug('about to alert ');
-
 		shouldAlertHomeOwners();
 	}, 1 * 60 * 1000);
 
