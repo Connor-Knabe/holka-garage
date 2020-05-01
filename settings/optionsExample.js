@@ -9,11 +9,9 @@ module.exports.localIp = '192.168.1.1';
 module.exports.hueBridgeIp = '192.168.0.31';
 module.exports.hueUser = 'alksdjflKZJDFLKJSDLKFJlkshdflkjsdf';
 module.exports.serverDomain = 'example.com';
-
 module.exports.garageOpenMinsAlert = true;
 module.exports.garageOpenAlertOneMins = 15;
 module.exports.garageOpenAlertTwoMins = 30;
-
 module.exports.geoIpFilter = 'FL';
 module.exports.alertSendPictureText = true;
 module.exports.iftttSendGarageOpenAlert = false;
@@ -25,4 +23,6 @@ module.exports.enableMotionSensor = true;
 module.exports.enableLightsOnGarageOpen = false;
 module.exports.garageLightTimeoutMins = 15;
 module.exports.openViaButtonAlertSendPictureText = false;
-module.exports.garageGpsEnabled = true;
+module.exports.garageGpsEnabledMain = true;
+module.exports.garageGpsEnabledPersonOne = true;
+module.exports.garageGpsEnabledPersonTwo = true;

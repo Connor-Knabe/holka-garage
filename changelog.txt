@@ -1,3 +1,4 @@
+v1.6.0 - only open garage if you've been gone for 15 minutes to prevent false positives
 v1.5.4 - fixing bug with garage open alert
 v1.5.3 - disabling tls 1.0 and 1.1
 v1.5.1 - adding feature to call if garage still open after first alert

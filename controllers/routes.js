@@ -133,13 +133,13 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	app.post('/gpsToggle', function(req, res) {
-		if (options.garageGpsEnabled) {
-			options.garageGpsEnabled = false;
+		if (options.garageGpsEnabledMain) {
+			options.garageGpsEnabledMain = false;
 		} else {
-			options.garageGpsEnabled = true;
+			options.garageGpsEnabledMain = true;
 		}
 
-		var garageGPSStatus = options.garageGpsEnabled ? 'enabled' : 'disabled';
+		var garageGPSStatus = options.garageGpsEnabledMain ? 'enabled' : 'disabled';
 
 		io.sockets.emit('garageGPSStatus', garageGPSStatus);
 
@@ -219,13 +219,25 @@ module.exports = function(app, logger, io, debugMode) {
 
 	app.post('/openViaGps', bodyParser.json(), function(req, res) {
 		logger.debug('openViaGps called');
-		openViaGps(res, req, false);
+
+		if (options.garageGpsEnabledPersonOne) {
+			logger.debug('openViaGpsTwo active');
+			openViaGps(res, req, false);
+		} else {
+			res.status(200);
+			res.send('OK');
+		}
 	});
 
 	app.post('/openViaGpsTwo', bodyParser.json(), function(req, res) {
 		logger.debug('openViaGpsTwo called');
-
-		openViaGps(res, req, true);
+		if (options.garageGpsEnabledPersonTwo) {
+			logger.debug('openViaGpsTwo active');
+			openViaGps(res, req, true);
+		} else {
+			res.status(200);
+			res.send('OK');
+		}
 	});
 
 	function containsString(str, containsStr) {
@@ -246,25 +258,15 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 
 		if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
-			if (!options.garageGpsEnabled) {
+			if (!options.garageGpsEnabledMain) {
 				messenger.sendIftt(true, `NOT opening GPS open disabled`);
 				res.status(200);
 				res.send('OK');
 				return;
 			}
 
-			if (isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime() || isWeekendAndShouldOpen()) {
-				if (!iot.garageIsOpen()) {
-					logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress}`);
-					iot.toggleGarageDoor();
-					messenger.sendIftt(true, `Garage open via GPS for person ${gpsPerson}`);
-				} else {
-					logger.info(`Attempted to open garage via gps person ${gpsPerson} from ip: ${req.connection.remoteAddress} but garage was closed`);
-				}
-			} else {
-				messenger.sendIftt(true, `Not opening for person ${gpsPerson} due to time range`);
-				logger.info(`Not opening garage for person ${gpsPerson} outside of time range from ip: ${req.connection.remoteAddress}`);
-			}
+			iot.garageDoorOpenHandler(two, gpsPerson, req.connection.remoteAddress);
+
 			res.status(200);
 			res.send('OK');
 		} else {
@@ -272,29 +274,6 @@ module.exports = function(app, logger, io, debugMode) {
 			res.status(401);
 			res.send('not auth to open garage');
 		}
-	}
-
-	function isFridayAndShouldOpen() {
-		var dayOfWeek = new Date().getDay();
-		var theTime = new Date();
-		return dayOfWeek == 5 && theTime.getHours() >= 11 && theTime.getHours() <= 21;
-	}
-
-	function isTuesdayAndShouldOpen() {
-		var dayOfWeek = new Date().getDay();
-		var theTime = new Date();
-		return (dayOfWeek == 2 && theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 23);
-	}
-
-	function isWeekendAndShouldOpen() {
-		var dayOfWeek = new Date().getDay();
-		var theTime = new Date();
-		return (dayOfWeek == 6 && (theTime.getHours() >= 11 && theTime.getHours() <= 23)) || (dayOfWeek == 0 && (theTime.getHours() >= 8 && theTime.getHours() <= 20));
-	}
-
-	function genericShouldOpenBasedOnTime() {
-		var theTime = new Date();
-		return (theTime.getHours() >= 6 && theTime.getHours() <= 7) || (theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 19);
 	}
 
 	app.post('/openOrCloseGarage', function(req, res) {

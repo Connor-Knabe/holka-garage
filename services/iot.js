@@ -17,7 +17,11 @@ var motionSensorTimeoutOne = null,
 	garageOpenAlertManualEnable = false,
 	garageOpenAlertPersonTwoManualEnable = false,
 	manualButtonToggle = false,
-	manualGarageOpenTimeout = null;
+	manualGarageOpenTimeout = null,
+	personOneShouldOpenTimer = false,
+	personTwoShouldOpenTimer = false,
+	personOneShouldOpenTimerTimeout = null,
+	personTwoShouldOpenTimerTimeout = null;
 
 module.exports = function(app, debugMode, io, logger) {
 	var hasBeenOpened = garageIsOpen();
@@ -161,7 +165,22 @@ module.exports = function(app, debugMode, io, logger) {
 		return isOpen;
 	}
 
-	function toggleGarageDoor() {
+	function toggleGarageDoor(gpsPerson, remoteAddress) {
+		if (isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime() || isWeekendAndShouldOpen()) {
+			if (!garageIsOpen()) {
+				logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${remoteAddress}`);
+				openGarageDoor();
+				messenger.sendIftt(true, `Garage open via GPS for person ${gpsPerson}`);
+			} else {
+				logger.info(`Attempted to open garage via gps person ${gpsPerson} from ip: ${remoteAddress} but garage was closed`);
+			}
+		} else {
+			messenger.sendIftt(true, `Not opening for person ${gpsPerson} due to time range`);
+			logger.info(`Not opening garage for person ${gpsPerson} outside of time range from ip: ${remoteAddress}`);
+		}
+	}
+
+	function openGarageDoor() {
 		if (!debugMode) {
 			manualButtonToggle = true;
 			clearTimeout(manualGarageOpenTimeout);
@@ -177,19 +196,67 @@ module.exports = function(app, debugMode, io, logger) {
 	}
 
 	function toggleGarageOpenAlert(enable) {
+		if (enable) {
+			clearTimeout(personOneShouldOpenTimerTimeout);
+			personOneShouldOpenTimerTimeout = setTimeout(() => {
+				personOneShouldOpenTimer = true;
+			}, 15 * 60 * 60);
+		}
 		logger.debug('Enable toggleGarageOpenAlert' + enable);
 		garageOpenAlertManualEnable = enable;
 	}
 
 	function toggleGarageOpenAlertSecondPerson(enable) {
+		if (enable) {
+			clearTimeout(personTwoShouldOpenTimerTimeout);
+			personTwoShouldOpenTimerTimeout = setTimeout(() => {
+				personTwoShouldOpenTimer = true;
+			}, 15 * 60 * 60);
+		}
 		logger.debug('Enable toggleGarageOpenAlertSecondPerson' + enable);
 		garageOpenAlertPersonTwoManualEnable = enable;
+	}
+
+	function garageDoorOpenHandler(isPersonTwo, gpsPerson, remoteAddress) {
+		if (personTwoShouldOpenTimer && isPersonTwo) {
+			personTwoShouldOpenTimer = false;
+			toggleGarageDoor(gpsPerson, remoteAddress);
+		}
+
+		if (personOneShouldOpenTimer && !isPersonTwo) {
+			personOneShouldOpenTimer = false;
+			toggleGarageDoor(gpsPerson, remoteAddress);
+		}
+	}
+
+	function isFridayAndShouldOpen() {
+		var dayOfWeek = new Date().getDay();
+		var theTime = new Date();
+		return dayOfWeek == 5 && theTime.getHours() >= 11 && theTime.getHours() <= 21;
+	}
+
+	function isTuesdayAndShouldOpen() {
+		var dayOfWeek = new Date().getDay();
+		var theTime = new Date();
+		return (dayOfWeek == 2 && theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 23);
+	}
+
+	function isWeekendAndShouldOpen() {
+		var dayOfWeek = new Date().getDay();
+		var theTime = new Date();
+		return (dayOfWeek == 6 && (theTime.getHours() >= 11 && theTime.getHours() <= 23)) || (dayOfWeek == 0 && (theTime.getHours() >= 8 && theTime.getHours() <= 20));
+	}
+
+	function genericShouldOpenBasedOnTime() {
+		var theTime = new Date();
+		return (theTime.getHours() >= 6 && theTime.getHours() <= 7) || (theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 19);
 	}
 
 	return {
 		garageIsOpen: garageIsOpen,
 		toggleGarageDoor: toggleGarageDoor,
 		toggleGarageOpenAlert: toggleGarageOpenAlert,
-		toggleGarageOpenAlertSecondPerson: toggleGarageOpenAlertSecondPerson
+		toggleGarageOpenAlertSecondPerson: toggleGarageOpenAlertSecondPerson,
+		garageDoorOpenHandler: garageDoorOpenHandler
 	};
 };
