@@ -164,7 +164,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 	}
 
 	function toggleGarageDoor(gpsPerson, remoteAddress) {
-		if (isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime() || isWeekendAndShouldOpen()) {
+		if (options.debugMode || isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime() || isWeekendAndShouldOpen()) {
 			if (!garageIsOpen()) {
 				logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${remoteAddress}`);
 				openGarageDoor();

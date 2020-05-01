@@ -143,7 +143,7 @@ app.use(
 if (options.debugMode) {
 	logger.level = 'debug';
 	logger.debug('___________________________________');
-	logger.debug('In debug mode not sending texts!!!');
+	logger.debug('In debug mode not sending texts or opening garage!!!');
 	logger.debug('___________________________________');
 }
 require('./controllers/routes.js')(app, logger, io, options.debugMode);
