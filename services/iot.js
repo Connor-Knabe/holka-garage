@@ -182,7 +182,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 		}
 	}
 
-	function openGarageDoor() {
+	function openCloseGarageDoor() {
 		expectedGarageOpen = true;
 		clearTimeout(manualGarageOpenTimeout);
 		manualGarageOpenTimeout = setTimeout(() => {
@@ -272,6 +272,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 		toggleGarageDoor: toggleGarageDoor,
 		toggleGarageOpenAlert: toggleGarageOpenAlert,
 		toggleGarageOpenAlertSecondPerson: toggleGarageOpenAlertSecondPerson,
-		garageDoorOpenHandler: garageDoorOpenHandler
+		garageDoorOpenHandler: garageDoorOpenHandler,
+		openCloseGarageDoor: openCloseGarageDoor
 	};
 };
