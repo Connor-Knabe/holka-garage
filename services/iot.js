@@ -196,7 +196,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 	function toggleGarageOpenAlert(enable) {
 		if (enable) {
 			clearTimeout(personOneShouldOpenTimerTimeout);
-			logger.debug('personOneTimer QUEUED');
+			logger.debug(`personOneTimer QUEUED for ${options.minsToWaitAfterLeavingHouseForGPSOpen}`);
 
 			personOneShouldOpenTimerTimeout = setTimeout(() => {
 				personOneShouldOpenTimer = true;
