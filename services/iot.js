@@ -221,11 +221,15 @@ module.exports = function(app, debugMode, io, logger) {
 		if (personTwoShouldOpenTimer && isPersonTwo) {
 			personTwoShouldOpenTimer = false;
 			toggleGarageDoor(gpsPerson, remoteAddress);
+		} else {
+			logger.debug(`Not opening for person ${gpsPerson} due to timer`);
 		}
 
 		if (personOneShouldOpenTimer && !isPersonTwo) {
 			personOneShouldOpenTimer = false;
 			toggleGarageDoor(gpsPerson, remoteAddress);
+		} else {
+			logger.debug(`Not opening for person ${gpsPerson} due to timer`);
 		}
 	}
 

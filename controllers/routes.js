@@ -218,10 +218,10 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	app.post('/openViaGps', bodyParser.json(), function(req, res) {
-		logger.debug('openViaGps called');
+		logger.debug('openViaGpsOne called');
 
 		if (options.garageGpsEnabledPersonOne) {
-			logger.debug('openViaGpsTwo active');
+			logger.debug('openViaGpsOne active');
 			openViaGps(res, req, false);
 		} else {
 			res.status(200);
