@@ -232,7 +232,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 		}
 
 		if (shouldLogAlert) {
-			logger.debug(`Not opening for person ${gpsPerson} due to timer`);
+			const logMsg = `Not opening for person ${gpsPerson} due to timer`;
+			logger.debug(logMsg);
+			messenger.sendIftt(true, logMsg);
 		}
 	}
 

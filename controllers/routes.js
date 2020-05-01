@@ -219,9 +219,8 @@ module.exports = function(app, logger, io, debugMode) {
 
 	app.post('/openViaGps', bodyParser.json(), function(req, res) {
 		logger.debug('openViaGpsOne called');
-
 		if (options.garageGpsEnabledPersonOne) {
-			logger.debug('openViaGpsOne active');
+			logger.debug('openViaGpsOne attempting to open');
 			openViaGps(res, req, false);
 		} else {
 			res.status(200);
@@ -232,7 +231,7 @@ module.exports = function(app, logger, io, debugMode) {
 	app.post('/openViaGpsTwo', bodyParser.json(), function(req, res) {
 		logger.debug('openViaGpsTwo called');
 		if (options.garageGpsEnabledPersonTwo) {
-			logger.debug('openViaGpsTwo active');
+			logger.debug('openViaGpsTwo attempting to open');
 			openViaGps(res, req, true);
 		} else {
 			res.status(200);
@@ -259,7 +258,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 		if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
 			if (!options.garageGpsEnabledMain) {
-				messenger.sendIftt(true, `NOT opening GPS open disabled`);
+				messenger.sendIftt(true, `NOT opening GPS open disabled person:${gpsPerson}`);
 				res.status(200);
 				res.send('OK');
 				return;
