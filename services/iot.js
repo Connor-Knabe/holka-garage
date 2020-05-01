@@ -16,7 +16,7 @@ var motionSensorTimeoutOne = null,
 	garageOpenAlertTwoTimeout = null,
 	garageOpenAlertManualEnable = false,
 	garageOpenAlertPersonTwoManualEnable = false,
-	manualButtonToggle = false,
+	expectedGarageOpen = false,
 	manualGarageOpenTimeout = null,
 	personOneShouldOpenTimer = false,
 	personTwoShouldOpenTimer = false,
@@ -100,7 +100,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 	}
 
 	function shouldAlertHomeOwners() {
-		if (!manualButtonToggle) {
+		if (!expectedGarageOpen) {
 			logger.debug('garage not opened via button');
 			if (shouldSendGarageDoorAlertOne && garageOpenAlertManualEnable) {
 				logger.debug('sending garage door gps alert');
@@ -187,12 +187,13 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 	}
 
 	function openGarageDoor() {
+		expectedGarageOpen = true;
+		clearTimeout(manualGarageOpenTimeout);
+		manualGarageOpenTimeout = setTimeout(() => {
+			expectedGarageOpen = false;
+		}, 60 * 1000);
+
 		if (!debugMode) {
-			manualButtonToggle = true;
-			clearTimeout(manualGarageOpenTimeout);
-			manualGarageOpenTimeout = setTimeout(() => {
-				manualButtonToggle = false;
-			}, 60 * 1000);
 			logger.debug('Opening/closing door now');
 			garageSwitch.writeSync(1);
 			setTimeout(function() {
