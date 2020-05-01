@@ -325,7 +325,7 @@ module.exports = function(app, logger, io, debugMode) {
 			res.send(garageOpenStatus);
 		} else {
 			var garageStatus = 'hack';
-			var hoursToWaitBeforeNextSecurityAlert = 2;
+			var minsToWaitBeforeNextSecurityAlert = 5;
 
 			if (req.body && req.body.garageSwitch == 'open') {
 				garageStatus = 'open';
@@ -337,7 +337,7 @@ module.exports = function(app, logger, io, debugMode) {
 			clearTimeout(securityMsgTimeout);
 			securityMsgTimeout = setTimeout(function() {
 				shouldSendSecurityAlert = true;
-			}, hoursToWaitBeforeNextSecurityAlert * 60 * 60 * 10000);
+			}, minsToWaitBeforeNextSecurityAlert * 60 * 10000);
 			var btnPress = true;
 			if (shouldSendSecurityAlert) {
 				messenger.send(true, messengerInfo.toNumbers, securityMsg, options.alertSendPictureText, btnPress);

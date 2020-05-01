@@ -95,7 +95,7 @@ module.exports = function(logger, debugMode) {
 		clearTimeout(messageTimeout);
 		messageTimeout = setTimeout(function() {
 			messageCount = 0;
-		}, 1 * 60 * 60 * 1000);
+		}, 1 * 60 * 1000);
 		messageCount++;
 		logger.debug(
 			`Sending message? -> msgContent:${msgContent} messageCount:${messageCount} generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress} sendPicture:${sendPicture}`
