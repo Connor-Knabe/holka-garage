@@ -63,7 +63,7 @@ module.exports = function(logger, debugMode) {
 		} else if (garageOpened === null) {
 			url = messengerInfo.iftttGarageOpenAlertUrl;
 		}
-		logger.debug('requesting ifttt with url: ', url + api.substring(0, 5), '. Garage opened:', garageOpened);
+		logger.debug('requesting ifttt with url: ', url + apiKey.substring(0, 5), '. Garage opened:', garageOpened);
 		url += apiKey;
 		var options = {
 			method: 'POST',
