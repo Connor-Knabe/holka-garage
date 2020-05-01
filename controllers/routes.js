@@ -253,7 +253,7 @@ module.exports = function(app, logger, io, debugMode) {
 		var gpsPerson = 'one';
 		if (two) {
 			gpsOpenKey = login.iftttGpsGarageOpenKeyTwo;
-			gpsPerson = 'two;';
+			gpsPerson = 'two';
 		}
 
 		if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {

@@ -205,7 +205,7 @@ module.exports = function(logger, debugMode) {
 			var mailOptions = {
 				from: messengerInfo.gmailUsername,
 				to: alertInfo.email,
-				subject: 'Garge Monitor!',
+				subject: 'Garage Monitor!',
 				text: msgContent
 			};
 			if (!debugMode) {
