@@ -28,3 +28,5 @@ module.exports.garageGpsEnabledPersonOne = true;
 module.exports.garageGpsEnabledPersonTwo = true;
 module.exports.minsToWaitAfterLeavingHouseForGPSOpen = 15;
 module.exports.bothHomeOwnersGoneOpenAlert = true;
+module.exports.personOneName = 'Steve';
+module.exports.personTwoName = 'Ashley';
