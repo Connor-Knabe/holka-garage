@@ -31,8 +31,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 	app.set('takingVideo', false);
 
 	setTimeout(() => {
+		logger.debug('about to alert ');
+
 		shouldAlertHomeOwners();
-	}, 60 * 60 * 1000);
+	}, 1 * 60 * 1000);
 
 	garageSensor.watch(function(err, value) {
 		if (err) {
