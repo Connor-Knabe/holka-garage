@@ -9,6 +9,9 @@ module.exports = function(logger, debugMode) {
 	const nodemailer = require('nodemailer');
 	const client = twilio(messengerInfo.TWILIO_ACCOUNT_SID, messengerInfo.TWILIO_AUTH_TOKEN);
 	var minsOpened = 0;
+
+	send(true, messengerInfo.toNumbers, 'The Garage Software Has Rebooted.  Garage Open Alerts Disabled Until You Leave Home!!');
+
 	function sendIftt(garageOpened, message) {
 		if (options.enableIfttt) {
 			var iftttMessage = messengerInfo.iftttValue1;
