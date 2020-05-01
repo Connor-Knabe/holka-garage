@@ -279,7 +279,7 @@ module.exports = function(app, logger, io, debugMode) {
 		if (auth(req)) {
 			if (req.body && req.body.garageSwitch == 'open') {
 				if (!iot.garageIsOpen()) {
-					iot.toggleGarageDoor();
+					iot.toggleGarageDoor('website', req.connection.remoteAddress);
 					garageOpenStatus = 'Opening...';
 					video.updateGarageStatus(garageOpenStatus);
 					io.sockets.emit('garageOpenStatus', garageOpenStatus);
@@ -301,7 +301,7 @@ module.exports = function(app, logger, io, debugMode) {
 				}
 			} else if (req.body && req.body.garageSwitch == 'close') {
 				if (iot.garageIsOpen()) {
-					iot.toggleGarageDoor();
+					iot.toggleGarageDoor('website', req.connection.remoteAddress);
 					garageOpenStatus = 'Closing...';
 					video.updateGarageStatus(garageOpenStatus);
 					io.sockets.emit('garageOpenStatus', garageOpenStatus);

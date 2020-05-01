@@ -30,6 +30,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 	const hue = require('./hue.js')(logger);
 	app.set('takingVideo', false);
 
+	setTimeout(() => {
+		shouldAlertHomeOwners();
+	}, 60 * 60 * 1000);
+
 	garageSensor.watch(function(err, value) {
 		if (err) {
 			logger.error('Error watching garage sensor: ', err);
@@ -49,31 +53,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 
 			garageAlertOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
 
-			if (!manualButtonToggle) {
-				logger.debug('garage not opened via button');
-				if (shouldSendGarageDoorAlertOne && garageOpenAlertManualEnable) {
-					logger.debug('sending garage door gps alert');
-
-					if (garageOpenAlertPersonTwoManualEnable) {
-						logger.debug('about to send video message');
-						video
-							.streamVideo()
-							.then(() => {
-								var garageAlertMsg = `The garage has been opened but the homeowners are not home!`;
-								messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
-								video.stopStreaming();
-							})
-							.catch(() => {
-								var garageAlertMsg = `The garage has been opened but the homeowners are not home! Error taking new video.`;
-								messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
-								video.stopStreaming();
-							});
-					} else {
-						messenger.sendIftt(garageOpened);
-					}
-					shouldSendGarageDoorAlertOne = false;
-				}
-			}
+			shouldAlertHomeOwners();
 
 			logger.debug(msg);
 			io.sockets.emit('garageErrorStatus', null);
@@ -117,6 +97,34 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 				}, 5 * 1000);
 			}
 		});
+	}
+
+	function shouldAlertHomeOwners() {
+		if (!manualButtonToggle) {
+			logger.debug('garage not opened via button');
+			if (shouldSendGarageDoorAlertOne && garageOpenAlertManualEnable) {
+				logger.debug('sending garage door gps alert');
+
+				if (garageOpenAlertPersonTwoManualEnable) {
+					logger.debug('about to send video message');
+					video
+						.streamVideo()
+						.then(() => {
+							var garageAlertMsg = `The garage has been opened but the homeowners are not home!`;
+							messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
+							video.stopStreaming();
+						})
+						.catch(() => {
+							var garageAlertMsg = `The garage has been opened but the homeowners are not home! Error taking new video.`;
+							messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
+							video.stopStreaming();
+						});
+				} else {
+					messenger.sendIftt(garageOpened);
+				}
+				shouldSendGarageDoorAlertOne = false;
+			}
+		}
 	}
 
 	function garageAlertOpenCheck(timeUntilAlert, timeOut, shouldCall) {
