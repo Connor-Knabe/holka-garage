@@ -10,7 +10,7 @@ module.exports = function(logger, debugMode) {
 	const client = twilio(messengerInfo.TWILIO_ACCOUNT_SID, messengerInfo.TWILIO_AUTH_TOKEN);
 	var minsOpened = 0;
 
-	send(true, messengerInfo.toNumbers, 'The Garage Software Has Rebooted.  Garage Open Alerts Disabled Until You Leave Home!!');
+	send(true, messengerInfo.toNumbers, 'The garage software has rebooted.  Garage open alerts aisabled until you leave home!');
 
 	function sendIftt(garageOpened, message) {
 		if (options.enableIfttt) {
