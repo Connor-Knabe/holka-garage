@@ -174,7 +174,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 				openCloseGarageDoor();
 				messenger.sendIftt(true, `Garage open via GPS for person ${gpsPerson}`);
 			} else {
-				logger.info(`Attempted to open garage via gps person ${gpsPerson} from ip: ${remoteAddress} but garage was closed`);
+				logger.info(`Attempted to open garage via gps person ${gpsPerson} from ip: ${remoteAddress} but garage was open`);
 			}
 		} else {
 			messenger.sendIftt(true, `Not opening for person ${gpsPerson} due to time range`);
