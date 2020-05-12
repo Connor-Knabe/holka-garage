@@ -63,9 +63,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 			}, 1 * 60 * 10000);
 
 			if (shouldSendGarageDoorAlertTwo && garageOpenAlertManualEnable) {
-				if (options.alertButtonPressTexts) {
-					messenger.send(true, messengerInfo.toNumbers, msg, false, false);
-				}
+				// if (options.alertButtonPressTexts) {
+				// 	messenger.send(true, messengerInfo.toNumbers, msg, false, false);
+				// }
 				messenger.sendIftt(garageOpened);
 				shouldSendGarageDoorAlertTwo = false;
 			}
