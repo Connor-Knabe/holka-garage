@@ -27,6 +27,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 	var hasBeenOpened = garageIsOpen();
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const options = require('../settings/options.js');
+	const garageOpenRules = require('garageOpenRules.js');
+
 	const hue = require('./hue.js')(logger);
 	app.set('takingVideo', false);
 
@@ -48,7 +50,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 			logger.debug('garage open');
 
 			garageAlertOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
-
 			shouldAlertHomeOwners();
 
 			logger.debug(msg);
@@ -168,7 +169,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 	}
 
 	function toggleGarageDoor(gpsPerson, remoteAddress) {
-		if (isFridayAndShouldOpen() || isTuesdayAndShouldOpen() || genericShouldOpenBasedOnTime() || isWeekendAndShouldOpen()) {
+		if (garageOpenRules.isFridayAndShouldOpen() || garageOpenRules.isTuesdayAndShouldOpen() || garageOpenRules.genericShouldOpenBasedOnTime() || garageOpenRules.isWeekendAndShouldOpen()) {
 			if (!garageIsOpen()) {
 				logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${remoteAddress}`);
 				openCloseGarageDoor();
@@ -242,29 +243,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 			logger.debug(logMsg);
 			messenger.sendGenericIfttt(logMsg);
 		}
-	}
-
-	function isFridayAndShouldOpen() {
-		var dayOfWeek = new Date().getDay();
-		var theTime = new Date();
-		return dayOfWeek == 5 && theTime.getHours() >= 11 && theTime.getHours() <= 21;
-	}
-
-	function isTuesdayAndShouldOpen() {
-		var dayOfWeek = new Date().getDay();
-		var theTime = new Date();
-		return (dayOfWeek == 2 && theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 23);
-	}
-
-	function isWeekendAndShouldOpen() {
-		var dayOfWeek = new Date().getDay();
-		var theTime = new Date();
-		return (dayOfWeek == 6 && (theTime.getHours() >= 11 && theTime.getHours() <= 23)) || (dayOfWeek == 0 && (theTime.getHours() >= 8 && theTime.getHours() <= 20));
-	}
-
-	function genericShouldOpenBasedOnTime() {
-		var theTime = new Date();
-		return (theTime.getHours() >= 6 && theTime.getHours() <= 7) || (theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 19);
 	}
 
 	return {
