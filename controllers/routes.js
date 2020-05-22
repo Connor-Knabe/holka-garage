@@ -363,7 +363,6 @@ module.exports = function(app, logger, io, debugMode) {
 			messenger.send(true, messengerInfo.toNumbers, securityMsg, options.alertSendPictureText, btnPress);
 			shouldSendSecurityAlert = false;
 		}
-		return { btnPress, securityMsg, securityMsgTimeout, shouldSendSecurityAlert };
 	}
 
 	app.get('/gpsOn/:gpsKey', function(req, res) {
