@@ -2,6 +2,7 @@ var messengerInfo = require('../settings/messengerInfo.js');
 var options = require('../settings/options.js');
 var garageOpenStatus = null;
 const geoip = require('geoip-lite');
+const { constants } = require('buffer');
 module.exports = function(app, logger, io, debugMode) {
 	const hue = require('../services/hue.js')(logger);
 	const video = require('../services/video.js')(app, logger, io);
@@ -221,6 +222,8 @@ module.exports = function(app, logger, io, debugMode) {
 		logger.debug('openViaGpsOne called');
 		if (options.garageGpsEnabledPersonOne) {
 			logger.debug('openViaGpsOne attempting to open');
+			iot.toggleGarageOpenAlert(false);
+			messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
 			openViaGps(res, req, false);
 		} else {
 			res.status(200);
@@ -232,6 +235,8 @@ module.exports = function(app, logger, io, debugMode) {
 		logger.debug('openViaGpsTwo called');
 		if (options.garageGpsEnabledPersonTwo) {
 			logger.debug('openViaGpsTwo attempting to open');
+			iot.toggleGarageOpenAlertSecondPerson(false);
+			messenger.sendGenericIfttt(`${options.personTwoName} Set to Home`);
 			openViaGps(res, req, true);
 		} else {
 			res.status(200);
@@ -269,7 +274,10 @@ module.exports = function(app, logger, io, debugMode) {
 			res.status(200);
 			res.send('OK');
 		} else {
-			logger.info(`Failed attempt to open garage for person ${gpsPerson} via gps from ip: ${req.connection.remoteAddress} with body of ${JSON.stringify(req.body)}`);
+			const minsToWaitBeforeNextSecurityAlert = 5;
+			possibleHackAlert('openViaGPS', req, minsToWaitBeforeNextSecurityAlert);
+
+			logger.info(`Failed attempt to open garage for person ${gpsPerson} via gps from ip: ${req.connection.remoteAddress} with body of ${JSON.stringify(req.body)}, Possible Hack?`);
 			res.status(401);
 			res.send('not auth to open garage');
 		}
@@ -325,30 +333,38 @@ module.exports = function(app, logger, io, debugMode) {
 			res.send(garageOpenStatus);
 		} else {
 			var garageStatus = 'hack';
-			var minsToWaitBeforeNextSecurityAlert = 5;
+			const minsToWaitBeforeNextSecurityAlert = 5;
 
 			if (req.body && req.body.garageSwitch == 'open') {
 				garageStatus = 'open';
 			} else if (req.body && req.body.garageSwitch == 'close') {
 				garageStatus = 'close';
 			}
-			var securityMsg = 'SECURITY: tried to ' + garageStatus + ' garage via post without being authenticated!! From ip: ' + req.connection.remoteAddress;
 
-			clearTimeout(securityMsgTimeout);
-			securityMsgTimeout = setTimeout(function() {
-				shouldSendSecurityAlert = true;
-			}, minsToWaitBeforeNextSecurityAlert * 60 * 10000);
-			var btnPress = true;
-			if (shouldSendSecurityAlert) {
-				messenger.send(true, messengerInfo.toNumbers, securityMsg, options.alertSendPictureText, btnPress);
-				shouldSendSecurityAlert = false;
-			}
-			logger.fatal(securityMsg, 'Ip address is: ', req.connection.remoteAddress);
+			possibleHackAlert(garageStatus, req, minsToWaitBeforeNextSecurityAlert);
+
 			io.sockets.emit('garageErrorStatus', 'You are not authorized to do this!');
 			res.status(401);
 			res.send('not auth');
 		}
 	});
+
+	function possibleHackAlert(garageStatus, req, minsToWaitBeforeNextSecurityAlert) {
+		var securityMsg = 'SECURITY: tried to ' + garageStatus + ' garage via post without being authenticated!! From ip: ' + req.connection.remoteAddress;
+
+		clearTimeout(securityMsgTimeout);
+		securityMsgTimeout = setTimeout(function() {
+			shouldSendSecurityAlert = true;
+		}, minsToWaitBeforeNextSecurityAlert * 60 * 10000);
+		logger.fatal(securityMsg, 'Ip address is: ', req.connection.remoteAddress);
+
+		if (shouldSendSecurityAlert) {
+			var btnPress = true;
+			messenger.send(true, messengerInfo.toNumbers, securityMsg, options.alertSendPictureText, btnPress);
+			shouldSendSecurityAlert = false;
+		}
+		return { btnPress, securityMsg, securityMsgTimeout, shouldSendSecurityAlert };
+	}
 
 	app.get('/gpsOn/:gpsKey', function(req, res) {
 		//away from home turn alert on
@@ -364,20 +380,6 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	});
 
-	app.get('/gpsOff/:gpsKey', function(req, res) {
-		//close to home turn alert off
-		if (req.params && req.params.gpsKey === login.gpsAlertKey) {
-			iot.toggleGarageOpenAlert(false);
-			logger.debug('/gpsOff/:gpsKey');
-			messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
-			res.send('Ok');
-		} else {
-			logger.error('malformed request for /gpsOff');
-			res.status(401);
-			res.send('None shall pass');
-		}
-	});
-
 	app.get('/gpsPersonTwoOn/:gpsAlertPersonTwoKey', function(req, res) {
 		//away from home turn alert on
 		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
@@ -387,20 +389,6 @@ module.exports = function(app, logger, io, debugMode) {
 			res.send('Ok');
 		} else {
 			logger.error('malformed request for /gpsPersonTwoOn');
-			res.status(401);
-			res.send('None shall pass');
-		}
-	});
-
-	app.get('/gpsPersonTwoOff/:gpsAlertPersonTwoKey', function(req, res) {
-		//close to home turn alert off
-		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
-			iot.toggleGarageOpenAlertSecondPerson(false);
-			logger.debug('/gpsPersonTwoOff/:gpsAlertPersonTwoKey');
-			messenger.sendGenericIfttt(`${options.personTwoName} Set to Home`);
-			res.send('Ok');
-		} else {
-			logger.error('malformed request for /gpsPersonTwoOff');
 			res.status(401);
 			res.send('None shall pass');
 		}
