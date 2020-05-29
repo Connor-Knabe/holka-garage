@@ -334,15 +334,12 @@ module.exports = function(app, logger, io, debugMode) {
 		} else {
 			var garageStatus = 'hack';
 			const minsToWaitBeforeNextSecurityAlert = 5;
-
 			if (req.body && req.body.garageSwitch == 'open') {
 				garageStatus = 'open';
 			} else if (req.body && req.body.garageSwitch == 'close') {
 				garageStatus = 'close';
 			}
-
 			possibleHackAlert(garageStatus, req, minsToWaitBeforeNextSecurityAlert);
-
 			io.sockets.emit('garageErrorStatus', 'You are not authorized to do this!');
 			res.status(401);
 			res.send('not auth');
@@ -365,31 +362,34 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	}
 
-	app.get('/gpsOn/:gpsKey', function(req, res) {
+	app.post('/personOneAway', function(req, res) {
 		//away from home turn alert on
-		if (req.params && req.params.gpsKey === login.gpsAlertKey) {
-			iot.toggleGarageOpenAlert(true);
-			logger.debug('/gpsOn/:gpsKey');
-			messenger.sendGenericIfttt(`${options.personOneName} Set to Away`);
-			res.send('Ok');
-		} else {
-			logger.error('malformed request for /gpsOn');
-			res.status(401);
-			res.send('None shall pass');
-		}
+		setPersonAway(req, res);
 	});
 
-	app.get('/gpsPersonTwoOn/:gpsAlertPersonTwoKey', function(req, res) {
+	app.post('/personTwoAway', function(req, res) {
 		//away from home turn alert on
-		if (req.params && req.params.gpsAlertPersonTwoKey === login.gpsAlertPersonTwoKey) {
+		setPersonAway(req, res);
+	});
+
+	function setPersonAway(req, res, isPersonTwo) {
+		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
+		var personText = isPersonTwo ? 'personTwo' : 'personOne';
+		var personName = isPersonTwo ? options.personTwoName : options.personOneName;
+
+		if (req.body && req.body.garageOpenTimer) {
+			options.minsToWaitAfterLeavingHouseForGPSOpen = req.body.garageOpenTimer;
+		}
+
+		if (req.body && req.body.gpsAuthKey === gpsKey) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
-			logger.debug('/gpsPersonTwoOn/:gpsAlertPersonTwoKey');
-			messenger.sendGenericIfttt(`${options.personTwoName} Set to Away`);
+			logger.debug(`Garage set to away via ${personText}`);
+			messenger.sendGenericIfttt(`${personName} Set to Away`);
 			res.send('Ok');
 		} else {
-			logger.error('malformed request for /gpsPersonTwoOn');
+			logger.error(`malformed request for ${personText}Away`);
 			res.status(401);
 			res.send('None shall pass');
 		}
-	});
+	}
 };
