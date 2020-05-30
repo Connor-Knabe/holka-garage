@@ -362,13 +362,13 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	}
 
-	app.post('/personOneAway', function(req, res) {
+	app.post('/personOneAway', bodyParser.json(), function(req, res) {
 		//away from home turn alert on
 		const isPersonTwo = false;
 		setPersonAway(req, res, isPersonTwo);
 	});
 
-	app.post('/personTwoAway', function(req, res) {
+	app.post('/personTwoAway', bodyParser.json(), function(req, res) {
 		//away from home turn alert on
 		const isPersonTwo = true;
 		setPersonAway(req, res, isPersonTwo);
@@ -389,7 +389,7 @@ module.exports = function(app, logger, io, debugMode) {
 			messenger.sendGenericIfttt(`${personName} Set to Away`);
 			res.send('Ok');
 		} else {
-			logger.error(`malformed request for ${personText}Away`);
+			logger.error(`malformed request for ${personText}Away or wrong key`);
 			res.status(401);
 			res.send('None shall pass');
 		}

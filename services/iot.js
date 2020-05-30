@@ -29,7 +29,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 	const options = require('../settings/options.js');
 	const garageOpenRules = require('./garageOpenRules.js')();
 
-
 	const hue = require('./hue.js')(logger);
 	app.set('takingVideo', false);
 
