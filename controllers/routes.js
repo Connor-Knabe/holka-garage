@@ -379,14 +379,12 @@ module.exports = function(app, logger, io, debugMode) {
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
 		var personName = isPersonTwo ? options.personTwoName : options.personOneName;
 
-		if (req.body && req.body.garageOpenTimer) {
-			options.minsToWaitAfterLeavingHouseForGPSOpen = req.body.garageOpenTimer;
-			logger.debug(`Garage away timeout is ${options.minsToWaitAfterLeavingHouseForGPSOpen}`);
-		}
-
 		if (req.body && req.body.gpsPersonOneKey === gpsKey) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
 			logger.debug(`Garage set to away via ${personText}`);
+
+			options.minsToWaitAfterLeavingHouseForGPSOpen = req.body.garageOpenTimer;
+			logger.debug(`Garage away timeout is ${options.minsToWaitAfterLeavingHouseForGPSOpen}`);
 
 			messenger.sendGenericIfttt(`${personName} Set to Away`);
 			res.send('Ok');
