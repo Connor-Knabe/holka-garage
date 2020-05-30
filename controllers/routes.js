@@ -383,7 +383,11 @@ module.exports = function(app, logger, io, debugMode) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
 			logger.debug(`Garage set to away via ${personText}`);
 
-			options.minsToWaitAfterLeavingHouseForGPSOpen = isNaN(req.body.garageOpenTimer) ? options.minsToWaitAfterLeavingHouseForGPSOpen : req.body.garageOpenTimer;
+			try {
+				options.minsToWaitAfterLeavingHouseForGPSOpen = isNaN(req.body.garageOpenTimer) ? options.minsToWaitAfterLeavingHouseForGPSOpen : req.body.garageOpenTimer;
+			} catch (ex) {
+				logger.error('Failed to parse garageOpenTimer', ex);
+			}
 
 			logger.debug(`Garage away timeout is ${options.minsToWaitAfterLeavingHouseForGPSOpen}`);
 
