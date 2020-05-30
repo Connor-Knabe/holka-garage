@@ -261,7 +261,7 @@ module.exports = function(app, logger, io, debugMode) {
 			gpsPerson = 'two';
 		}
 
-		if (gpsOpenKey === req.body.gpsPersonOneKey) {
+		if (gpsOpenKey === req.body.gpsPersonKey) {
 			if (!options.garageGpsEnabledMain) {
 				messenger.sendGenericIfttt(`NOT opening GPS open disabled person:${gpsPerson}`);
 				res.status(200);
@@ -379,17 +379,11 @@ module.exports = function(app, logger, io, debugMode) {
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
 		var personName = isPersonTwo ? options.personTwoName : options.personOneName;
 
-		if (req.body && req.body.gpsPersonOneKey === gpsKey) {
+		if (req.body && req.body.gpsPersonKey === gpsKey) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
 			logger.debug(`Garage set to away via ${personText}`);
 
-			try {
-				options.minsToWaitAfterLeavingHouseForGPSOpen = isNaN(req.body.garageOpenTimer) ? options.minsToWaitAfterLeavingHouseForGPSOpen : req.body.garageOpenTimer;
-			} catch (ex) {
-				logger.error('Failed to parse garageOpenTimer', ex);
-			}
-
-			logger.debug(`Garage away timeout is ${options.minsToWaitAfterLeavingHouseForGPSOpen}`);
+			options.minsToWaitAfterLeavingHouseForGPSOpen = isNaN(req.body.garageOpenTimer) ? options.minsToWaitAfterLeavingHouseForGPSOpen : req.body.garageOpenTimer;
 
 			messenger.sendGenericIfttt(`${personName} Set to Away`);
 			res.send('Ok');
