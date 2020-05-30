@@ -12,5 +12,3 @@ module.exports.acmeChallenge = 'al;sjdfas0idfjoasjdflksjdfokjasi0dfj0asdjf';
 module.exports.acmeChallengeKey = 'alksjdf0iasjdf0ijas0dfj0iasjdfaskldjflkajsdfja.asjdlfkjaklsdjflkjaslkdjf';
 module.exports.gpsPersonOneKey = 'gps key goes here';
 module.exports.gpsPersonTwoKey = 'gps2 key goes here';
-module.exports.iftttGpsGarageOpenKey = '';
-module.exports.iftttGpsGarageOpenKeyTwo = '';

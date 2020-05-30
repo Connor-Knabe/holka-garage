@@ -254,14 +254,14 @@ module.exports = function(app, logger, io, debugMode) {
 	}
 
 	function openViaGps(res, req, two) {
-		var gpsOpenKey = login.iftttGpsGarageOpenKey;
+		var gpsOpenKey = login.gpsPersonOneKey;
 		var gpsPerson = 'one';
 		if (two) {
-			gpsOpenKey = login.iftttGpsGarageOpenKeyTwo;
+			gpsOpenKey = login.gpsPersonTwoKey;
 			gpsPerson = 'two';
 		}
 
-		if (gpsOpenKey === req.body.iftttGpsGarageOpenKey) {
+		if (gpsOpenKey === req.body.gpsAuthKey) {
 			if (!options.garageGpsEnabledMain) {
 				messenger.sendGenericIfttt(`NOT opening GPS open disabled person:${gpsPerson}`);
 				res.status(200);
@@ -364,12 +364,14 @@ module.exports = function(app, logger, io, debugMode) {
 
 	app.post('/personOneAway', function(req, res) {
 		//away from home turn alert on
-		setPersonAway(req, res);
+		const isPersonTwo = false;
+		setPersonAway(req, res, isPersonTwo);
 	});
 
 	app.post('/personTwoAway', function(req, res) {
 		//away from home turn alert on
-		setPersonAway(req, res);
+		const isPersonTwo = true;
+		setPersonAway(req, res, isPersonTwo);
 	});
 
 	function setPersonAway(req, res, isPersonTwo) {
