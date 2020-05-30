@@ -21,6 +21,7 @@ module.exports = function() {
 		var theTime = new Date();
 		return (theTime.getHours() >= 6 && theTime.getHours() <= 7) || (theTime.getHours() >= 11 && theTime.getHours() <= 12) || (theTime.getHours() >= 16 && theTime.getHours() <= 19);
 	}
+
 	return {
 		isFridayAndShouldOpen: isFridayAndShouldOpen,
 		isTuesdayAndShouldOpen: isTuesdayAndShouldOpen,

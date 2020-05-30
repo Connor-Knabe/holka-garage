@@ -261,7 +261,7 @@ module.exports = function(app, logger, io, debugMode) {
 			gpsPerson = 'two';
 		}
 
-		if (gpsOpenKey === req.body.gpsAuthKey) {
+		if (gpsOpenKey === req.body.gpsPersonOneKey) {
 			if (!options.garageGpsEnabledMain) {
 				messenger.sendGenericIfttt(`NOT opening GPS open disabled person:${gpsPerson}`);
 				res.status(200);
@@ -383,7 +383,7 @@ module.exports = function(app, logger, io, debugMode) {
 			options.minsToWaitAfterLeavingHouseForGPSOpen = req.body.garageOpenTimer;
 		}
 
-		if (req.body && req.body.gpsAuthKey === gpsKey) {
+		if (req.body && req.body.gpsPersonOneKey === gpsKey) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
 			logger.debug(`Garage set to away via ${personText}`);
 			messenger.sendGenericIfttt(`${personName} Set to Away`);
