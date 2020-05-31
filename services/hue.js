@@ -14,9 +14,7 @@ var HueApi = hue.HueApi,
 module.exports = function(logger) {
 	function garageLightsOnTimed(brightness) {
 		if (options.enableHue) {
-			lightsOn(brightness)
-				.then(() => {})
-				.catch(() => {});
+			lightsOn(brightness).then(() => {}).catch(() => {});
 			logger.debug('Lights on for ' + options.garageLightTimeoutMins + ' mins');
 			clearTimeout(lightsOffTimeout);
 			lightsOffTimeout = setTimeout(function() {
@@ -25,27 +23,14 @@ module.exports = function(logger) {
 		}
 	}
 
-	var displayResult = function(result) {
-		logger.debug(result);
-	};
-
 	function garageLightsOffTimed() {
 		if (options.enableHue) {
-			logger.debug(`Lights turning off in ${options.garageLightTimeoutMins} mins`);
 			clearTimeout(lightsOffTimedTimeout);
 			lightsOffTimedTimeout = setTimeout(function() {
 				lightsOff();
 			}, options.garageLightTimeoutMins * 60 * 1000);
 		}
 	}
-
-	var displayResult = function(result) {
-		logger.debug(result);
-	};
-
-	var displayError = function(err) {
-		logger.error(err);
-	};
 
 	function lightsOn(brightness) {
 		if (options.enableHue) {
@@ -55,7 +40,7 @@ module.exports = function(logger) {
 					.then(() => {
 						resolve();
 					})
-					.catch(e => {
+					.catch((e) => {
 						logger.error(`Error setting light brightness ${e}`);
 						reject();
 					});
@@ -64,10 +49,7 @@ module.exports = function(logger) {
 	}
 
 	function lightsOff() {
-		api
-			.setGroupLightState(8, state.off())
-			.then(() => {})
-			.catch(() => {});
+		api.setGroupLightState(8, state.off()).then(() => {}).catch(() => {});
 	}
 
 	return {
