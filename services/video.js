@@ -62,8 +62,6 @@ module.exports = (app, logger, io) => {
 		if (!app.get('cameraOn')) {
 			var args = [ '-w', '800', '-h', '600', '-vf', '-hf', '-o', './stream/image_stream.jpg', '-t', '999999999', '-tl', '1000', '-ex', 'night' ];
 			raspistillProc = spawn('raspistill', args);
-
-			logger.debug('Starting camera...');
 			app.set('cameraOn', true);
 		}
 	}
@@ -81,7 +79,6 @@ module.exports = (app, logger, io) => {
 			return;
 		}
 		startCamera();
-		logger.debug('Watching for changes...');
 		fs.watchFile('./stream/image_stream.jpg', function(current, previous) {
 			fs.stat('./stream/image_stream.jpg', function(err, stats) {
 				if (stats) {
