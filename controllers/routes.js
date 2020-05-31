@@ -262,14 +262,11 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 
 		if (gpsOpenKey === req.body.gpsPersonKey) {
-			if (!options.garageGpsEnabledMain) {
+			if (options.garageGpsEnabledMain) {
+				iot.garageDoorOpenHandler(two, gpsPerson, req.connection.remoteAddress);
+			} else {
 				messenger.sendGenericIfttt(`NOT opening GPS open disabled person:${gpsPerson}`);
-				res.status(200);
-				res.send('OK');
-				return;
 			}
-
-			iot.garageDoorOpenHandler(two, gpsPerson, req.connection.remoteAddress);
 
 			res.status(200);
 			res.send('OK');

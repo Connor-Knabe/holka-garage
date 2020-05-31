@@ -1,3 +1,4 @@
+v1.7.1 - refactoring route file
 v1.7.0 - working on setting timer with gps away request
 v1.6.6 - refactoring the garage open rules and security alert
 v1.6.5 - using correct verbiage in log
