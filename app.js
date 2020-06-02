@@ -32,6 +32,7 @@ var basicAuth = require('basic-auth-connect');
 
 app.use(helmet());
 app.use(cookieParser());
+app.use(bodyParser.json());
 
 app.use(function(req, res, next) {
 	if (!req.secure) {

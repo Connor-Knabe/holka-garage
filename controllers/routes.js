@@ -15,7 +15,7 @@ module.exports = function(app, logger, io, debugMode) {
 	var shouldSendSecurityAlert = true;
 
 	var fs = require('fs');
-	var bodyParser = require('body-parser');
+	// var bodyParser = require('body-parser');
 	var login = require('../settings/login.js');
 
 	function auth(req) {
@@ -218,7 +218,7 @@ module.exports = function(app, logger, io, debugMode) {
 		res.send('No content');
 	});
 
-	app.post('/openViaGps', bodyParser.json(), function(req, res) {
+	app.post('/openViaGps', function(req, res) {
 		logger.debug('openViaGpsOne called');
 		if (options.garageGpsEnabledPersonOne) {
 			logger.debug('openViaGpsOne attempting to open');
@@ -231,7 +231,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	});
 
-	app.post('/openViaGpsTwo', bodyParser.json(), function(req, res) {
+	app.post('/openViaGpsTwo', function(req, res) {
 		logger.debug('openViaGpsTwo called');
 		if (options.garageGpsEnabledPersonTwo) {
 			logger.debug('openViaGpsTwo attempting to open');
@@ -263,6 +263,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 
 		logger.debug('-----');
+
 		logger.debug(req.body);
 
 		if (gpsOpenKey === req.body.gpsPersonKey) {
@@ -363,13 +364,13 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	}
 
-	app.post('/personOneAway', bodyParser.json(), function(req, res) {
+	app.post('/personOneAway', function(req, res) {
 		//away from home turn alert on
 		const isPersonTwo = false;
 		setPersonAway(req, res, isPersonTwo);
 	});
 
-	app.post('/personTwoAway', bodyParser.json(), function(req, res) {
+	app.post('/personTwoAway', function(req, res) {
 		//away from home turn alert on
 		const isPersonTwo = true;
 		setPersonAway(req, res, isPersonTwo);
