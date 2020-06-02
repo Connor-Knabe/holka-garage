@@ -17,12 +17,10 @@ module.exports = (app, logger, io) => {
 
 	io.on('connection', function(socket) {
 		sockets[socket.id] = socket;
-		logger.debug('Total clients connected : ', Object.keys(sockets).length);
 		io.sockets.emit('clients', Object.keys(sockets).length);
 
 		socket.on('disconnect', function() {
 			delete sockets[socket.id];
-			logger.debug('Client Disconnected, total clients connected : ', Object.keys(sockets).length);
 			hue.garageLightsOffTimed();
 			stopStreaming();
 		});

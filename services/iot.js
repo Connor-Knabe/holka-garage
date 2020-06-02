@@ -98,7 +98,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 
 	function shouldAlertHomeOwners() {
 		if (!expectedGarageOpen) {
-			logger.debug('garage not opened via button');
+			logger.debug('!expectedGarageOpen');
 			if (shouldSendGarageDoorAlertOne && garageOpenAlertManualEnable) {
 				logger.debug('sending garage door gps alert');
 
