@@ -262,6 +262,7 @@ module.exports = function(app, logger, io, debugMode) {
 			gpsPerson = 'two';
 		}
 
+		logger.debug('-----');
 		logger.debug(req.body);
 
 		if (gpsOpenKey === req.body.gpsPersonKey) {
