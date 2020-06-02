@@ -257,9 +257,12 @@ module.exports = function(app, logger, io, debugMode) {
 		var gpsOpenKey = login.gpsPersonOneKey;
 		var gpsPerson = 'one';
 		if (two) {
+			logger.debug('person two!');
 			gpsOpenKey = login.gpsPersonTwoKey;
 			gpsPerson = 'two';
 		}
+
+		logger.debug(req.body);
 
 		if (gpsOpenKey === req.body.gpsPersonKey) {
 			if (options.garageGpsEnabledMain) {
