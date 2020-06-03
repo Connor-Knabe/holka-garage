@@ -264,7 +264,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 		logger.debug('-----');
 
-		logger.debug(req.body);
+		logger.debug(req);
 
 		if (gpsOpenKey === req.body.gpsPersonKey) {
 			if (options.garageGpsEnabledMain) {
