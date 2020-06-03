@@ -218,7 +218,7 @@ module.exports = function(app, logger, io, debugMode) {
 		res.send('No content');
 	});
 
-	app.post('/openViaGps', bodyParser.urlencoded({ extended: false }), function(req, res) {
+	app.post('/openViaGps', bodyParser.text(), function(req, res) {
 		logger.debug('openViaGpsOne called');
 		if (options.garageGpsEnabledPersonOne) {
 			logger.debug('openViaGpsOne attempting to open');
@@ -231,7 +231,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	});
 
-	app.post('/openViaGpsTwo', bodyParser.urlencoded({ extended: false }), function(req, res) {
+	app.post('/openViaGpsTwo', bodyParser.text(), function(req, res) {
 		logger.debug('openViaGpsTwo called');
 		if (options.garageGpsEnabledPersonTwo) {
 			logger.debug('openViaGpsTwo attempting to open');
@@ -364,13 +364,13 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	}
 
-	app.post('/personOneAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
+	app.post('/personOneAway', bodyParser.text(), function(req, res) {
 		//away from home turn alert on
 		const isPersonTwo = false;
 		setPersonAway(req, res, isPersonTwo);
 	});
 
-	app.post('/personTwoAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
+	app.post('/personTwoAway', bodyParser.text(), function(req, res) {
 		//away from home turn alert on
 		const isPersonTwo = true;
 		setPersonAway(req, res, isPersonTwo);
