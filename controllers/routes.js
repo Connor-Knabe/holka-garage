@@ -381,11 +381,11 @@ module.exports = function(app, logger, io, debugMode) {
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
 		var personName = isPersonTwo ? options.personTwoName : options.personOneName;
 
-		if (req.body && req.body.gpsPersonKey === gpsKey) {
+		if (req.body && req.body.includes(gpsKey)) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
 			logger.debug(`Garage set to away via ${personText}`);
 
-			options.minsToWaitAfterLeavingHouseForGPSOpen = isNaN(req.body.garageOpenTimer) ? options.minsToWaitAfterLeavingHouseForGPSOpen : req.body.garageOpenTimer;
+			// options.minsToWaitAfterLeavingHouseForGPSOpen = isNaN(req.body.garageOpenTimer) ? options.minsToWaitAfterLeavingHouseForGPSOpen : req.body.garageOpenTimer;
 
 			messenger.sendGenericIfttt(`${personName} Set to Away`);
 			res.send('Ok');
