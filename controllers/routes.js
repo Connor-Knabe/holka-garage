@@ -15,7 +15,7 @@ module.exports = function(app, logger, io, debugMode) {
 	var shouldSendSecurityAlert = true;
 
 	var fs = require('fs');
-	// var bodyParser = require('body-parser');
+	var bodyParser = require('body-parser');
 	var login = require('../settings/login.js');
 
 	function auth(req) {
@@ -82,7 +82,7 @@ module.exports = function(app, logger, io, debugMode) {
 		});
 	});
 
-	app.post('/', function(req, res) {
+	app.post('/', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var options = {
 			maxAge: 1000 * 60 * 60 * 24 * 180,
 			httpOnly: true
@@ -119,7 +119,7 @@ module.exports = function(app, logger, io, debugMode) {
 		return username.toLowerCase() === login.username.toLowerCase() && password === login.password;
 	}
 
-	app.post('/video', function(req, res) {
+	app.post('/video', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		io.sockets.emit('garageOpenStatus', 'Recording video');
 		video
 			.streamVideo()
@@ -133,7 +133,7 @@ module.exports = function(app, logger, io, debugMode) {
 		res.send('Ok');
 	});
 
-	app.post('/gpsToggle', function(req, res) {
+	app.post('/gpsToggle', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		if (options.garageGpsEnabledMain) {
 			options.garageGpsEnabledMain = false;
 		} else {
@@ -147,7 +147,7 @@ module.exports = function(app, logger, io, debugMode) {
 		res.send('Ok');
 	});
 
-	app.post('/lights/:brightness', function(req, res) {
+	app.post('/lights/:brightness', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		io.sockets.emit('garageOpenStatus', 'Changing light brightness');
 		hue
 			.lightsOn(req.params.brightness)
@@ -162,7 +162,7 @@ module.exports = function(app, logger, io, debugMode) {
 		res.send(`Set to brightness ${req.params.brightness}`);
 	});
 
-	app.post('/sms', function(req, res) {
+	app.post('/sms', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var incomingPhoneNumber = req.body.From;
 
 		var msg = {
@@ -218,7 +218,7 @@ module.exports = function(app, logger, io, debugMode) {
 		res.send('No content');
 	});
 
-	app.post('/openViaGps', function(req, res) {
+	app.post('/openViaGps', bodyParser.json(), function(req, res) {
 		logger.debug('openViaGpsOne called');
 		if (options.garageGpsEnabledPersonOne) {
 			logger.debug('openViaGpsOne attempting to open');
@@ -231,7 +231,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	});
 
-	app.post('/openViaGpsTwo', function(req, res) {
+	app.post('/openViaGpsTwo', bodyParser.json(), function(req, res) {
 		logger.debug('openViaGpsTwo called');
 		if (options.garageGpsEnabledPersonTwo) {
 			logger.debug('openViaGpsTwo attempting to open');
@@ -285,7 +285,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	}
 
-	app.post('/openOrCloseGarage', function(req, res) {
+	app.post('/openOrCloseGarage', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		if (auth(req)) {
 			if (req.body && req.body.garageSwitch == 'open') {
 				if (!iot.garageIsOpen()) {
@@ -364,13 +364,13 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	}
 
-	app.post('/personOneAway', function(req, res) {
+	app.post('/personOneAway', bodyParser.json(), function(req, res) {
 		//away from home turn alert on
 		const isPersonTwo = false;
 		setPersonAway(req, res, isPersonTwo);
 	});
 
-	app.post('/personTwoAway', function(req, res) {
+	app.post('/personTwoAway', bodyParser.json(), function(req, res) {
 		//away from home turn alert on
 		const isPersonTwo = true;
 		setPersonAway(req, res, isPersonTwo);
