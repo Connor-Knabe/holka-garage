@@ -381,8 +381,6 @@ module.exports = function(app, logger, io, debugMode) {
 			iot.toggleGarageOpenAlertSecondPerson(true);
 			logger.debug(`Garage set to away via ${personText}`);
 
-			// options.minsToWaitAfterLeavingHouseForGPSOpen = isNaN(req.body.garageOpenTimer) ? options.minsToWaitAfterLeavingHouseForGPSOpen : req.body.garageOpenTimer;
-
 			messenger.sendGenericIfttt(`${personName} Set to Away`);
 			res.send('Ok');
 		} else {
