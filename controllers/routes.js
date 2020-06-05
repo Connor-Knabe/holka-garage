@@ -222,7 +222,8 @@ module.exports = function(app, logger, io, debugMode) {
 		logger.debug('openViaGpsOne called');
 		if (options.garageGpsEnabledPersonOne) {
 			logger.debug('openViaGpsOne attempting to open');
-			iot.toggleGarageOpenAlert(false);
+			var isSecondPerson = false;
+			iot.toggleGarageOpenAlert(false, isSecondPerson);
 			messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
 			openViaGps(res, req, false);
 		} else {
@@ -235,7 +236,8 @@ module.exports = function(app, logger, io, debugMode) {
 		logger.debug('openViaGpsTwo called');
 		if (options.garageGpsEnabledPersonTwo) {
 			logger.debug('openViaGpsTwo attempting to open');
-			iot.toggleGarageOpenAlertSecondPerson(false);
+			var isSecondPerson = true;
+			iot.toggleGarageOpenAlert(false, isSecondPerson);
 			messenger.sendGenericIfttt(`${options.personTwoName} Set to Home`);
 			openViaGps(res, req, true);
 		} else {
@@ -378,7 +380,7 @@ module.exports = function(app, logger, io, debugMode) {
 		var personName = isPersonTwo ? options.personTwoName : options.personOneName;
 
 		if (req.body && req.body.includes(gpsKey)) {
-			iot.toggleGarageOpenAlertSecondPerson(true);
+			iot.toggleGarageOpenAlert(true, isPersonTwo);
 			logger.debug(`Garage set to away via ${personText}`);
 
 			messenger.sendGenericIfttt(`${personName} Set to Away`);

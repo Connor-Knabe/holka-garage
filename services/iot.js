@@ -199,8 +199,16 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 		}
 	}
 
-	function toggleGarageOpenAlert(enable) {
-		if (enable) {
+	function toggleGarageOpenAlert(enable, personTwo) {
+		if (personTwo) {
+			clearTimeout(personTwoShouldOpenTimerTimeout);
+			personTwoShouldOpenTimerTimeout = setTimeout(() => {
+				personTwoShouldOpenTimer = true;
+			}, options.minsToWaitAfterLeavingHouseForGPSOpen * 60 * 1000);
+
+			logger.debug('Enable toggleGarageOpenAlertSecondPerson: ' + enable);
+			garageOpenAlertPersonTwoManualEnable = enable;
+		} else {
 			clearTimeout(personOneShouldOpenTimerTimeout);
 			logger.debug(`personOneTimer QUEUED for ${options.minsToWaitAfterLeavingHouseForGPSOpen}`);
 
@@ -208,20 +216,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 				personOneShouldOpenTimer = true;
 				logger.debug('personOneTimer Active');
 			}, options.minsToWaitAfterLeavingHouseForGPSOpen * 60 * 1000);
-		}
-		logger.debug('Enable toggleGarageOpenAlertPersonOne: ' + enable);
-		garageOpenAlertManualEnable = enable;
-	}
 
-	function toggleGarageOpenAlertSecondPerson(enable) {
-		if (enable) {
-			clearTimeout(personTwoShouldOpenTimerTimeout);
-			personTwoShouldOpenTimerTimeout = setTimeout(() => {
-				personTwoShouldOpenTimer = true;
-			}, options.minsToWaitAfterLeavingHouseForGPSOpen * 60 * 1000);
+			logger.debug('Enable toggleGarageOpenAlertPersonOne: ' + enable);
+			garageOpenAlertManualEnable = enable;
 		}
-		logger.debug('Enable toggleGarageOpenAlertSecondPerson: ' + enable);
-		garageOpenAlertPersonTwoManualEnable = enable;
 	}
 
 	function garageDoorOpenHandler(isPersonTwo, gpsPerson, remoteAddress) {
@@ -246,7 +244,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger) {
 		garageIsOpen: garageIsOpen,
 		toggleGarageDoor: toggleGarageDoor,
 		toggleGarageOpenAlert: toggleGarageOpenAlert,
-		toggleGarageOpenAlertSecondPerson: toggleGarageOpenAlertSecondPerson,
 		garageDoorOpenHandler: garageDoorOpenHandler,
 		openCloseGarageDoor: openCloseGarageDoor
 	};
