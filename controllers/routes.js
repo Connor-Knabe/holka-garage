@@ -227,6 +227,7 @@ module.exports = function(app, logger, io, debugMode) {
 			messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
 			openViaGps(res, req, false);
 		} else {
+			logger.info('garage gps open is disabled for person one!');
 			res.status(200);
 			res.send('OK');
 		}
@@ -241,6 +242,7 @@ module.exports = function(app, logger, io, debugMode) {
 			messenger.sendGenericIfttt(`${options.personTwoName} Set to Home`);
 			openViaGps(res, req, true);
 		} else {
+			logger.info('garage gps open is disabled for person two!');
 			res.status(200);
 			res.send('OK');
 		}

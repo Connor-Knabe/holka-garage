@@ -1,3 +1,4 @@
+v1.8.1 - cleaning up debug logs
 v1.8.0 - fixing bug with away timer
 v1.7.1 - refactoring route file
 v1.7.0 - working on setting timer with gps away request

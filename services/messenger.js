@@ -99,7 +99,7 @@ module.exports = function(logger, debugMode) {
 		}, 1 * 60 * 1000);
 		messageCount++;
 		logger.debug(
-			`Sending message? -> msgContent:${msgContent} messageCount:${messageCount} generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress} sendPicture:${sendPicture}`
+			`Sending message? -> msgContent:${msgContent} \nmessageCount:${messageCount} generalTexts:${options.generalTexts}alertButtonPressTexts:${options.alertButtonPressTexts} btnPress:${btnPress} sendPicture:${sendPicture}`
 		);
 
 		if (numbers && messageCount < 10) {

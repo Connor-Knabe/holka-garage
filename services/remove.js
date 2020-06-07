@@ -31,11 +31,9 @@ module.exports = (convertProc, logger) => {
 	function deleteStream() {
 		return new Promise((resolve, reject) => {
 			if (convertProc) convertProc.kill();
-			logger.debug('deleteing stream');
 			var directory = './stream/video/';
 			rmDir(directory)
 				.then(() => {
-					logger.debug('resolving from delete stream');
 					resolve();
 				})
 				.catch(() => {});

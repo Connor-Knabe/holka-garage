@@ -104,7 +104,6 @@ module.exports = (app, logger, io) => {
 
 	function streamVideo() {
 		return new Promise((resolve, reject) => {
-			logger.debug('About to stream video');
 			if (!app.get('takingVideo')) {
 				pictureCounter = 0;
 				startCamera();
