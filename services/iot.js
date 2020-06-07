@@ -63,9 +63,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			}, 1 * 60 * 10000);
 
 			if (shouldSendGarageDoorAlertTwo && garageOpenAlertManualEnable) {
-				// if (options.alertButtonPressTexts) {
-				// 	messenger.send(true, messengerInfo.toNumbers, msg, false, false);
-				// }
 				messenger.sendIftt(garageOpened);
 				shouldSendGarageDoorAlertTwo = false;
 			}
@@ -138,18 +135,15 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 							.then(() => {
 								if (shouldCall) {
 									messenger.sendCallAlert();
-								} else {
-									messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
 								}
+								messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
 								video.stopStreaming();
 							})
 							.catch(() => {
 								if (shouldCall) {
 									messenger.sendCallAlert();
-								} else {
-									garageAlertMsg = `Garage has been open for more than: ${timeUntilAlert} minutes! Error taking new video.`;
-									messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
 								}
+								messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
 								video.stopStreaming();
 							});
 						if (!shouldCall) {
