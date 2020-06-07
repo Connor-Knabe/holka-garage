@@ -23,13 +23,12 @@ var motionSensorTimeoutOne = null,
 	personOneShouldOpenTimerTimeout = null,
 	personTwoShouldOpenTimerTimeout = null;
 
-module.exports = function(app, debugMode, io, logger, video, messenger) {
+module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 	var hasBeenOpened = garageIsOpen();
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const options = require('../settings/options.js');
 	const garageOpenRules = require('./garageOpenRules.js')();
 
-	const hue = require('./hue.js')(logger);
 	app.set('takingVideo', false);
 
 	garageSensor.watch(function(err, value) {

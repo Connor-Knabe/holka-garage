@@ -11,8 +11,7 @@ var needsToConvert = true;
 const options = require('../settings/options.js');
 var garageOpenStatus = null;
 
-module.exports = (app, logger, io) => {
-	const hue = require('./hue.js')(logger);
+module.exports = (app, logger, io, hue) => {
 	const remove = require('./remove.js')(convertProc, logger);
 
 	io.on('connection', function(socket) {

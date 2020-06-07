@@ -5,9 +5,9 @@ const geoip = require('geoip-lite');
 const { constants } = require('buffer');
 module.exports = function(app, logger, io, debugMode) {
 	const hue = require('../services/hue.js')(logger);
-	const video = require('../services/video.js')(app, logger, io);
+	const video = require('../services/video.js')(app, logger, io, hue);
 	var messenger = require('../services/messenger.js')(logger, debugMode);
-	var iot = require('../services/iot.js')(app, debugMode, io, logger, video, messenger);
+	var iot = require('../services/iot.js')(app, debugMode, io, logger, video, messenger, hue);
 	const rp = require('request-promise');
 
 	var securityMsgTimeout = null;

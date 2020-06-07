@@ -108,8 +108,6 @@ module.exports = function(logger, debugMode) {
 					sendEmail(numbers[i], msgContent);
 				}
 				if (numbers[i].number) {
-					logger.debug('number', numbers[i].number);
-
 					if (options.generalTexts) {
 						sendText(numbers[i], msgContent, sendPicture);
 					} else if (options.alertButtonPressTexts && btnPress) {
@@ -158,15 +156,12 @@ module.exports = function(logger, debugMode) {
 				};
 				textTimeout = messengerInfo.photoTextTimeoutSeconds;
 			}
-			logger.debug('timeout', textTimeout);
 
 			setTimeout(function() {
 				client.messages.create(twilioRequestObj, (err, message) => {
 					if (err) {
 						logger.error(new Date(), ' Error sending text message for message: ', message, '\nFor error: ', err);
 					} else {
-						logger.info('Msg sid: ', message.sid);
-
 						setTimeout(() => {
 							if (message && message.sid) {
 								//@ts-ignore
@@ -187,10 +182,9 @@ module.exports = function(logger, debugMode) {
 							}
 						}, 75 * 1000);
 
-						logger.info(new Date(), ' Text sent: ', msgContent);
+						logger.info(`Text sent: ${msgContent} to number: ${twilioRequestObj.to} MsgSid: ${message.sid}`);
 					}
 				});
-				logger.debug('timeout triggered');
 			}, textTimeout * 1000);
 		} else {
 			logger.info('Not sending text in debug mode. Message contains:', msgContent);
