@@ -1,3 +1,4 @@
+v1.9.0 - website to show home/away/timer status for all users
 v1.8.2 - text alert for garage being open 30 mins
 v1.8.1 - cleaning up debug logs
 v1.8.0 - fixing bug with away timer

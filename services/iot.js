@@ -130,6 +130,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 					logger.debug(garageAlertMsg);
 					if (options.garageOpenMinsAlert) {
 						logger.debug(garageAlertMsg);
+
+						if (shouldCall) {
+							garageAlertMsg = `Garage has been open for more than: ${timeUntilAlert + options.garageOpenAlertOneMins} minutes!`;
+						}
 						video
 							.streamVideo()
 							.then(() => {
@@ -218,7 +222,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 	function garageDoorOpenHandler(isPersonTwo, gpsPerson, remoteAddress) {
 		var personTimerShouldOpen = isPersonTwo ? personTwoShouldOpenTimer : personOneShouldOpenTimer;
 		if (!personTimerShouldOpen) {
-			const logMsg = `Not opening for person ${gpsPerson} due to timer`;
+			const logMsg = `Not opening for person ${gpsPerson} due to timer. ${options.minsToWaitAfterLeavingHouseForGPSOpen} min delay`;
 			logger.debug(logMsg);
 			messenger.sendGenericIfttt(logMsg);
 		}

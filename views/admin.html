@@ -71,6 +71,47 @@
             }
         });
 
+
+/*
+        socket.on('personOneAway', function (status) {
+            if (status) {
+                $("#personOneAway").text(status);
+                $("#personOneAway").show();
+            } else {
+                $("#personOneAway").hide();
+            }
+        });
+
+
+        socket.on('garageStatus', function (status) {
+            if (status) {
+                $("#garageStatus").text(status);
+                $("#garageStatus").show();
+            } else {
+                $("#garageStatus").hide();
+            }
+        });
+
+        socket.on('garageStatus', function (status) {
+            if (status) {
+                $("#garageStatus").text(status);
+                $("#garageStatus").show();
+            } else {
+                $("#garageStatus").hide();
+            }
+        });
+
+        socket.on('garageStatus', function (status) {
+            if (status) {
+                $("#garageStatus").text(status);
+                $("#garageStatus").show();
+            } else {
+                $("#garageStatus").hide();
+            }
+        });
+        */
+
+
         socket.on('garageErrorStatus', function (status) {
             if (status) {
                 $("#garageErrorStatus").text(status);
@@ -108,6 +149,13 @@
         <div id="garageStatus"></div>
         <div id="garageOpenStatus"></div>
         <div id="garageErrorStatus"></div>
+
+<!-- 
+        <br> Garage personOne is currently:
+        <div id="personOneAway"></div>
+
+        <br> Garage personTwo is currently:
+        <div id="personTwoAway"></div> -->
 
         GPS auto open is: <div id="garageGPSStatus"></div>
         <br>
