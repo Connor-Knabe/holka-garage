@@ -1,7 +1,6 @@
 var fs = require('fs');
 var raspistillProc;
 var convertProc;
-var sockets = {};
 var Gpio = require('onoff').Gpio;
 var spawn = require('child_process').spawn;
 
@@ -11,39 +10,8 @@ var needsToConvert = true;
 const options = require('../settings/options.js');
 var garageOpenStatus = null;
 
-module.exports = (app, logger, io, hue) => {
+module.exports = (app, logger, io, hue, sockets) => {
 	const remove = require('./remove.js')(convertProc, logger);
-
-	io.on('connection', function(socket) {
-		sockets[socket.id] = socket;
-		io.sockets.emit('clients', Object.keys(sockets).length);
-
-		socket.on('disconnect', function() {
-			delete sockets[socket.id];
-			hue.garageLightsOffTimed();
-			stopStreaming();
-		});
-
-		if (garageIsOpen()) {
-			io.sockets.emit('garageStatus', 'open');
-		} else {
-			io.sockets.emit('garageStatus', 'closed');
-		}
-
-		if (garageGpsEnabledMain()) {
-			io.sockets.emit('garageGPSStatus', 'enabled');
-		} else {
-			io.sockets.emit('garageGPSStatus', 'disabled');
-		}
-
-		if (app.get('takingVideo')) {
-			io.sockets.emit('garageOpenStatus', 'Recording video');
-		}
-
-		socket.on('start-stream', function() {
-			startStreaming(io);
-		});
-	});
 
 	function stopStreaming() {
 		// no more sockets, kill the stream
@@ -65,9 +33,6 @@ module.exports = (app, logger, io, hue) => {
 	function garageIsOpen() {
 		var isOpen = garageSensor.readSync() == 1 ? true : false;
 		return isOpen;
-	}
-	function garageGpsEnabledMain() {
-		return options.garageGpsEnabledMain;
 	}
 
 	function startStreaming(io) {
@@ -163,6 +128,7 @@ module.exports = (app, logger, io, hue) => {
 	return {
 		streamVideo: streamVideo,
 		stopStreaming: stopStreaming,
-		updateGarageStatus: updateGarageStatus
+		updateGarageStatus: updateGarageStatus,
+		startStreaming: startStreaming
 	};
 };

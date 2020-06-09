@@ -3,9 +3,15 @@ var options = require('../settings/options.js');
 var garageOpenStatus = null;
 const geoip = require('geoip-lite');
 const { constants } = require('buffer');
+var sockets = {};
+var personOneAway = false;
+var personTwoAway = false;
+var personOneAwayTime = null;
+var personTwoAwayTime = null;
+
 module.exports = function(app, logger, io, debugMode) {
 	const hue = require('../services/hue.js')(logger);
-	const video = require('../services/video.js')(app, logger, io, hue);
+	const video = require('../services/video.js')(app, logger, io, hue, sockets);
 	var messenger = require('../services/messenger.js')(logger, debugMode);
 	var iot = require('../services/iot.js')(app, debugMode, io, logger, video, messenger, hue);
 	const rp = require('request-promise');
@@ -17,6 +23,55 @@ module.exports = function(app, logger, io, debugMode) {
 	var fs = require('fs');
 	var bodyParser = require('body-parser');
 	var login = require('../settings/login.js');
+
+	io.on('connection', function(socket) {
+		sockets[socket.id] = socket;
+		io.sockets.emit('clients', Object.keys(sockets).length);
+
+		socket.on('disconnect', function() {
+			delete sockets[socket.id];
+			hue.garageLightsOffTimed();
+			video.stopStreaming();
+		});
+
+		if (iot.garageIsOpen()) {
+			io.sockets.emit('garageStatus', 'open');
+		} else {
+			io.sockets.emit('garageStatus', 'closed');
+		}
+
+		if (options.garageGpsEnabledMain) {
+			io.sockets.emit('garageGPSStatus', 'enabled');
+		} else {
+			io.sockets.emit('garageGPSStatus', 'disabled');
+		}
+
+		if (options.garageGpsEnabledPersonTwo) {
+			if (personTwoAway) {
+				io.sockets.emit('personTwoAway', `away for ${getMinutesBetweenDates(personTwoAwayTime, new Date())} minutes`);
+			} else {
+				io.sockets.emit('personTwoAway', 'home');
+			}
+		}
+
+		if (options.garageGpsEnabledPersonOne) {
+			if (personTwoAway) {
+				io.sockets.emit('personOneAway', `away for ${getMinutesBetweenDates(personOneAwayTime, new Date())} minutes`);
+			} else {
+				io.sockets.emit('personOneAway', 'home');
+			}
+		}
+
+		io.sockets.emit('garageTimer', options.minsToWaitAfterLeavingHouseForGPSOpen);
+
+		if (app.get('takingVideo')) {
+			io.sockets.emit('garageOpenStatus', 'Recording video');
+		}
+
+		socket.on('start-stream', function() {
+			video.startStreaming(io);
+		});
+	});
 
 	function auth(req) {
 		var authenticated = req && req.cookies && (req.cookies.holkaCookie === login.secretCookie || req.cookies.holkaCookie === login.secretAdminCookie);
@@ -382,15 +437,32 @@ module.exports = function(app, logger, io, debugMode) {
 		var personName = isPersonTwo ? options.personTwoName : options.personOneName;
 
 		if (req.body && req.body.includes(gpsKey)) {
+			if (isPersonTwo) {
+				personTwoAway = true;
+				personTwoAwayTime = new Date();
+			} else {
+				personOneAway = true;
+				personOneAwayTime = new Date();
+			}
 			iot.toggleGarageOpenAlert(true, isPersonTwo);
 			logger.debug(`Garage set to away via ${personText}`);
-
 			messenger.sendGenericIfttt(`${personName} Set to Away`);
 			res.send('Ok');
 		} else {
+			if (isPersonTwo) {
+				personTwoAway = false;
+				personTwoAwayTime = null;
+			} else {
+				personOneAway = false;
+				personOneAwayTime = null;
+			}
 			logger.error(`malformed request for ${personText}Away or wrong key`);
 			res.status(401);
 			res.send('None shall pass');
 		}
+	}
+	function getMinutesBetweenDates(startDate, endDate) {
+		var diff = endDate.getTime() - startDate.getTime();
+		return diff / 60000;
 	}
 };

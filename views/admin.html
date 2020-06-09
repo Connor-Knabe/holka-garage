@@ -72,7 +72,6 @@
         });
 
 
-/*
         socket.on('personOneAway', function (status) {
             if (status) {
                 $("#personOneAway").text(status);
@@ -83,12 +82,21 @@
         });
 
 
-        socket.on('garageStatus', function (status) {
+        socket.on('personTwoAway', function (status) {
             if (status) {
-                $("#garageStatus").text(status);
-                $("#garageStatus").show();
+                $("#personTwoAway").text(status);
+                $("#personTwoAway").show();
             } else {
-                $("#garageStatus").hide();
+                $("#personTwoAway").hide();
+            }
+        });
+
+        socket.on('garageTimer', function (status) {
+            if (status) {
+                $("#garageTimer").text(status);
+                $("#garageTimer").show();
+            } else {
+                $("#garageTimer").hide();
             }
         });
 
@@ -100,16 +108,6 @@
                 $("#garageStatus").hide();
             }
         });
-
-        socket.on('garageStatus', function (status) {
-            if (status) {
-                $("#garageStatus").text(status);
-                $("#garageStatus").show();
-            } else {
-                $("#garageStatus").hide();
-            }
-        });
-        */
 
 
         socket.on('garageErrorStatus', function (status) {
@@ -150,12 +148,15 @@
         <div id="garageOpenStatus"></div>
         <div id="garageErrorStatus"></div>
 
-<!-- 
+
         <br> Garage personOne is currently:
         <div id="personOneAway"></div>
 
         <br> Garage personTwo is currently:
-        <div id="personTwoAway"></div> -->
+        <div id="personTwoAway"></div>
+
+        <br> Garage open timer is set to:
+        <div id="garageTimer"></div>
 
         GPS auto open is: <div id="garageGPSStatus"></div>
         <br>
