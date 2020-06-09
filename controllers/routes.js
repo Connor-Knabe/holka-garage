@@ -279,6 +279,8 @@ module.exports = function(app, logger, io, debugMode) {
 			logger.debug('openViaGpsOne attempting to open');
 			var isSecondPerson = false;
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
+			personOneAway = false;
+			personOneAwayTime = null;
 			messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
 			openViaGps(res, req, false);
 		} else {
@@ -294,6 +296,8 @@ module.exports = function(app, logger, io, debugMode) {
 			logger.debug('openViaGpsTwo attempting to open');
 			var isSecondPerson = true;
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
+			personTwoAway = false;
+			personTwoAwayTime = null;
 			messenger.sendGenericIfttt(`${options.personTwoName} Set to Home`);
 			openViaGps(res, req, true);
 		} else {
@@ -449,13 +453,6 @@ module.exports = function(app, logger, io, debugMode) {
 			messenger.sendGenericIfttt(`${personName} Set to Away`);
 			res.send('Ok');
 		} else {
-			if (isPersonTwo) {
-				personTwoAway = false;
-				personTwoAwayTime = null;
-			} else {
-				personOneAway = false;
-				personOneAwayTime = null;
-			}
 			logger.error(`malformed request for ${personText}Away or wrong key`);
 			res.status(401);
 			res.send('None shall pass');
