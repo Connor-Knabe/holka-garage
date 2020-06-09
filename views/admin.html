@@ -133,26 +133,15 @@
 
         <button type="button" class="btn btn-info" id="video">Send Video</button>
 
+        
+        <br> Garage is:
+        <div id="garageStatus" style="color:green"></div>
+        <div id="garageOpenStatus" style="color:green"></div>
+        <div id="garageErrorStatus" style="color:green"></div>
 
-        <br>
-        <small>Light Brightness</small>
-        <br>
-
-        <button type="button" class="btn btn-info" id="lights25">25%</button>
-        <button type="button" class="btn btn-info" id="lights50">50%</button>
-        <button type="button" class="btn btn-info" id="lights75">75%</button>
-        <button type="button" class="btn btn-info" id="lights100">100%</button>
-
-        <br> Garage is currently:
-        <div id="garageStatus"></div>
-        <div id="garageOpenStatus"></div>
-        <div id="garageErrorStatus"></div>
-
-        Person one is: <div class="garageStatus" id="personOneAway"></div> <br>
-        Person two is: <div class="garageStatus" id="personTwoAway"></div> <br>
-        Auto open after: <div class="garageStatus" id="garageTimer"></div> <br>
-        GPS auto open is: <div class="garageStatus" id="garageGPSStatus"></div>
-        <br>
+        User 1: <div class="garageStatus" id="personOneAway" style="color:green"></div> <br>
+        User 2: <div class="garageStatus" id="personTwoAway" style="color:green"></div> <br>
+        Auto open after: <div class="garageStatus" id="garageTimer" style="color:green"></div> <br>
         <progress id="progress"></progress>
     </h1>
     <hr>
@@ -205,10 +194,21 @@
 
         Image Last Updated:
         <div class="date">N/a</div>
-        <br>
 
+        <h1 class="text-center">
+        GPS auto open is: <div class="garageStatus" id="garageGPSStatus"></div>
+        </h1>
         <button type="button" class="btn btn-info" id="gps">Toggle GPS Open</button>
         <br>
+
+        <small>Light Brightness</small>
+        <br>
+
+        <button type="button" class="btn btn-info" id="lights25">25%</button>
+        <button type="button" class="btn btn-info" id="lights50">50%</button>
+        <button type="button" class="btn btn-info" id="lights75">75%</button>
+        <button type="button" class="btn btn-info" id="lights100">100%</button>
+
 
     </div>
 

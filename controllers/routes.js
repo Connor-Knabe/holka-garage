@@ -48,7 +48,9 @@ module.exports = function(app, logger, io, debugMode) {
 
 		if (options.garageGpsEnabledPersonTwo) {
 			if (personTwoAway) {
-				io.sockets.emit('personTwoAway', `away for ${getMinutesBetweenDates(personTwoAwayTime, new Date())} minutes`);
+				const minsAway = getMinutesBetweenDates(personTwoAwayTime, new Date());
+				var timeAway = minsAway > 120 ? `away for ${minsAway / 60} hours` : `away for ${minsAway} mins`;
+				io.sockets.emit('personTwoAway', `away for ${timeAway}`);
 			} else {
 				io.sockets.emit('personTwoAway', 'home');
 			}
@@ -56,7 +58,9 @@ module.exports = function(app, logger, io, debugMode) {
 
 		if (options.garageGpsEnabledPersonOne) {
 			if (personOneAway) {
-				io.sockets.emit('personOneAway', `away for ${getMinutesBetweenDates(personOneAwayTime, new Date())} minutes`);
+				const minsAway = getMinutesBetweenDates(personOneAwayTime, new Date());
+				var timeAway = minsAway > 120 ? `away for ${minsAway / 60} hours` : `away for ${minsAway} mins`;
+				io.sockets.emit('personOneAway', `away for ${timeAway}`);
 			} else {
 				io.sockets.emit('personOneAway', 'home');
 			}
