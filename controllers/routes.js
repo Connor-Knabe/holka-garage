@@ -62,7 +62,7 @@ module.exports = function(app, logger, io, debugMode) {
 			}
 		}
 
-		io.sockets.emit('garageTimer', options.minsToWaitAfterLeavingHouseForGPSOpen);
+		io.sockets.emit('garageTimer', `${options.minsToWaitAfterLeavingHouseForGPSOpen} mins`);
 
 		if (app.get('takingVideo')) {
 			io.sockets.emit('garageOpenStatus', 'Recording video');
