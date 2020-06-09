@@ -462,7 +462,12 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	}
 	function getMinutesBetweenDates(startDate, endDate) {
-		var diff = endDate.getTime() - startDate.getTime();
-		return Math.round(diff / 60000);
+		var minsBetweenDates = 0;
+		if (startDate && endDate) {
+			var diff = endDate.getTime() - startDate.getTime();
+			minsBetweenDates = Math.round(diff / 60000);
+		}
+
+		return minsBetweenDates;
 	}
 };
