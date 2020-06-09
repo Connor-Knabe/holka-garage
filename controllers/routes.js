@@ -55,7 +55,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 
 		if (options.garageGpsEnabledPersonOne) {
-			if (personTwoAway) {
+			if (personOneAway) {
 				io.sockets.emit('personOneAway', `away for ${getMinutesBetweenDates(personOneAwayTime, new Date())} minutes`);
 			} else {
 				io.sockets.emit('personOneAway', 'home');
