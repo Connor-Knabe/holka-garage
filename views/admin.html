@@ -165,9 +165,9 @@
 <body class="container">
     <h1 class="text-center">Silver Leaf Garage
         <br />
-        <button type="button" class="btn btn-info" id="open">Open Garage</button>
+        <button type="button" disabled class="btn btn-info" id="open">Open Garage</button>
 
-        <button type="button" class="btn btn-info" id="close">Close Garage</button>
+        <button type="button" disabled class="btn btn-info" id="close">Close Garage</button>
 
         <button type="button" class="btn btn-info" id="video">Send Video</button>
 
@@ -178,9 +178,9 @@
         <div class="largeText" id="garageOpenStatus" style="color:green"></div>
         <div class="largeText" id="garageErrorStatus" style="color:green"></div>
         <br>
-        User 1: <div class="garageStatus" id="personOneAway" style="color:green"></div>
+        User 1: <div class="garageStatus" id="personOneAway" style="color:orange"></div>
                 <div id="personOneTime" style="color:green"></div>
-        User 2: <div class="garageStatus" id="personTwoAway" style="color:pink"></div> 
+        <div class="garageStatus" style="color:pink">User 2:</div> <div class="garageStatus" id="personTwoAway" style="color:pink"></div> 
                 <div id="personTwoTime" style="color:pink"></div>
         Open after: <div class="garageStatus" id="garageTimer" style="color:purple"></div> <br>
         <progress id="progress"></progress>
