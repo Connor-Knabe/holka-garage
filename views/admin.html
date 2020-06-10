@@ -64,6 +64,14 @@
 
         socket.on('garageStatus', function (status) {
             if (status) {
+                if(status=="open"){
+                    $("#open").attr('disabled', 'disabled');
+                    $("#close").removeAttr("disabled");
+                } else {
+                    $("#open").removeAttr("disabled");
+                    $("#close").attr('disabled', 'disabled');
+                }
+
                 $("#garageStatus").text(status);
                 $("#garageStatus").show();
             } else {
@@ -74,6 +82,11 @@
 
         socket.on('personOneAway', function (status) {
             if (status) {
+                if(status=='home'){
+                    $("#personOneAway").css("color", "green");
+                } else {
+                    $("#personOneAway").css("color", "purple");
+                }
                 $("#personOneAway").text(status);
                 $("#personOneAway").show();
             } else {
@@ -84,6 +97,11 @@
 
         socket.on('personTwoAway', function (status) {
             if (status) {
+                if(status=='home'){
+                    $("#personTwoAway").css("color", "green");
+                } else {
+                    $("#personTwoAway").css("color", "purple");
+                }
                 $("#personTwoAway").text(status);
                 $("#personTwoAway").show();
             } else {
@@ -162,9 +180,9 @@
         <br>
         User 1: <div class="garageStatus" id="personOneAway" style="color:green"></div>
                 <div id="personOneTime" style="color:green"></div>
-        User 2: <div class="garageStatus" id="personTwoAway" style="color:green"></div> 
-                <div id="personTwoTime" style="color:green"></div>
-        Open after: <div class="garageStatus" id="garageTimer" style="color:green"></div> <br>
+        User 2: <div class="garageStatus" id="personTwoAway" style="color:pink"></div> 
+                <div id="personTwoTime" style="color:pink"></div>
+        Open after: <div class="garageStatus" id="garageTimer" style="color:purple"></div> <br>
         <progress id="progress"></progress>
     </h1>
     <hr id="bootstrap-overrides"> 

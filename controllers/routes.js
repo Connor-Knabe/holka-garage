@@ -48,7 +48,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 		if (options.garageGpsEnabledPersonTwo) {
 			const minsAway = getMinutesBetweenDates(personTwoTime, new Date());
-			var timeAway = minsAway > 120 ? `for ${minsAway / 60} hours` : `for ${minsAway} mins`;
+			var timeAway = minsAway > 120 ? `for ${Math.round(minsAway / 60)} hours` : `for ${minsAway} mins`;
 			io.sockets.emit('personTwoTime', `${timeAway}`);
 			if (personTwoAway) {
 				io.sockets.emit('personTwoAway', `away`);
@@ -59,7 +59,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 		if (options.garageGpsEnabledPersonOne) {
 			const minsAway = getMinutesBetweenDates(personOneTime, new Date());
-			var timeAway = minsAway > 120 ? `for ${minsAway / 60} hours` : `for ${minsAway} mins`;
+			var timeAway = minsAway > 120 ? `for ${Math.round(minsAway / 60)} hours` : `for ${minsAway} mins`;
 			io.sockets.emit('personOneTime', `${timeAway}`);
 			if (personOneAway) {
 				io.sockets.emit('personOneAway', `away`);

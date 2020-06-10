@@ -39,6 +39,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			hasBeenOpened = true;
 			garageOpened = true;
 			var msg = 'Garage door opened';
+
 			if (options.enableLightsOnGarageOpen) {
 				hue.garageLightsOnTimed(25);
 			}
