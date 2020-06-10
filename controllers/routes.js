@@ -63,6 +63,7 @@ module.exports = function(app, logger, io, debugMode) {
 				const minsAway = getMinutesBetweenDates(personOneAwayTime, new Date());
 				var timeAway = minsAway > 120 ? `away for ${minsAway / 60} hours` : `away for ${minsAway} mins`;
 				io.sockets.emit('personOneAway', `away`);
+				logger.debug(`Time away ${timeAway}`);
 				io.sockets.emit('personOneAwayTime', `${timeAway}`);
 			} else {
 				io.sockets.emit('personOneAway', 'home');
