@@ -180,10 +180,6 @@ margin-right: 150px;*/
 	display: inline;
 }
 
-#garageGPSStatus {
-	display: inline;
-}
-
 #garageErrorStatus {
 	color: red;
 }
@@ -204,5 +200,6 @@ margin-right: 150px;*/
 }
 
 .largeText {
+	display: inline;
 	font-size: 70px;
 }
