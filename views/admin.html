@@ -67,11 +67,10 @@
                 if(status=="open"){
                     $("#open").attr('disabled', 'disabled');
                     $("#close").removeAttr("disabled");
-                } else {
+                } else (status=="closed"){
                     $("#open").removeAttr("disabled");
                     $("#close").attr('disabled', 'disabled');
                 }
-
                 $("#garageStatus").text(status);
                 $("#garageStatus").show();
             } else {
@@ -84,8 +83,10 @@
             if (status) {
                 if(status=='home'){
                     $("#personOneAway").css("color", "green");
+                    $("#personOneTime").css("color", "green");
                 } else {
                     $("#personOneAway").css("color", "purple");
+                    $("#personOneTime").css("color", "purple");
                 }
                 $("#personOneAway").text(status);
                 $("#personOneAway").show();
@@ -94,13 +95,14 @@
             }
         });
 
-
         socket.on('personTwoAway', function (status) {
             if (status) {
                 if(status=='home'){
                     $("#personTwoAway").css("color", "green");
+                    $("#personTwoTime").css("color", "green");
                 } else {
                     $("#personTwoAway").css("color", "purple");
+                    $("#personTwoTime").css("color", "purple");
                 }
                 $("#personTwoAway").text(status);
                 $("#personTwoAway").show();
@@ -178,11 +180,11 @@
         <div class="largeText" id="garageOpenStatus" style="color:green"></div>
         <div class="largeText" id="garageErrorStatus" style="color:green"></div>
         <br>
-        <div class="garageStatus" style="color:orange">User 1:</div> <div class="garageStatus" id="personOneAway"></div>
-                <div id="personOneTime" style="color:orange"></div>
-        <div class="garageStatus" style="color:pink">User 2:</div> <div class="garageStatus" id="personTwoAway"></div> 
-                <div id="personTwoTime" style="color:pink"></div>
-        Open after: <div class="garageStatus" id="garageTimer" style="color:yellow"></div> <br>
+        User 1:<div class="garageStatus" id="personOneAway"></div>
+                <div id="personOneTime"></div>
+        User 2: <div class="garageStatus" id="personTwoAway"></div> 
+                <div id="personTwoTime"></div>
+        Open after: <div class="garageStatus" id="garageTimer" style="color:purple"></div> <br>
         <progress id="progress"></progress>
     </h1>
     <hr id="bootstrap-overrides"> 

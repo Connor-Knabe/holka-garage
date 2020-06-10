@@ -3,9 +3,8 @@ $(document).ready(function() {
 	$('#stream').hide();
 	$('#open').click(function(e) {
 		e.preventDefault();
-		$('#open').attr('disabled', 'disabled');
-		$('#close').attr('disabled', 'disabled');
-
+		// $('#open').attr('disabled', 'disabled');
+		// $('#close').attr('disabled', 'disabled');
 		$.ajax({
 			type: 'POST',
 			url: '/openOrCloseGarage',
@@ -17,9 +16,8 @@ $(document).ready(function() {
 	});
 	$('#close').click(function(e) {
 		e.preventDefault();
-		$('#open').attr('disabled', 'disabled');
-		$('#close').attr('disabled', 'disabled');
-
+		// $('#open').attr('disabled', 'disabled');
+		// $('#close').attr('disabled', 'disabled');
 		$.ajax({
 			type: 'POST',
 			url: '/openOrCloseGarage',

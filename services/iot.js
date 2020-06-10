@@ -36,6 +36,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			logger.error('Error watching garage sensor: ', err);
 		}
 		if (value == 1 && !hasBeenOpened) {
+			io.sockets.emit('garageStatus', 'open');
+
 			hasBeenOpened = true;
 			garageOpened = true;
 			var msg = 'Garage door opened';
@@ -55,6 +57,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			logger.debug(msg);
 			io.sockets.emit('garageErrorStatus', null);
 		} else if (value == 0 && hasBeenOpened) {
+			io.sockets.emit('garageStatus', 'closed');
+
 			hasBeenOpened = false;
 			garageOpened = false;
 			var msg = 'Garage door closed';
