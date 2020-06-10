@@ -6,8 +6,8 @@ const { constants } = require('buffer');
 var sockets = {};
 var personOneAway = false;
 var personTwoAway = false;
-var personOneTime = null;
-var personTwoTime = null;
+var personOneTime = new Date();
+var personTwoTime = new Date();
 
 module.exports = function(app, logger, io, debugMode) {
 	const hue = require('../services/hue.js')(logger);
