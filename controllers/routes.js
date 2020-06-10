@@ -50,9 +50,11 @@ module.exports = function(app, logger, io, debugMode) {
 			if (personTwoAway) {
 				const minsAway = getMinutesBetweenDates(personTwoAwayTime, new Date());
 				var timeAway = minsAway > 120 ? `away for ${minsAway / 60} hours` : `away for ${minsAway} mins`;
-				io.sockets.emit('personTwoAway', `away for ${timeAway}`);
+				io.sockets.emit('personTwoAway', `away`);
+				io.sockets.emit('personTwoAwayTime', `${timeAway}`);
 			} else {
 				io.sockets.emit('personTwoAway', 'home');
+				io.sockets.emit('personTwoAwayTime', ``);
 			}
 		}
 
@@ -60,9 +62,11 @@ module.exports = function(app, logger, io, debugMode) {
 			if (personOneAway) {
 				const minsAway = getMinutesBetweenDates(personOneAwayTime, new Date());
 				var timeAway = minsAway > 120 ? `away for ${minsAway / 60} hours` : `away for ${minsAway} mins`;
-				io.sockets.emit('personOneAway', `away for ${timeAway}`);
+				io.sockets.emit('personOneAway', `away`);
+				io.sockets.emit('personOneAwayTime', `${timeAway}`);
 			} else {
 				io.sockets.emit('personOneAway', 'home');
+				io.sockets.emit('personOneAwayTime', ``);
 			}
 		}
 
