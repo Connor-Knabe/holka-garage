@@ -67,7 +67,6 @@ module.exports = function(logger, debugMode) {
 
 	function requestIfttt(url, apiKey, minsOpened, message) {
 		logger.debug(`Request ifttt ${minsOpened}, with message ${message}`);
-		var url = messengerInfo.iftttGarageClosedUrl ? messengerInfo.iftttGarageClosedUrl : url;
 
 		logger.debug('requesting ifttt with url: ', url + apiKey.substring(0, 5), '<--- key is truncated.');
 		url += apiKey;
