@@ -287,7 +287,7 @@ module.exports = function(app, logger, io, debugMode) {
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
 			personOneAway = false;
 			personOneTime = new Date();
-			messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHome);
+			messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 			messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
 			openViaGps(res, req, false);
 		} else {
