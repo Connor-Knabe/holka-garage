@@ -8,6 +8,7 @@ var personOneAway = false;
 var personTwoAway = false;
 var personOneTime = new Date();
 var personTwoTime = new Date();
+const rebootTime = new Date();
 
 module.exports = function(app, logger, io, debugMode) {
 	const hue = require('../services/hue.js')(logger);
@@ -47,8 +48,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 
 		if (options.garageGpsEnabledPersonTwo) {
-			const minsAway = getMinutesBetweenDates(personTwoTime, new Date());
-			var timeAway = minsAway > 120 ? `for ${Math.round(minsAway / 60)} hours` : `for ${minsAway} mins`;
+			const timeAway = getTimeAway(personTwoTime);
 			io.sockets.emit('personTwoTime', `${timeAway}`);
 			if (personTwoAway) {
 				io.sockets.emit('personTwoAway', `away`);
@@ -58,8 +58,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 
 		if (options.garageGpsEnabledPersonOne) {
-			const minsAway = getMinutesBetweenDates(personOneTime, new Date());
-			var timeAway = minsAway > 120 ? `for ${Math.round(minsAway / 60)} hours` : `for ${minsAway} mins`;
+			const timeAway = getTimeAway(personOneTime);
 			io.sockets.emit('personOneTime', `${timeAway}`);
 			if (personOneAway) {
 				io.sockets.emit('personOneAway', `away`);
@@ -67,6 +66,10 @@ module.exports = function(app, logger, io, debugMode) {
 				io.sockets.emit('personOneAway', 'home');
 			}
 		}
+
+		const timeSinceReboot = getTimeAway(rebootTime);
+
+		io.sockets.emit('rebootTime', timeSinceReboot);
 
 		io.sockets.emit('garageTimer', `${options.minsToWaitAfterLeavingHouseForGPSOpen} mins`);
 
@@ -262,12 +265,9 @@ module.exports = function(app, logger, io, debugMode) {
 
 			var hoursToPause = isInt(parsedTime) ? parsedTime : 12;
 
-			iot.setIsHomeEnabled(false, hoursToPause);
-
 			var txtMsg = `Pausing home/away trigger for ${hoursToPause} hours`;
 			messenger.send(true, alertInfo, txtMsg, false, true);
 		} else if (msg.textMessage.toLowerCase().trim() == 'resume') {
-			iot.setIsHomeEnabled(true);
 			var txtMsg = 'Resuming home/away trigger';
 			messenger.send(true, alertInfo, txtMsg, false, true);
 		} else {
@@ -287,6 +287,7 @@ module.exports = function(app, logger, io, debugMode) {
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
 			personOneAway = false;
 			personOneTime = new Date();
+			messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHome);
 			messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
 			openViaGps(res, req, false);
 		} else {
@@ -304,6 +305,7 @@ module.exports = function(app, logger, io, debugMode) {
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
 			personTwoAway = false;
 			personTwoTime = new Date();
+			messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 			messenger.sendGenericIfttt(`${options.personTwoName} Set to Home`);
 			openViaGps(res, req, true);
 		} else {
@@ -454,6 +456,11 @@ module.exports = function(app, logger, io, debugMode) {
 				personOneAway = true;
 				personOneTime = new Date();
 			}
+
+			if (personOneAway && personTwoAway) {
+				messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
+			}
+
 			iot.toggleGarageOpenAlert(true, isPersonTwo);
 			logger.debug(`Garage set to away via ${personText}`);
 			messenger.sendGenericIfttt(`${personName} Set to Away`);
@@ -464,13 +471,17 @@ module.exports = function(app, logger, io, debugMode) {
 			res.send('None shall pass');
 		}
 	}
-	function getMinutesBetweenDates(startDate, endDate) {
+	function getTimeAway(startDate) {
 		var minsBetweenDates = 0;
+		const endDate = new Date();
+
 		if (startDate && endDate) {
 			var diff = endDate.getTime() - startDate.getTime();
 			minsBetweenDates = Math.round(diff / 60000);
 		}
 
-		return minsBetweenDates;
+		var timeAway = minsBetweenDates > 120 ? `for ${Math.round(minsBetweenDates / 60)} hours` : `for ${minsBetweenDates} mins`;
+
+		return timeAway;
 	}
 };

@@ -13,14 +13,20 @@ module.exports = function(logger, debugMode) {
 	send(true, messengerInfo.toNumbers, 'The garage software has rebooted.  Garage open alerts disabled until you leave home!');
 	sendGenericIfttt('Garage software rebooted.');
 
-	function sendIftt(garageOpened, message) {
+	function sendIftt(garageOpened, message, url) {
 		if (options.enableIfttt) {
 			var iftttMessage = messengerInfo.iftttValue1;
+
+			if (garageOpened != null) {
+				url = garageOpened ? messengerInfo.iftttGarageOpenedUrl : messengerInfo.iftttGarageClosedUrl;
+			}
+
 			if (message) {
 				iftttMessage = message;
 			}
+
 			for (var i = 0; i < messengerInfo.iftttRecipients.length; i++) {
-				requestIfttt(garageOpened, messengerInfo.iftttRecipients[i].ApiKey, minsOpened, iftttMessage);
+				requestIfttt(url, messengerInfo.iftttRecipients[i].ApiKey, minsOpened, iftttMessage);
 			}
 		}
 	}
@@ -54,20 +60,16 @@ module.exports = function(logger, debugMode) {
 	function sendIfttGarageOpenedAlert(shouldSend = true, minsOpened) {
 		if (shouldSend && options.enableIfttt) {
 			for (var i = 0; i < messengerInfo.iftttRecipients.length; i++) {
-				requestIfttt(null, messengerInfo.iftttRecipients[i].ApiKey, minsOpened, messengerInfo.iftttValue1);
+				requestIfttt(messengerInfo.iftttGarageOpenAlertUrl, messengerInfo.iftttRecipients[i].ApiKey, minsOpened, messengerInfo.iftttValue1);
 			}
 		}
 	}
 
-	function requestIfttt(garageOpened, apiKey, minsOpened, message) {
-		logger.debug(`Minutes opened request ifttt ${minsOpened}, with message ${message}`);
-		var url = messengerInfo.iftttGarageClosedUrl;
-		if (garageOpened) {
-			url = messengerInfo.iftttGarageOpenedUrl;
-		} else if (garageOpened === null) {
-			url = messengerInfo.iftttGarageOpenAlertUrl;
-		}
-		logger.debug('requesting ifttt with url: ', url + apiKey.substring(0, 5), '<--- key is truncated. Garage opened:', garageOpened);
+	function requestIfttt(url, apiKey, minsOpened, message) {
+		logger.debug(`Request ifttt ${minsOpened}, with message ${message}`);
+		var url = messengerInfo.iftttGarageClosedUrl ? messengerInfo.iftttGarageClosedUrl : url;
+
+		logger.debug('requesting ifttt with url: ', url + apiKey.substring(0, 5), '<--- key is truncated.');
 		url += apiKey;
 		var options = {
 			method: 'POST',

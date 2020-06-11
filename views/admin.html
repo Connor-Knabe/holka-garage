@@ -129,7 +129,15 @@
             }
         });
 
-        
+
+        socket.on('personTwoTime', function (status) {
+            if (status) {
+                $("#personTwoTime").text(status);
+                $("#personTwoTime").show();
+            } else {
+                $("#personTwoTime").hide();
+            }
+        });        
 
         socket.on('garageTimer', function (status) {
             if (status) {
@@ -158,6 +166,16 @@
                 $("#garageErrorStatus").hide();
             }
         });
+
+        socket.on('rebootTime', function (status) {
+            if (status) {
+                $("#rebootTime").text(status);
+                $("#rebootTime").show();
+            } else {
+                $("#rebootTime").hide();
+            }
+        });
+        
 
         socket.emit('start-stream');
 
@@ -251,6 +269,9 @@
         <button type="button" class="btn btn-info" id="lights50">50%</button>
         <button type="button" class="btn btn-info" id="lights75">75%</button>
         <button type="button" class="btn btn-info" id="lights100">100%</button>
+
+        <br>
+        Time since reboot: <div class="garageStatus" id="rebootTime"></div>
 
 
     </div>
