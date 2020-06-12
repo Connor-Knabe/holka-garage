@@ -25,6 +25,7 @@ $(document).ready(function() {
 			}
 		});
 	});
+
 	$('#video').click(function(e) {
 		e.preventDefault();
 		$.ajax({
@@ -38,6 +39,7 @@ $(document).ready(function() {
 
 	$('#gps').click(function(e) {
 		e.preventDefault();
+		$('#gps').attr('disabled', 'disabled');
 		$.ajax({
 			type: 'POST',
 			url: '/gpsToggle',
@@ -49,6 +51,7 @@ $(document).ready(function() {
 
 	$('#setHome').click(function(e) {
 		e.preventDefault();
+		$('#setHome').attr('disabled', 'disabled');
 		$.ajax({
 			type: 'POST',
 			url: '/setHome',
