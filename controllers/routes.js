@@ -204,10 +204,9 @@ module.exports = function(app, logger, io, debugMode) {
 			} else {
 				options.garageGpsEnabledMain = true;
 			}
-
 			var garageGPSStatus = options.garageGpsEnabledMain ? 'enabled' : 'disabled';
-
 			io.sockets.emit('garageGPSStatus', garageGPSStatus);
+			res.send('Ok');
 		} else {
 			res.status(401);
 			res.send('not auth');
