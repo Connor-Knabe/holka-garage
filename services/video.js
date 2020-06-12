@@ -53,13 +53,11 @@ module.exports = (app, logger, io, hue, sockets) => {
 							io.sockets.emit('garageOpenStatus', null);
 							garageOpenStatus = null;
 						}
-						// io.sockets.emit('garageStatus', 'open');
 					} else {
 						if (garageOpenStatus == 'Closing...') {
 							io.sockets.emit('garageOpenStatus', null);
 							garageOpenStatus = null;
 						}
-						// io.sockets.emit('garageStatus', 'closed');
 					}
 				}
 			});

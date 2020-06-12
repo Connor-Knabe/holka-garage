@@ -198,17 +198,20 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	app.post('/gpsToggle', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		if (options.garageGpsEnabledMain) {
-			options.garageGpsEnabledMain = false;
+		if (auth(req)) {
+			if (options.garageGpsEnabledMain) {
+				options.garageGpsEnabledMain = false;
+			} else {
+				options.garageGpsEnabledMain = true;
+			}
+
+			var garageGPSStatus = options.garageGpsEnabledMain ? 'enabled' : 'disabled';
+
+			io.sockets.emit('garageGPSStatus', garageGPSStatus);
 		} else {
-			options.garageGpsEnabledMain = true;
+			res.status(401);
+			res.send('not auth');
 		}
-
-		var garageGPSStatus = options.garageGpsEnabledMain ? 'enabled' : 'disabled';
-
-		io.sockets.emit('garageGPSStatus', garageGPSStatus);
-
-		res.send('Ok');
 	});
 
 	app.post('/lights/:brightness', bodyParser.urlencoded({ extended: false }), function(req, res) {
@@ -351,6 +354,16 @@ module.exports = function(app, logger, io, debugMode) {
 			res.send('not auth to open garage');
 		}
 	}
+
+	app.post('/setHome', bodyParser.urlencoded({ extended: false }), function(req, res) {
+		if (auth(req)) {
+			messenger.sendIftt(null, 'set home manually', messengerInfo.iftttGarageSetHomeUrl);
+			res.send('Ok');
+		} else {
+			res.status(401);
+			res.send('not auth');
+		}
+	});
 
 	app.post('/openOrCloseGarage', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		if (auth(req)) {
