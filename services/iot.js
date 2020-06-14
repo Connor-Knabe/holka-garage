@@ -31,6 +31,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 
 	app.set('takingVideo', false);
 
+	//to remove
+	garageAlertOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
+
 	garageSensor.watch(function(err, value) {
 		if (err) {
 			logger.error('Error watching garage sensor: ', err);
@@ -133,35 +136,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 		timeOut = setTimeout(() => {
 			if (garageIsOpen()) {
 				setTimeout(() => {
-					var garageAlertMsg = `Garage has been open for more than: ${timeUntilAlert} minutes!`;
-					logger.debug(garageAlertMsg);
-					if (options.garageOpenMinsAlert) {
-						logger.debug(garageAlertMsg);
-
-						if (shouldCall) {
-							garageAlertMsg = `Garage has been open for more than: ${timeUntilAlert + options.garageOpenAlertOneMins} minutes!`;
-						}
-						video
-							.streamVideo()
-							.then(() => {
-								if (shouldCall) {
-									messenger.sendCallAlert();
-								}
-								messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
-								video.stopStreaming();
-							})
-							.catch(() => {
-								if (shouldCall) {
-									messenger.sendCallAlert();
-								}
-								messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
-								video.stopStreaming();
-							});
-						if (!shouldCall) {
-							garageAlertOpenCheck(options.garageOpenAlertTwoMins, garageOpenAlertTwoTimeout, true);
-						}
-					}
-					messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert, timeUntilAlert);
+					garageAlert(timeUntilAlert, shouldCall);
 				}, 45 * 1000);
 			}
 		}, timeUntilAlert * 60 * 1000);
@@ -170,6 +145,38 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 	function garageIsOpen() {
 		var isOpen = garageSensor.readSync() == 1 ? true : false;
 		return isOpen;
+	}
+
+	function garageAlert(timeUntilAlert, shouldCall) {
+		var garageAlertMsg = `Garage has been open for more than: ${timeUntilAlert} minutes!`;
+		logger.debug(garageAlertMsg);
+		if (options.garageOpenMinsAlert) {
+			logger.debug(garageAlertMsg);
+
+			if (shouldCall) {
+				garageAlertMsg = `Garage has been open for more than: ${timeUntilAlert + options.garageOpenAlertOneMins} minutes!`;
+			}
+			video
+				.streamVideo()
+				.then(() => {
+					if (shouldCall) {
+						messenger.sendCallAlert();
+					}
+					messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
+					video.stopStreaming();
+				})
+				.catch(() => {
+					if (shouldCall) {
+						messenger.sendCallAlert();
+					}
+					messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
+					video.stopStreaming();
+				});
+			if (!shouldCall) {
+				garageAlertOpenCheck(options.garageOpenAlertTwoMins, garageOpenAlertTwoTimeout, true);
+			}
+		}
+		messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert, timeUntilAlert);
 	}
 
 	function toggleGarageDoor(gpsPerson, remoteAddress) {
