@@ -31,9 +31,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 
 	app.set('takingVideo', false);
 
-	//to remove
-	garageAlertOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
-
 	garageSensor.watch(function(err, value) {
 		if (err) {
 			logger.error('Error watching garage sensor: ', err);
