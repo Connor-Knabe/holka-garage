@@ -109,14 +109,12 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 						.streamVideo()
 						.then(() => {
 							var garageAlertMsg = `The garage has been opened but the homeowners are not home!`;
-							//TO REVERT
-							messenger.send(true, messengerInfo.allNumbers, garageAlertMsg, options.alertSendPictureText, true);
+							messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
 							video.stopStreaming();
 						})
 						.catch(() => {
 							var garageAlertMsg = `The garage has been opened but the homeowners are not home! Error taking new video.`;
-							//TO REVERT
-							messenger.send(true, messengerInfo.allNumbers, garageAlertMsg, options.alertSendPictureText, true);
+							messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
 							video.stopStreaming();
 						});
 				} else {
