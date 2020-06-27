@@ -504,6 +504,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 	function setPersonAway(req, res, isPersonTwo) {
 		var personName = isPersonTwo ? options.personTwoName : options.personOneName;
+		var personText = isPersonTwo ? 'personTwo' : 'personOne';
 
 		if (isPersonTwo) {
 			personTwoAway = true;
