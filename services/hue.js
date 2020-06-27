@@ -1,5 +1,4 @@
-var login = require('../settings/login.js'),
-	hue = require('node-hue-api'),
+var hue = require('node-hue-api'),
 	options = require('../settings/options.js');
 
 var HueApi = hue.HueApi,
@@ -11,7 +10,7 @@ var HueApi = hue.HueApi,
 	lightsOffTimeout = null,
 	lightsOffTimedTimeout = null;
 
-module.exports = function(logger) {
+module.exports = function(logger, io) {
 	function garageLightsOnTimed(brightness) {
 		if (options.enableHue) {
 			lightsOn(brightness).then(() => {}).catch(() => {});
@@ -38,6 +37,9 @@ module.exports = function(logger) {
 				api
 					.setGroupLightState(8, state.on().brightness(brightness))
 					.then(() => {
+						setTimeout(() => {
+							io.sockets.emit('garageOpenStatus', null);
+						}, 2 * 1000);
 						resolve();
 					})
 					.catch((e) => {

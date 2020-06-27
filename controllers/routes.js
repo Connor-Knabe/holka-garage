@@ -11,7 +11,7 @@ var personTwoTime = new Date();
 const rebootTime = new Date();
 
 module.exports = function(app, logger, io, debugMode) {
-	const hue = require('../services/hue.js')(logger);
+	const hue = require('../services/hue.js')(logger, io);
 	const video = require('../services/video.js')(app, logger, io, hue, sockets);
 	var messenger = require('../services/messenger.js')(logger, debugMode);
 	var iot = require('../services/iot.js')(app, debugMode, io, logger, video, messenger, hue);
