@@ -90,7 +90,6 @@
                     $("#personOneAway").css("color", "purple");
                     $("#personOneTime").css("color", "purple");
                 }
-                $("#personOneAway").append('&nbsp;<a href="/">toggle</a>'); 
 
                 $("#personOneAway").text(status);
                 $("#personOneAway").show();
@@ -109,7 +108,7 @@
                     $("#personTwoAway").css("color", "purple");
                     $("#personTwoTime").css("color", "purple");
                 }
-                $("#personTwoAway").append('&nbsp;<a href="/">toggle</a>'); 
+                // $("#personTwoAway").append('&nbsp;<a href="/">toggle</a>'); 
 
                 $("#personTwoAway").text(status);
                 $("#personTwoAway").show();
@@ -227,7 +226,7 @@
         
         <div class="garageStatus" id="personOneName">User 1:</div> <div class="garageStatus" id="personOneAway"></div>
                 <div id="personOneTime"></div>
-        <div class="garageStatus" id="personTwoName">User 2:</div> <div class="garageStatus" id="personTwoAway"></div> 
+        <div class="garageStatus" id="personTwoName">User 2:</div> <a class="garageStatus" id="personTwoAway"></a> 
                 <div id="personTwoTime"></div>
         <!--Open after: <div class="garageStatus" id="garageTimer" style="color:purple"></div> <br>
 -->        <progress id="progress"></progress>
