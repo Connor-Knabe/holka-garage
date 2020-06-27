@@ -50,6 +50,7 @@ module.exports = function(app, logger, io, debugMode) {
 		if (options.garageGpsEnabledPersonTwo) {
 			const timeAway = getTimeAway(personTwoTime);
 			io.sockets.emit('personTwoTime', `${timeAway}`);
+			io.sockets.emit('personTwoName', `${options.personTwoName}: `);
 			if (personTwoAway) {
 				io.sockets.emit('personTwoAway', `away`);
 			} else {
@@ -60,6 +61,7 @@ module.exports = function(app, logger, io, debugMode) {
 		if (options.garageGpsEnabledPersonOne) {
 			const timeAway = getTimeAway(personOneTime);
 			io.sockets.emit('personOneTime', `${timeAway}`);
+			io.sockets.emit('personOneName', `${options.personOneName}: `);
 			if (personOneAway) {
 				io.sockets.emit('personOneAway', `away`);
 			} else {
@@ -287,8 +289,7 @@ module.exports = function(app, logger, io, debugMode) {
 			logger.debug('openViaGpsOne attempting to open');
 			var isSecondPerson = false;
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
-			personOneAway = false;
-			personOneTime = new Date();
+			setPersonOneHome();
 			messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 			messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
 			openViaGps(res, req, false);
@@ -305,8 +306,7 @@ module.exports = function(app, logger, io, debugMode) {
 			logger.debug('openViaGpsTwo attempting to open');
 			var isSecondPerson = true;
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
-			personTwoAway = false;
-			personTwoTime = new Date();
+			setPersonTwoHome();
 			messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 			messenger.sendGenericIfttt(`${options.personTwoName} Set to Home`);
 			openViaGps(res, req, true);
@@ -443,45 +443,86 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	}
 
+	app.post('/togglePersonOneHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
+		if (auth(req)) {
+			if (personOneAway) {
+				setPersonOneHome();
+			} else {
+				const isPersonTwo = false;
+				setPersonAway(req, res, isPersonTwo);
+			}
+			res.send('Ok');
+		} else {
+			res.status(401);
+			res.send('not auth');
+		}
+	});
+
+	app.post('/togglePersonTwoHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
+		if (auth(req)) {
+			if (personTwoAway) {
+				setPersonTwoHome();
+			} else {
+				const isPersonTwo = true;
+				setPersonAway(req, res, isPersonTwo);
+			}
+			res.send('Ok');
+		} else {
+			res.status(401);
+			res.send('not auth');
+		}
+	});
+
 	app.post('/personOneAway', bodyParser.text(), function(req, res) {
 		//away from home turn alert on
 		const isPersonTwo = false;
-		setPersonAway(req, res, isPersonTwo);
-	});
-
-	app.post('/personTwoAway', bodyParser.text(), function(req, res) {
-		//away from home turn alert on
-		const isPersonTwo = true;
-		setPersonAway(req, res, isPersonTwo);
-	});
-
-	function setPersonAway(req, res, isPersonTwo) {
 		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
-		var personName = isPersonTwo ? options.personTwoName : options.personOneName;
-
 		if (req.body && req.body.includes(gpsKey)) {
-			if (isPersonTwo) {
-				personTwoAway = true;
-				personTwoTime = new Date();
-			} else {
-				personOneAway = true;
-				personOneTime = new Date();
-			}
-
-			if (personOneAway && personTwoAway) {
-				messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
-			}
-
-			iot.toggleGarageOpenAlert(true, isPersonTwo);
-			logger.debug(`Garage set to away via ${personText}`);
-			messenger.sendGenericIfttt(`${personName} Set to Away`);
-			res.send('Ok');
+			setPersonAway(req, res, isPersonTwo);
 		} else {
 			logger.error(`malformed request for ${personText}Away or wrong key`);
 			res.status(401);
 			res.send('None shall pass');
 		}
+	});
+
+	app.post('/personTwoAway', bodyParser.text(), function(req, res) {
+		//away from home turn alert on
+		const isPersonTwo = true;
+		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
+		var personText = isPersonTwo ? 'personTwo' : 'personOne';
+
+		if (req.body && req.body.includes(gpsKey)) {
+			setPersonAway(req, res, isPersonTwo);
+		} else {
+			logger.error(`malformed request for ${personText}Away or wrong key`);
+			res.status(401);
+			res.send('None shall pass');
+		}
+	});
+
+	function setPersonAway(req, res, isPersonTwo) {
+		var personName = isPersonTwo ? options.personTwoName : options.personOneName;
+
+		if (isPersonTwo) {
+			personTwoAway = true;
+			personTwoTime = new Date();
+			io.sockets.emit('personTwoAway', 'away');
+		} else {
+			personOneAway = true;
+			personOneTime = new Date();
+			io.sockets.emit('personOneAway', 'away');
+		}
+
+		if (personOneAway && personTwoAway) {
+			messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
+		}
+
+		iot.toggleGarageOpenAlert(true, isPersonTwo);
+		logger.debug(`Garage set to away via ${personText}`);
+		messenger.sendGenericIfttt(`${personName} Set to Away`);
+		res.send('Ok');
 	}
 	function getTimeAway(startDate) {
 		var minsBetweenDates = 0;
@@ -495,5 +536,17 @@ module.exports = function(app, logger, io, debugMode) {
 		var timeAway = minsBetweenDates > 120 ? `for ${Math.round(minsBetweenDates / 60)} hours` : `for ${minsBetweenDates} mins`;
 
 		return timeAway;
+	}
+
+	function setPersonOneHome() {
+		personOneAway = false;
+		personOneTime = new Date();
+		io.sockets.emit('personOneAway', 'home');
+	}
+
+	function setPersonTwoHome() {
+		personTwoAway = false;
+		personTwoTime = new Date();
+		io.sockets.emit('personTwoAway', 'home');
 	}
 };

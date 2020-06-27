@@ -90,6 +90,8 @@
                     $("#personOneAway").css("color", "purple");
                     $("#personOneTime").css("color", "purple");
                 }
+                $("#personOneAway").append('&nbsp;<a href="/">toggle</a>'); 
+
                 $("#personOneAway").text(status);
                 $("#personOneAway").show();
             } else {
@@ -97,6 +99,7 @@
             }
         });
 
+        
         socket.on('personTwoAway', function (status) {
             if (status) {
                 if(status=='home'){
@@ -106,10 +109,30 @@
                     $("#personTwoAway").css("color", "purple");
                     $("#personTwoTime").css("color", "purple");
                 }
+                $("#personTwoAway").append('&nbsp;<a href="/">toggle</a>'); 
+
                 $("#personTwoAway").text(status);
                 $("#personTwoAway").show();
             } else {
                 $("#personTwoAway").hide();
+            }
+        });
+
+        socket.on('personOneName', function (status) {
+            if (status) {
+                $("#personOneName").text(status);
+                $("#personOneName").show();
+            } else {
+                $("#personOneName").hide();
+            }
+        });
+
+        socket.on('personTwoName', function (status) {
+            if (status) {
+                $("#personTwoName").text(status);
+                $("#personTwoName").show();
+            } else {
+                $("#personTwoName").hide();
             }
         });
 
@@ -200,9 +223,11 @@
         <div class="largeText" id="garageOpenStatus" style="color:green"></div>
         <div class="largeText" id="garageErrorStatus" style="color:green"></div>
         <br>
-        User 1:<div class="garageStatus" id="personOneAway"></div>
+
+        
+        <div class="garageStatus" id="personOneName">User 1:</div> <div class="garageStatus" id="personOneAway"></div>
                 <div id="personOneTime"></div>
-        User 2: <div class="garageStatus" id="personTwoAway"></div> 
+        <div class="garageStatus" id="personTwoName">User 2:</div> <div class="garageStatus" id="personTwoAway"></div> 
                 <div id="personTwoTime"></div>
         <!--Open after: <div class="garageStatus" id="garageTimer" style="color:purple"></div> <br>
 -->        <progress id="progress"></progress>
@@ -264,6 +289,11 @@
         <button type="button" class="btn btn-info" id="gps">Toggle GPS Open</button>
         <br><br>
         <button type="button" class="btn btn-info" id="setHome">Set Home</button>
+        <br>
+
+        <button type="button" class="btn btn-info" id="setPersonOneHomeAway">Set Home</button>
+        <br>
+        <button type="button" class="btn btn-info" id="setPersonTwoHomeAway">Set Home</button>
         <br>
 
         <small>Light Brightness</small>

@@ -1,3 +1,4 @@
+v2.0.3 - buttons to manually set home/away for each user
 v2.0.0 - calculates time since reboot and ability to set IFTTT to home
 v1.9.1 - now shows time since home/away 
 v1.9.0 - website to show home/away/timer status for all users

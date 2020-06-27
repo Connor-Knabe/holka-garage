@@ -26,6 +26,32 @@ $(document).ready(function() {
 		});
 	});
 
+	$('#personOneAway').click(function(e) {
+		e.preventDefault();
+		// $('#personOneAway').attr('disabled', 'disabled');
+		$.ajax({
+			type: 'POST',
+			url: '/togglePersonOneHomeAway',
+			data: {},
+			success: function(result) {
+				// $('#status').html(result);
+			}
+		});
+	});
+
+	$('#personTwoAway').click(function(e) {
+		e.preventDefault();
+		// $('#personTwoAway').attr('disabled', 'disabled');
+		$.ajax({
+			type: 'POST',
+			url: '/togglePersonTwoHomeAway',
+			data: {},
+			success: function(result) {
+				// $('#status').html(result);
+			}
+		});
+	});
+
 	$('#video').click(function(e) {
 		e.preventDefault();
 		$.ajax({
