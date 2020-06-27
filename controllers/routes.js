@@ -524,7 +524,15 @@ module.exports = function(app, logger, io, debugMode) {
 			minsBetweenDates = Math.round(diff / 60000);
 		}
 
-		var timeAway = minsBetweenDates > 120 ? `for ${Math.round(minsBetweenDates / 60)} hours` : `for ${minsBetweenDates} mins`;
+		var timeAway;
+		var hours = Math.floor(minsBetweenDates / 60);
+
+		if (hours > 24) {
+			var days = Math.floor(hours / 24);
+			timeAway = `for ${days} day(s) ${hours} hrs`;
+		} else {
+			timeAway = hours > 2 ? `for ${hours} hours` : `for ${minsBetweenDates} mins`;
+		}
 
 		return timeAway;
 	}
