@@ -11,7 +11,7 @@ var personTwoTime = new Date();
 const rebootTime = new Date();
 
 module.exports = function(app, logger, io, debugMode) {
-	const hue = require('../services/hue.js')(logger, io);
+	const hue = require('../services/hue.js')(logger);
 	const video = require('../services/video.js')(app, logger, io, hue, sockets);
 	var messenger = require('../services/messenger.js')(logger, debugMode);
 	var iot = require('../services/iot.js')(app, debugMode, io, logger, video, messenger, hue);
@@ -216,12 +216,15 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	app.post('/lights/:brightness', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		io.sockets.emit('garageOpenStatus', 'Changing light brightness');
+		io.sockets.emit('garageLightStatus', 'Changing light brightness');
 		hue
 			.lightsOn(req.params.brightness)
 			.then(() => {
 				setTimeout(() => {
-					io.sockets.emit('garageOpenStatus', 'Light brightness changed, wait for image to update');
+					io.sockets.emit('garageLightStatus', 'Light brightness changed, wait for image to update');
+					setTimeout(() => {
+						io.sockets.emit('garageLightStatus', null);
+					}, 3 * 1000);
 				}, 2 * 1000);
 			})
 			.catch((e) => {

@@ -10,7 +10,7 @@ var HueApi = hue.HueApi,
 	lightsOffTimeout = null,
 	lightsOffTimedTimeout = null;
 
-module.exports = function(logger, io) {
+module.exports = function(logger) {
 	function garageLightsOnTimed(brightness) {
 		if (options.enableHue) {
 			lightsOn(brightness).then(() => {}).catch(() => {});
@@ -37,9 +37,6 @@ module.exports = function(logger, io) {
 				api
 					.setGroupLightState(8, state.on().brightness(brightness))
 					.then(() => {
-						setTimeout(() => {
-							io.sockets.emit('garageOpenStatus', null);
-						}, 2 * 1000);
 						resolve();
 					})
 					.catch((e) => {
