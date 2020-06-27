@@ -75,18 +75,6 @@ $(document).ready(function() {
 		});
 	});
 
-	$('#setHome').click(function(e) {
-		e.preventDefault();
-		$('#setHome').attr('disabled', 'disabled');
-		$.ajax({
-			type: 'POST',
-			url: '/setHome',
-			success: function(result) {
-				$('#status').html(result);
-			}
-		});
-	});
-
 	$('#lights25').click(function(e) {
 		e.preventDefault();
 		$.ajax({

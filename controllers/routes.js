@@ -290,8 +290,6 @@ module.exports = function(app, logger, io, debugMode) {
 			var isSecondPerson = false;
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
 			setPersonOneHome();
-			messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
-			messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
 			openViaGps(res, req, false);
 		} else {
 			logger.info('garage gps open is disabled for person one!');
@@ -307,8 +305,6 @@ module.exports = function(app, logger, io, debugMode) {
 			var isSecondPerson = true;
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
 			setPersonTwoHome();
-			messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
-			messenger.sendGenericIfttt(`${options.personTwoName} Set to Home`);
 			openViaGps(res, req, true);
 		} else {
 			logger.info('garage gps open is disabled for person two!');
@@ -353,16 +349,6 @@ module.exports = function(app, logger, io, debugMode) {
 			res.send('not auth to open garage');
 		}
 	}
-
-	app.post('/setHome', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		if (auth(req)) {
-			messenger.sendIftt(null, 'set home manually', messengerInfo.iftttGarageSetHomeUrl);
-			res.send('Ok');
-		} else {
-			res.status(401);
-			res.send('not auth');
-		}
-	});
 
 	app.post('/openOrCloseGarage', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		if (auth(req)) {
@@ -509,10 +495,14 @@ module.exports = function(app, logger, io, debugMode) {
 		if (isPersonTwo) {
 			personTwoAway = true;
 			personTwoTime = new Date();
+			const timeAway = getTimeAway(personTwoTime);
+			io.sockets.emit('personTwoTime', `${timeAway}`);
 			io.sockets.emit('personTwoAway', 'away');
 		} else {
 			personOneAway = true;
 			personOneTime = new Date();
+			const timeAway = getTimeAway(personOneTime);
+			io.sockets.emit('personOneTime', `${timeAway}`);
 			io.sockets.emit('personOneAway', 'away');
 		}
 
@@ -543,11 +533,19 @@ module.exports = function(app, logger, io, debugMode) {
 		personOneAway = false;
 		personOneTime = new Date();
 		io.sockets.emit('personOneAway', 'home');
+		const timeAway = getTimeAway(personOneTime);
+		io.sockets.emit('personOneTime', `${timeAway}`);
+		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
+		messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
 	}
 
 	function setPersonTwoHome() {
 		personTwoAway = false;
 		personTwoTime = new Date();
 		io.sockets.emit('personTwoAway', 'home');
+		const timeAway = getTimeAway(personOneTime);
+		io.sockets.emit('personTwoTime', `${timeAway}`);
+		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
+		messenger.sendGenericIfttt(`${options.personTwoName} Set to Home`);
 	}
 };
