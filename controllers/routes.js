@@ -435,12 +435,11 @@ module.exports = function(app, logger, io, debugMode) {
 	app.post('/togglePersonOneHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		if (auth(req)) {
 			if (personOneAway) {
-				setPersonOneHome();
+				setPersonOneHome(res);
 			} else {
 				const isPersonTwo = false;
 				setPersonAway(req, res, isPersonTwo);
 			}
-			res.send('Ok');
 		} else {
 			res.status(401);
 			res.send('not auth');
@@ -450,12 +449,11 @@ module.exports = function(app, logger, io, debugMode) {
 	app.post('/togglePersonTwoHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		if (auth(req)) {
 			if (personTwoAway) {
-				setPersonTwoHome();
+				setPersonTwoHome(res);
 			} else {
 				const isPersonTwo = true;
 				setPersonAway(req, res, isPersonTwo);
 			}
-			res.send('Ok');
 		} else {
 			res.status(401);
 			res.send('not auth');
@@ -520,11 +518,11 @@ module.exports = function(app, logger, io, debugMode) {
 	}
 	function getTimeAway(startDate) {
 		var minsBetweenDates = 0;
-		const endDate = new Date();
+		const curDate = new Date();
 
-		if (startDate && endDate) {
-			var diff = endDate.getTime() - startDate.getTime();
-			minsBetweenDates = Math.round(diff / 60000);
+		if (startDate && curDate) {
+			var diff = curDate.getTime() - startDate.getTime();
+			minsBetweenDates = Math.floor(diff / 60000);
 		}
 
 		var timeAway;
@@ -534,13 +532,13 @@ module.exports = function(app, logger, io, debugMode) {
 			var days = Math.floor(hours / 24);
 			timeAway = `for ${days} day(s) ${hours} hrs`;
 		} else {
-			timeAway = hours > 2 ? `for ${hours} hours` : `for ${minsBetweenDates} mins`;
+			timeAway = hours >= 2 ? `for ${hours} hours` : `for ${minsBetweenDates} mins`;
 		}
 
 		return timeAway;
 	}
 
-	function setPersonOneHome() {
+	function setPersonOneHome(res) {
 		personOneAway = false;
 		personOneTime = new Date();
 		io.sockets.emit('personOneAway', 'home');
@@ -548,9 +546,10 @@ module.exports = function(app, logger, io, debugMode) {
 		io.sockets.emit('personOneTime', `${timeAway}`);
 		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 		messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
+		res.send('Ok');
 	}
 
-	function setPersonTwoHome() {
+	function setPersonTwoHome(res) {
 		personTwoAway = false;
 		personTwoTime = new Date();
 		io.sockets.emit('personTwoAway', 'home');
@@ -558,5 +557,6 @@ module.exports = function(app, logger, io, debugMode) {
 		io.sockets.emit('personTwoTime', `${timeAway}`);
 		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 		messenger.sendGenericIfttt(`${options.personTwoName} Set to Home`);
+		res.send('Ok');
 	}
 };
