@@ -522,7 +522,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 		if (startDate && curDate) {
 			var diff = curDate.getTime() - startDate.getTime();
-			minsBetweenDates = Math.floor(diff);
+			minsBetweenDates = Math.floor(diff / 60000);
 		}
 
 		var timeAway;
