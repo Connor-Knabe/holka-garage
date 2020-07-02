@@ -234,6 +234,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			const logMsg = `Not opening for person ${gpsPerson} due to timer. ${options.minsToWaitAfterLeavingHouseForGPSOpen} min delay`;
 			logger.debug(logMsg);
 			messenger.sendGenericIfttt(logMsg);
+		} else {
+			logger.debug('should open garage');
 		}
 
 		if (personTimerShouldOpen) {
@@ -242,6 +244,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			} else {
 				personOneShouldOpenTimer = false;
 			}
+			logger.debug('toggle garage door');
 			toggleGarageDoor(gpsPerson, remoteAddress);
 		}
 	}

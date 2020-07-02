@@ -334,8 +334,13 @@ module.exports = function(app, logger, io, debugMode) {
 			gpsPerson = 'two';
 		}
 
+		logger.debug('open garage via gps');
+
 		if (req.body && req.body.includes(gpsOpenKey)) {
+			logger.debug('open garage via gps, correct key');
+
 			if (options.garageGpsEnabledMain) {
+				logger.debug('garageDoorOpenHandler');
 				iot.garageDoorOpenHandler(two, gpsPerson, req.connection.remoteAddress);
 			} else {
 				messenger.sendGenericIfttt(`NOT opening GPS open disabled person:${gpsPerson}`);
