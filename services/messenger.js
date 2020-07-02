@@ -11,7 +11,7 @@ module.exports = function(logger, debugMode) {
 	var minsOpened = 0;
 
 	send(true, messengerInfo.toNumbers, 'The garage software has rebooted.  Garage open alerts disabled until you leave home!');
-	sendGenericIfttt('Garage software rebooted.');
+	// sendGenericIfttt('Garage software rebooted.');
 
 	function sendIftt(garageOpened, message, url) {
 		if (options.enableIfttt) {
