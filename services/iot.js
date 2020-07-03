@@ -99,12 +99,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 
 	function shouldAlertHomeOwners() {
 		if (!expectedGarageOpen) {
-			logger.debug('!expectedGarageOpen');
 			if (shouldSendGarageDoorAlertOne && garageOpenAlertManualEnable) {
-				logger.debug('sending garage door gps alert');
-
 				if (garageOpenAlertPersonTwoManualEnable) {
-					logger.debug('about to send video message');
 					video
 						.streamVideo()
 						.then(() => {
@@ -127,7 +123,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 
 	function garageAlertOpenCheck(timeUntilAlert, timeOut, shouldCall) {
 		clearTimeout(timeOut);
-		logger.debug('garage alert open check');
 		timeOut = setTimeout(() => {
 			if (garageIsOpen()) {
 				setTimeout(() => {
