@@ -287,7 +287,6 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	app.post('/openViaGps', bodyParser.text(), function(req, res) {
-		logger.debug('openViaGpsOne called');
 		if (options.garageGpsEnabledPersonOne) {
 			logger.debug('openViaGpsOne attempting to open');
 			var isSecondPerson = false;
@@ -302,7 +301,6 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	app.post('/openViaGpsTwo', bodyParser.text(), function(req, res) {
-		logger.debug('openViaGpsTwo called');
 		if (options.garageGpsEnabledPersonTwo) {
 			logger.debug('openViaGpsTwo attempting to open');
 			var isSecondPerson = true;
