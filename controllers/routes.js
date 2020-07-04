@@ -516,7 +516,7 @@ module.exports = function(app, logger, io, debugMode) {
 		messenger.sendGenericIfttt(`${personName} Set to Away`);
 		res.send('Ok');
 	}
-	function getTimeAway(startDate) {
+	function egetTimeAway(startDate) {
 		var minsBetweenDates = 0;
 		const curDate = new Date();
 
@@ -530,6 +530,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 		if (hours > 24) {
 			var days = Math.floor(hours / 24);
+			hours = hours - days * 24;
 			timeAway = `for ${days} day(s) ${hours} hrs`;
 		} else {
 			timeAway = hours >= 2 ? `for ${hours} hours` : `for ${minsBetweenDates} mins`;
