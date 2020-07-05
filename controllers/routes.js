@@ -516,7 +516,7 @@ module.exports = function(app, logger, io, debugMode) {
 		messenger.sendGenericIfttt(`${personName} Set to Away`);
 		res.send('Ok');
 	}
-	function egetTimeAway(startDate) {
+	function getTimeAway(startDate) {
 		var minsBetweenDates = 0;
 		const curDate = new Date();
 
