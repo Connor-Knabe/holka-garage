@@ -528,7 +528,7 @@ module.exports = function(app, logger, io, debugMode) {
 		var timeAway;
 		var hours = Math.floor(minsBetweenDates / 60);
 
-		if (hours > 24) {
+		if (hours >= 24) {
 			var days = Math.floor(hours / 24);
 			hours = hours - days * 24;
 			timeAway = `for ${days} day(s) ${hours} hrs`;
