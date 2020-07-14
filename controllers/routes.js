@@ -291,7 +291,7 @@ module.exports = function(app, logger, io, debugMode) {
 			logger.debug('openViaGpsOne attempting to open');
 			var isSecondPerson = false;
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
-			setPersonOneHome(res);
+			setPersonOneHome();
 			openViaGps(res, req, false);
 		} else {
 			logger.info('garage gps open is disabled for person one!');
@@ -305,7 +305,7 @@ module.exports = function(app, logger, io, debugMode) {
 			logger.debug('openViaGpsTwo attempting to open');
 			var isSecondPerson = true;
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
-			setPersonTwoHome(res);
+			setPersonTwoHome();
 			openViaGps(res, req, true);
 		} else {
 			logger.info('garage gps open is disabled for person two!');
@@ -343,6 +343,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 			res.status(200);
 			res.send('OK');
+			return;
 		} else {
 			const minsToWaitBeforeNextSecurityAlert = 5;
 			possibleHackAlert('openViaGPS', req, minsToWaitBeforeNextSecurityAlert);
@@ -350,6 +351,7 @@ module.exports = function(app, logger, io, debugMode) {
 			logger.info(`Failed attempt to open garage for person ${gpsPerson} via gps from ip: ${req.connection.remoteAddress} with body of ${JSON.stringify(req.body)}, Possible Hack?`);
 			res.status(401);
 			res.send('not auth to open garage');
+			return;
 		}
 	}
 
@@ -539,7 +541,7 @@ module.exports = function(app, logger, io, debugMode) {
 		return timeAway;
 	}
 
-	function setPersonOneHome(res) {
+	function setPersonOneHome() {
 		personOneAway = false;
 		personOneTime = new Date();
 		io.sockets.emit('personOneAway', 'home');
@@ -547,10 +549,9 @@ module.exports = function(app, logger, io, debugMode) {
 		io.sockets.emit('personOneTime', `${timeAway}`);
 		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 		messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
-		res.send('Ok');
 	}
 
-	function setPersonTwoHome(res) {
+	function setPersonTwoHome() {
 		personTwoAway = false;
 		personTwoTime = new Date();
 		io.sockets.emit('personTwoAway', 'home');
@@ -558,6 +559,5 @@ module.exports = function(app, logger, io, debugMode) {
 		io.sockets.emit('personTwoTime', `${timeAway}`);
 		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 		messenger.sendGenericIfttt(`${options.personTwoName} Set to Home`);
-		res.send('Ok');
 	}
 };

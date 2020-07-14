@@ -1,4 +1,4 @@
-v2.0.6 - 
+v2.0.7 - fixing bug with website timing out and failing health check
 v2.0.5 - fixed away time if over 24 hours
 v2.0.3 - buttons to manually set home/away for each user
 v2.0.0 - calculates time since reboot and ability to set IFTTT to home
