@@ -437,7 +437,7 @@ module.exports = function(app, logger, io, debugMode) {
 	app.post('/togglePersonOneHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		if (auth(req)) {
 			if (personOneAway) {
-				setPersonOneHome(res);
+				setPersonOneHome();
 			} else {
 				const isPersonTwo = false;
 				setPersonAway(req, res, isPersonTwo);
@@ -451,7 +451,7 @@ module.exports = function(app, logger, io, debugMode) {
 	app.post('/togglePersonTwoHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		if (auth(req)) {
 			if (personTwoAway) {
-				setPersonTwoHome(res);
+				setPersonTwoHome();
 			} else {
 				const isPersonTwo = true;
 				setPersonAway(req, res, isPersonTwo);
