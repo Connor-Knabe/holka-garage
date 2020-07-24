@@ -326,10 +326,20 @@ module.exports = function(app, logger, io, debugMode) {
 	function openViaGps(res, req, two) {
 		var gpsOpenKey = login.gpsPersonOneKey;
 		var gpsPerson = 'one';
+
 		if (two) {
 			logger.debug('person two!');
 			gpsOpenKey = login.gpsPersonTwoKey;
 			gpsPerson = 'two';
+			if (!personTwoAway) {
+				logger.debug(`person two already home not opening garage!`);
+				return;
+			}
+		} else {
+			if (!personOneAway) {
+				logger.debug(`person one already home not opening garage!`);
+				return;
+			}
 		}
 
 		logger.debug(`open garage via gps ${gpsPerson}`);
@@ -343,7 +353,6 @@ module.exports = function(app, logger, io, debugMode) {
 
 			res.status(200);
 			res.send('OK');
-			return;
 		} else {
 			const minsToWaitBeforeNextSecurityAlert = 5;
 			possibleHackAlert('openViaGPS', req, minsToWaitBeforeNextSecurityAlert);
@@ -351,7 +360,6 @@ module.exports = function(app, logger, io, debugMode) {
 			logger.info(`Failed attempt to open garage for person ${gpsPerson} via gps from ip: ${req.connection.remoteAddress} with body of ${JSON.stringify(req.body)}, Possible Hack?`);
 			res.status(401);
 			res.send('not auth to open garage');
-			return;
 		}
 	}
 
