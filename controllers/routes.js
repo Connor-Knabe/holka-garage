@@ -291,8 +291,8 @@ module.exports = function(app, logger, io, debugMode) {
 			logger.debug('openViaGpsOne attempting to open');
 			var isSecondPerson = false;
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
-			setPersonOneHome();
 			openViaGps(res, req, false);
+			setPersonOneHome();
 		} else {
 			logger.info('garage gps open is disabled for person one!');
 			res.status(200);
@@ -305,8 +305,8 @@ module.exports = function(app, logger, io, debugMode) {
 			logger.debug('openViaGpsTwo attempting to open');
 			var isSecondPerson = true;
 			iot.toggleGarageOpenAlert(false, isSecondPerson);
-			setPersonTwoHome();
 			openViaGps(res, req, true);
+			setPersonTwoHome();
 		} else {
 			logger.info('garage gps open is disabled for person two!');
 			res.status(200);
