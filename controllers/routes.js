@@ -50,7 +50,7 @@ module.exports = function(app, logger, io, debugMode) {
 		if (options.garageGpsEnabledPersonTwo) {
 			const timeAway = getTimeAway(personTwoTime);
 			io.sockets.emit('personTwoTime', `${timeAway}`);
-			io.sockets.emit('personTwoName', `${options.personTwoName}: `);
+			io.sockets.emit('personTwoName', `${login.users[1].name}: `);
 			if (personTwoAway) {
 				io.sockets.emit('personTwoAway', `away`);
 			} else {
@@ -61,7 +61,7 @@ module.exports = function(app, logger, io, debugMode) {
 		if (options.garageGpsEnabledPersonOne) {
 			const timeAway = getTimeAway(personOneTime);
 			io.sockets.emit('personOneTime', `${timeAway}`);
-			io.sockets.emit('personOneName', `${options.personOneName}: `);
+			io.sockets.emit('personOneName', `${login.users[0].name}: `);
 			if (personOneAway) {
 				io.sockets.emit('personOneAway', `away`);
 			} else {
@@ -85,9 +85,15 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	function auth(req) {
-		var authenticated = req && req.cookies && (req.cookies.holkaCookie === login.secretCookie || req.cookies.holkaCookie === login.secretAdminCookie);
-
-		return authenticated;
+		var user = null;
+		if (req && req.cookies) {
+			login.users.forEach((userLogin) => {
+				if (userLogin.secretCookie === req.cookies.holkaCookie) {
+					user = userLogin;
+				}
+			});
+		}
+		return user;
 	}
 
 	function vpnAuth(req) {
@@ -155,19 +161,17 @@ module.exports = function(app, logger, io, debugMode) {
 		};
 
 		var shouldRedirect = false;
+		var user = req.body.username && req.body.password ? isValidLogin(req.body.username, req.body.password) : null;
 
-		if (req.body.username && req.body.password && isAdminLogin(req.body.username, req.body.password)) {
+		if (user) {
 			req.session.userInfo = req.body;
-			res.cookie('holkaCookie', login.secretAdminCookie, options);
-			shouldRedirect = true;
-		} else if (req.body.username && req.body.password && isUserLogin(req.body.username, req.body.password)) {
-			req.session.userInfo = req.body;
-			res.cookie('holkaCookie', login.secretCookie, options);
+			res.cookie('holkaCookie', user.secretCookie, options);
 			shouldRedirect = true;
 		} else {
 			res.status(401);
 			res.send('Access denied wrong username/password');
 		}
+
 		if (shouldRedirect) {
 			if (req && req.session && req.session.redirectTo) {
 				res.redirect(req.session.redirectTo);
@@ -177,12 +181,14 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 	});
 
-	function isAdminLogin(username, password) {
-		return username.toLowerCase() === login.adminUsername.toLowerCase() && password === login.adminPassword;
-	}
-
-	function isUserLogin(username, password) {
-		return username.toLowerCase() === login.username.toLowerCase() && password === login.password;
+	function isValidLogin(username, password) {
+		var user = null;
+		login.users.forEach((userLogin) => {
+			if (userLogin.username.toLowerCase() === username.toLowerCase() && userLogin.password === password) {
+				user = userLogin;
+			}
+		});
+		return user;
 	}
 
 	app.post('/video', bodyParser.urlencoded({ extended: false }), function(req, res) {
@@ -365,13 +371,15 @@ module.exports = function(app, logger, io, debugMode) {
 
 	app.post('/openOrCloseGarage', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		if (auth(req)) {
+			var user = auth(req);
+
 			if (req.body && req.body.garageSwitch == 'open') {
 				if (!iot.garageIsOpen()) {
 					iot.openCloseGarageDoor();
 					garageOpenStatus = 'Opening...';
 					video.updateGarageStatus(garageOpenStatus);
 					io.sockets.emit('garageOpenStatus', garageOpenStatus);
-					var msg = garageOpenStatus + ' garage via button';
+					var msg = `${garageOpenStatus} garage via button for ${user.name}`;
 					var btnPress = true;
 					video
 						.streamVideo()
@@ -500,7 +508,7 @@ module.exports = function(app, logger, io, debugMode) {
 	});
 
 	function setPersonAway(req, res, isPersonTwo) {
-		var personName = isPersonTwo ? options.personTwoName : options.personOneName;
+		var personName = isPersonTwo ? login.users[1].name : login.users[0].name;
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
 
 		if (isPersonTwo) {
@@ -556,7 +564,7 @@ module.exports = function(app, logger, io, debugMode) {
 		const timeAway = getTimeAway(personOneTime);
 		io.sockets.emit('personOneTime', `${timeAway}`);
 		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
-		messenger.sendGenericIfttt(`${options.personOneName} Set to Home`);
+		messenger.sendGenericIfttt(`${login.users[0].name} Set to Home`);
 	}
 
 	function setPersonTwoHome() {
@@ -566,6 +574,6 @@ module.exports = function(app, logger, io, debugMode) {
 		const timeAway = getTimeAway(personOneTime);
 		io.sockets.emit('personTwoTime', `${timeAway}`);
 		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
-		messenger.sendGenericIfttt(`${options.personTwoName} Set to Home`);
+		messenger.sendGenericIfttt(`${login.users[1].name} Set to Home`);
 	}
 };

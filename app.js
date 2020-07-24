@@ -84,8 +84,12 @@ var nestEnergyUsageIftttOptions = {
 function authChecker(req, res, next) {
 	var redirectToUrl = req.originalUrl ? req.originalUrl : '/';
 	req.session.redirectTo = redirectToUrl;
-	if (req && req.cookies && req.cookies.holkaCookie === login.secretAdminCookie) {
-		next();
+	if (req && req.cookies) {
+		login.users.forEach((userLogin) => {
+			if (userLogin.secretCookie === req.cookies.holkaCookie) {
+				next();
+			}
+		});
 	} else {
 		res.status(401);
 		res.redirect('/');
