@@ -45,7 +45,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			logger.debug('garage open');
 
 			garageAlertOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
-			shouldAlertHomeOwners('opened');
+			setTimeout(() => {
+				shouldAlertHomeOwners('opened');
+			}, 2 * 1000);
 
 			logger.debug(msg);
 			io.sockets.emit('garageErrorStatus', null);
@@ -55,7 +57,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			hasBeenOpened = false;
 			garageOpened = false;
 			var msg = 'Garage door closed';
-			shouldAlertHomeOwners('closed');
+			setTimeout(() => {
+				shouldAlertHomeOwners('closed');
+			}, 2 * 1000);
 
 			logger.debug(msg);
 			io.sockets.emit('garageErrorStatus', null);
