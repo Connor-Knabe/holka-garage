@@ -296,7 +296,7 @@ module.exports = function(app, logger, io, debugMode) {
 		if (options.garageGpsEnabledPersonOne) {
 			logger.debug('openViaGpsOne attempting to open');
 			var isSecondPerson = false;
-			iot.toggleGarageOpenAlert(false, isSecondPerson);
+			iot.toggleGarageOpenAlert(isSecondPerson);
 			openViaGps(res, req, false);
 			setPersonOneHome();
 		} else {
@@ -310,7 +310,7 @@ module.exports = function(app, logger, io, debugMode) {
 		if (options.garageGpsEnabledPersonTwo) {
 			logger.debug('openViaGpsTwo attempting to open');
 			var isSecondPerson = true;
-			iot.toggleGarageOpenAlert(false, isSecondPerson);
+			iot.toggleGarageOpenAlert(isSecondPerson);
 			openViaGps(res, req, true);
 			setPersonTwoHome();
 		} else {
@@ -518,12 +518,15 @@ module.exports = function(app, logger, io, debugMode) {
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
 
 		if (isPersonTwo) {
+			iot.setHome(true, true);
+
 			personTwoAway = true;
 			personTwoTime = new Date();
 			const timeAway = getTimeAway(personTwoTime);
 			io.sockets.emit('personTwoTime', `${timeAway}`);
 			io.sockets.emit('personTwoAway', 'away');
 		} else {
+			iot.setHome(false, true);
 			personOneAway = true;
 			personOneTime = new Date();
 			const timeAway = getTimeAway(personOneTime);
@@ -536,7 +539,7 @@ module.exports = function(app, logger, io, debugMode) {
 			messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
 		}
 
-		iot.toggleGarageOpenAlert(true, isPersonTwo);
+		iot.toggleGarageOpenAlert(isPersonTwo);
 		logger.debug(`Garage set to away via ${personText}`);
 		messenger.sendGenericIfttt(`${personName} Set to Away`);
 		res.send('Ok');
@@ -565,6 +568,7 @@ module.exports = function(app, logger, io, debugMode) {
 	}
 
 	function setPersonOneHome() {
+		iot.setHome(false, false);
 		personOneAway = false;
 		personOneTime = new Date();
 		io.sockets.emit('personOneAway', 'home');
@@ -575,6 +579,7 @@ module.exports = function(app, logger, io, debugMode) {
 	}
 
 	function setPersonTwoHome() {
+		iot.setHome(true, false);
 		personTwoAway = false;
 		personTwoTime = new Date();
 		io.sockets.emit('personTwoAway', 'home');

@@ -10,8 +10,8 @@ var motionSensorTimeoutOne = null,
 	garageOpened = false,
 	garageOpenAlertOneTimeout = null,
 	garageOpenAlertTwoTimeout = null,
-	garageOpenAlertPersonOneEnabled = false,
-	garageOpenAlertPersonTwoEnabled = false,
+	personOneAway = false,
+	personTwoAway = false,
 	expectedGarageOpen = false,
 	manualGarageOpenTimeout = null,
 	personOneShouldOpenTimer = false,
@@ -88,11 +88,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 	}
 
 	function shouldAlertHomeOwners(status) {
-		logger.debug(
-			`possibly alert home owners not home? expectedGarageOpen${expectedGarageOpen} | garageOpenAlertPersonOneEnabled && garageOpenAlertPersonTwoEnabled ${garageOpenAlertPersonOneEnabled} && ${garageOpenAlertPersonTwoEnabled}`
-		);
+		logger.debug(`possibly alert home owners not home? expectedGarageOpen${expectedGarageOpen} | personOneAway && personTwoAway ${personOneAway} && ${personTwoAway}`);
 		if (!expectedGarageOpen) {
-			if (garageOpenAlertPersonOneEnabled && garageOpenAlertPersonTwoEnabled) {
+			if (personOneAway && personTwoAway) {
 				video
 					.streamVideo()
 					.then(() => {
@@ -190,15 +188,12 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 		}
 	}
 
-	function toggleGarageOpenAlert(enable, personTwo) {
+	function toggleGarageOpenAlert(personTwo) {
 		if (personTwo) {
 			clearTimeout(personTwoShouldOpenTimerTimeout);
 			personTwoShouldOpenTimerTimeout = setTimeout(() => {
 				personTwoShouldOpenTimer = true;
 			}, options.minsToWaitAfterLeavingHouseForGPSOpen * 60 * 1000);
-
-			logger.debug('Enable toggleGarageOpenAlertSecondPerson: ' + enable);
-			garageOpenAlertPersonTwoEnabled = enable;
 		} else {
 			clearTimeout(personOneShouldOpenTimerTimeout);
 			logger.debug(`personOneTimer QUEUED for ${options.minsToWaitAfterLeavingHouseForGPSOpen}`);
@@ -207,9 +202,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 				personOneShouldOpenTimer = true;
 				logger.debug('personOneTimer Active');
 			}, options.minsToWaitAfterLeavingHouseForGPSOpen * 60 * 1000);
-
-			logger.debug('Enable toggleGarageOpenAlertPersonOne: ' + enable);
-			garageOpenAlertPersonOneEnabled = enable;
 		}
 	}
 
@@ -234,11 +226,20 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 		}
 	}
 
+	function setHome(personTwo, setAway) {
+		if (personTwo) {
+			personTwoAway = setAway;
+		} else {
+			personOneAway = setAway;
+		}
+	}
+
 	return {
 		garageIsOpen: garageIsOpen,
 		toggleGarageDoor: toggleGarageDoor,
 		toggleGarageOpenAlert: toggleGarageOpenAlert,
 		garageDoorOpenHandler: garageDoorOpenHandler,
-		openCloseGarageDoor: openCloseGarageDoor
+		openCloseGarageDoor: openCloseGarageDoor,
+		setHome: setHome
 	};
 };
