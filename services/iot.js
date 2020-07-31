@@ -7,15 +7,11 @@ const garageSwitch = new Gpio(21, 'out');
 var motionSensorTimeoutOne = null,
 	motionSensorTimeoutTwo = null,
 	hasTurnedLightsOn = false,
-	shouldSendGarageDoorAlertOne = true,
-	shouldSendGarageDoorAlertTwo = true,
-	garageSensorTimeoutOne = null,
-	garageSensorTimeoutTwo = null,
 	garageOpened = false,
 	garageOpenAlertOneTimeout = null,
 	garageOpenAlertTwoTimeout = null,
-	garageOpenAlertManualEnable = false,
-	garageOpenAlertPersonTwoManualEnable = false,
+	garageOpenAlertPersonOneEnabled = false,
+	garageOpenAlertPersonTwoEnabled = false,
 	expectedGarageOpen = false,
 	manualGarageOpenTimeout = null,
 	personOneShouldOpenTimer = false,
@@ -45,14 +41,11 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			if (options.enableLightsOnGarageOpen) {
 				hue.garageLightsOnTimed(25);
 			}
-			clearTimeout(garageSensorTimeoutOne);
-			garageSensorTimeoutOne = setTimeout(() => {
-				shouldSendGarageDoorAlertOne = true;
-			}, 1 * 60 * 10000);
+
 			logger.debug('garage open');
 
 			garageAlertOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
-			shouldAlertHomeOwners();
+			shouldAlertHomeOwners('opened');
 
 			logger.debug(msg);
 			io.sockets.emit('garageErrorStatus', null);
@@ -62,15 +55,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			hasBeenOpened = false;
 			garageOpened = false;
 			var msg = 'Garage door closed';
-			clearTimeout(garageSensorTimeoutTwo);
-			garageSensorTimeoutTwo = setTimeout(() => {
-				shouldSendGarageDoorAlertTwo = true;
-			}, 1 * 60 * 10000);
+			shouldAlertHomeOwners('closed');
 
-			if (shouldSendGarageDoorAlertTwo && garageOpenAlertManualEnable) {
-				messenger.sendIftt(garageOpened);
-				shouldSendGarageDoorAlertTwo = false;
-			}
 			logger.debug(msg);
 			io.sockets.emit('garageErrorStatus', null);
 		}
@@ -97,26 +83,26 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 		});
 	}
 
-	function shouldAlertHomeOwners() {
+	function shouldAlertHomeOwners(status) {
+		logger.debug(
+			`possibly alert home owners not home? expectedGarageOpen${expectedGarageOpen} | garageOpenAlertPersonOneEnabled && garageOpenAlertPersonTwoEnabled ${garageOpenAlertPersonOneEnabled} && ${garageOpenAlertPersonTwoEnabled}`
+		);
 		if (!expectedGarageOpen) {
-			if (shouldSendGarageDoorAlertOne && garageOpenAlertManualEnable) {
-				if (garageOpenAlertPersonTwoManualEnable) {
-					video
-						.streamVideo()
-						.then(() => {
-							var garageAlertMsg = `The garage has been opened but the homeowners are not home!`;
-							messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
-							video.stopStreaming();
-						})
-						.catch(() => {
-							var garageAlertMsg = `The garage has been opened but the homeowners are not home! Error taking new video.`;
-							messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
-							video.stopStreaming();
-						});
-				} else {
-					messenger.sendIftt(garageOpened);
-				}
-				shouldSendGarageDoorAlertOne = false;
+			if (garageOpenAlertPersonOneEnabled && garageOpenAlertPersonTwoEnabled) {
+				video
+					.streamVideo()
+					.then(() => {
+						var garageAlertMsg = `The garage has been ${status} but the homeowners are not home!`;
+						messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
+						video.stopStreaming();
+					})
+					.catch(() => {
+						var garageAlertMsg = `The garage has been ${status} but the homeowners are not home! Error taking new video.`;
+						messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
+						video.stopStreaming();
+					});
+			} else {
+				messenger.sendIftt(garageOpened);
 			}
 		}
 	}
@@ -208,7 +194,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			}, options.minsToWaitAfterLeavingHouseForGPSOpen * 60 * 1000);
 
 			logger.debug('Enable toggleGarageOpenAlertSecondPerson: ' + enable);
-			garageOpenAlertPersonTwoManualEnable = enable;
+			garageOpenAlertPersonTwoEnabled = enable;
 		} else {
 			clearTimeout(personOneShouldOpenTimerTimeout);
 			logger.debug(`personOneTimer QUEUED for ${options.minsToWaitAfterLeavingHouseForGPSOpen}`);
@@ -219,7 +205,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			}, options.minsToWaitAfterLeavingHouseForGPSOpen * 60 * 1000);
 
 			logger.debug('Enable toggleGarageOpenAlertPersonOne: ' + enable);
-			garageOpenAlertManualEnable = enable;
+			garageOpenAlertPersonOneEnabled = enable;
 		}
 	}
 

@@ -1,3 +1,4 @@
+v2.1.0 - changing up alerts for when homeowners are not home
 v2.0.8 - not sending response back
 v2.0.7 - fixing bug with website timing out and failing health check
 v2.0.5 - fixed away time if over 24 hours
