@@ -386,7 +386,10 @@ module.exports = function(app, logger, io, debugMode) {
 						.then(() => {
 							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
 						})
-						.catch(() => {});
+						.catch(() => {
+							logger.debug('failed to stream video when garage was opening');
+							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
+						});
 
 					io.sockets.emit('garageErrorStatus', null);
 				} else {
@@ -401,14 +404,17 @@ module.exports = function(app, logger, io, debugMode) {
 					garageOpenStatus = 'Closing...';
 					video.updateGarageStatus(garageOpenStatus);
 					io.sockets.emit('garageOpenStatus', garageOpenStatus);
-					var msg = garageOpenStatus + ' garage via button';
+					var msg = `${garageOpenStatus} garage via button for ${user.name}`;
 					var btnPress = true;
 					video
 						.streamVideo()
 						.then(() => {
 							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
 						})
-						.catch(() => {});
+						.catch(() => {
+							logger.debug('failed to stream video when garage was closing');
+							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
+						});
 					io.sockets.emit('garageErrorStatus', null);
 				} else {
 					logger.debug('err');
@@ -440,7 +446,7 @@ module.exports = function(app, logger, io, debugMode) {
 		clearTimeout(securityMsgTimeout);
 		securityMsgTimeout = setTimeout(function() {
 			shouldSendSecurityAlert = true;
-		}, minsToWaitBeforeNextSecurityAlert * 60 * 10000);
+		}, minsToWaitBeforeNextSecurityAlert * 60 * 1000);
 		logger.fatal(securityMsg, 'Ip address is: ', req.connection.remoteAddress);
 
 		if (shouldSendSecurityAlert) {
