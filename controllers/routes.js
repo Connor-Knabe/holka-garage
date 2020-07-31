@@ -532,6 +532,7 @@ module.exports = function(app, logger, io, debugMode) {
 		}
 
 		if (personOneAway && personTwoAway) {
+			messenger.sendGenericIfttt(`Home going to sleep as both home owners are away`);
 			messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
 		}
 
