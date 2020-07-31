@@ -65,7 +65,9 @@ module.exports = (app, logger, io, hue, sockets) => {
 	}
 
 	function streamVideo() {
+		logger.debug('started streaming video');
 		return new Promise((resolve, reject) => {
+			logger.debug('video promise');
 			if (!app.get('takingVideo')) {
 				pictureCounter = 0;
 				startCamera();
