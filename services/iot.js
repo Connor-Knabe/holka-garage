@@ -103,8 +103,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 						messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
 						video.stopStreaming();
 					});
-			} else {
-				messenger.sendIftt(garageOpened);
 			}
 		}
 	}
