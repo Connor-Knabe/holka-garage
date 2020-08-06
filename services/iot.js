@@ -57,6 +57,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			hasBeenOpened = false;
 			garageOpened = false;
 			var msg = 'Garage door closed';
+			clearTimeout(garageOpenAlertOneTimeout);
+			clearTimeout(garageOpenAlertTwoTimeout);
 			setTimeout(() => {
 				shouldAlertHomeOwners('closed');
 			}, 2 * 1000);
