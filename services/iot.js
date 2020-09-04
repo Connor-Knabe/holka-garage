@@ -37,7 +37,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 
 			hasBeenOpened = true;
 			garageOpened = true;
-			garageLastOpenedTime = new Date();
+			this.garageLastOpenedTime = new Date();
 			io.sockets.emit('garageLastOpenedTime', garageLastOpenedTime);
 
 			var msg = 'Garage door opened';
