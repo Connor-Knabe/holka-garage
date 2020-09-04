@@ -75,6 +75,7 @@ module.exports = function(app, logger, io, debugMode) {
 
 		io.sockets.emit('garageTimer', `${options.minsToWaitAfterLeavingHouseForGPSOpen} mins`);
 
+		logger.debug('iot.garageLastOpenedTime', iot.garageLastOpenedTime);
 		io.sockets.emit('garageLastOpenedTime', iot.garageLastOpenedTime);
 
 		if (app.get('takingVideo')) {
