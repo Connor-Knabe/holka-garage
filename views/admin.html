@@ -214,9 +214,8 @@
         socket.on('garageLastOpenedTime', function (status) {
             if (status) {
                 $("#garageLastOpenedTime").text(new Date(status).toLocaleString());
-                $("#garageLastOpenedTime").show();
             } else {
-                $("#garageLastOpenedTime").hide();
+                $("#garageLastOpenedTime").text("Unknown");
             }
         });
 
