@@ -237,6 +237,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 		}
 	}
 
+	function getGarageLastOpenedTime() {
+		return garageLastOpenedTime;
+	}
+
 	return {
 		garageIsOpen: garageIsOpen,
 		toggleGarageDoor: toggleGarageDoor,
@@ -244,6 +248,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 		garageDoorOpenHandler: garageDoorOpenHandler,
 		openCloseGarageDoor: openCloseGarageDoor,
 		setHome: setHome,
-		garageLastOpenedTime: garageLastOpenedTime
+		getGarageLastOpenedTime: getGarageLastOpenedTime
 	};
 };
