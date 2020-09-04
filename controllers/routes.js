@@ -390,6 +390,7 @@ module.exports = function(app, logger, io, debugMode) {
 						})
 						.catch(() => {
 							logger.debug('failed to stream video when garage was opening');
+							video.stopStreaming();
 							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
 						});
 
@@ -415,6 +416,7 @@ module.exports = function(app, logger, io, debugMode) {
 						})
 						.catch(() => {
 							logger.debug('failed to stream video when garage was closing');
+							video.stopStreaming();
 							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
 						});
 					io.sockets.emit('garageErrorStatus', null);
