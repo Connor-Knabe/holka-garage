@@ -17,7 +17,8 @@ var motionSensorTimeoutOne = null,
 	personOneShouldOpenTimer = false,
 	personTwoShouldOpenTimer = false,
 	personOneShouldOpenTimerTimeout = null,
-	personTwoShouldOpenTimerTimeout = null;
+	personTwoShouldOpenTimerTimeout = null,
+	garageLastOpenedTime = null;
 
 module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 	var hasBeenOpened = garageIsOpen();
@@ -36,6 +37,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 
 			hasBeenOpened = true;
 			garageOpened = true;
+			garageLastOpenedTime = new Date();
+			io.sockets.emit('garageLastOpenedTime', garageLastOpenedTime);
+
 			var msg = 'Garage door opened';
 
 			if (options.enableLightsOnGarageOpen) {
@@ -73,7 +77,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 			if (err) {
 				logger.error('Error watching motion sensor: ', err);
 			}
-			//logger.debug('value:', value);
 			if (value == 1 && !hasTurnedLightsOn) {
 				clearTimeout(motionSensorTimeoutOne);
 				motionSensorTimeoutOne = setTimeout(function() {
@@ -240,6 +243,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 		toggleGarageOpenAlert: toggleGarageOpenAlert,
 		garageDoorOpenHandler: garageDoorOpenHandler,
 		openCloseGarageDoor: openCloseGarageDoor,
-		setHome: setHome
+		setHome: setHome,
+		garageLastOpenedTime: garageLastOpenedTime
 	};
 };

@@ -27,7 +27,7 @@
         });
 
         socket.on('liveStreamDate', function (date) {
-            $(".date").text(date);
+            $(".date").text(date.toLocaleString());
             $('.start').hide();
             $('#stream').show();
         });
@@ -211,6 +211,16 @@
             }
         });
         
+        socket.on('garageLastOpenedTime', function (status) {
+            if (status) {
+                $("#garageLastOpenedTime").text(status.toLocaleString());
+                $("#garageLastOpenedTime").show();
+            } else {
+                $("#garageLastOpenedTime").hide();
+            }
+        });
+
+        
 
         socket.emit('start-stream');
 
@@ -311,6 +321,9 @@
         System has been online: <div class="garageStatus" id="rebootTime"></div>
         <br>
         Open after away for: <div class="garageStatus" id="garageTimer" style="color:purple"></div> <br>
+        <br>
+        Last opened: <div class="garageStatus" id="garageLastOpenedTime"></div>
+        
         <br><br>
 
     </div>
