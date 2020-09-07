@@ -30,6 +30,8 @@ var cookieParser = require('cookie-parser');
 // @ts-ignore
 var basicAuth = require('basic-auth-connect');
 
+var cron = require('cron').CronJob;
+
 app.use(helmet());
 app.use(cookieParser());
 
@@ -145,7 +147,7 @@ if (options.debugMode) {
 	logger.debug('In debug mode not sending texts or opening garage!!!');
 	logger.debug('___________________________________');
 }
-require('./controllers/routes.js')(app, logger, io, options.debugMode);
+require('./controllers/routes.js')(app, logger, io, options.debugMode, cron);
 
 app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
 

@@ -10,11 +10,11 @@ var personOneTime = new Date();
 var personTwoTime = new Date();
 const rebootTime = new Date();
 
-module.exports = function(app, logger, io, debugMode) {
+module.exports = function(app, logger, io, debugMode, cron) {
 	const hue = require('../services/hue.js')(logger);
 	const video = require('../services/video.js')(app, logger, io, hue, sockets);
 	var messenger = require('../services/messenger.js')(logger, debugMode);
-	var iot = require('../services/iot.js')(app, debugMode, io, logger, video, messenger, hue);
+	var iot = require('../services/iot.js')(app, debugMode, io, logger, video, messenger, hue, cron);
 	const rp = require('request-promise');
 
 	var securityMsgTimeout = null;

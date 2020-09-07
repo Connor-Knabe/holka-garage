@@ -20,7 +20,7 @@ var motionSensorTimeoutOne = null,
 	personTwoShouldOpenTimerTimeout = null,
 	garageLastOpenedTime = null;
 
-module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
+module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron) {
 	var hasBeenOpened = garageIsOpen();
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const options = require('../settings/options.js');
@@ -240,6 +240,19 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue) {
 	function getGarageLastOpenedTime() {
 		return garageLastOpenedTime;
 	}
+
+	//cron
+
+	var job = new cron(
+		'* * * * *',
+		function() {
+			console.log('You will see this message every second');
+		},
+		null,
+		true,
+		'America/Chicago'
+	);
+	job.start();
 
 	return {
 		garageIsOpen: garageIsOpen,
