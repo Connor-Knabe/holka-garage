@@ -25,7 +25,7 @@ Required for setup:
 
 5.Door magnent sensor (<https://www.amazon.com/Gikfun-Sensor-Magnetic-Switch-Arduino/dp/B0154PTDFI/ref=sr_1_1_sspa?ie=UTF8&qid=1508849795&sr=8-1-spons&keywords=wired+door+sensor&psc=1>)
 
-6. Optional Hue light bulbs (will need bridge too) (<https://www.amazon.com/Philips-Hue-Equivalent-Dimmable-Assistant/dp/B073SSNNNH/ref=sr_1_4?ie=UTF8&qid=1538656218&sr=8-4&keywords=hue+light+bulbs+white>)
+6.Optional Hue light bulbs (will need bridge too) (<https://www.amazon.com/Philips-Hue-Equivalent-Dimmable-Assistant/dp/B073SSNNNH/ref=sr_1_4?ie=UTF8&qid=1538656218&sr=8-4&keywords=hue+light+bulbs+white>)
 
 Setup:
 

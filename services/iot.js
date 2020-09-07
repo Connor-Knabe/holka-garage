@@ -244,9 +244,12 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	//cron
 
 	var job = new cron(
-		'* * * * *',
+		'5 * * * *',
 		function() {
-			console.log('You will see this message every second');
+			if (personOneAway && personTwoAway) {
+				//turn off specific iot devices that may be on a schedule to turn on at top of the hour
+				messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAway2Url);
+			}
 		},
 		null,
 		true,
