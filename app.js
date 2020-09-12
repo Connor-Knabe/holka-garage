@@ -147,9 +147,11 @@ if (options.debugMode) {
 	logger.debug('In debug mode not sending texts or opening garage!!!');
 	logger.debug('___________________________________');
 }
-require('./controllers/routes.js')(app, logger, io, options.debugMode, cron);
 
 app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
+
+require('./controllers/routes.js')(app, logger, io, options.debugMode, cron);
+
 
 if (options.enableNestEnergyUsageReport) {
 	app.use('/proxy/nest-energy-usage/ifttt', proxy(nestEnergyUsageIftttOptions));
