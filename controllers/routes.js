@@ -306,11 +306,15 @@ module.exports = function(app, logger, io, debugMode, cron) {
 			gpsPerson = 'two';
 			if (!personTwoAway) {
 				logger.debug(`person two already home not opening garage!`);
+				res.status(200);
+				res.send('OK');
 				return;
 			}
 		} else {
 			if (!personOneAway) {
 				logger.debug(`person one already home not opening garage!`);
+				res.status(200);
+				res.send('OK');
 				return;
 			}
 		}

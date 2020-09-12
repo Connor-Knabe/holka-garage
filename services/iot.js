@@ -218,8 +218,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		} else {
 			logger.debug('should open garage');
 			if (isPersonTwo) {
+				clearTimeout(personTwoShouldOpenTimerTimeout);
 				personTwoShouldOpenTimer = false;
 			} else {
+				clearTimeout(personOneShouldOpenTimerTimeout);
 				personOneShouldOpenTimer = false;
 			}
 			logger.debug('toggle garage door');
