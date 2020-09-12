@@ -1,5 +1,6 @@
 var messengerInfo = require('../settings/messengerInfo.js');
 var options = require('../settings/options.js');
+
 var garageOpenStatus = null;
 const geoip = require('geoip-lite');
 const { constants } = require('buffer');
@@ -150,11 +151,17 @@ module.exports = function(app, logger, io, debugMode, cron) {
 	});
 
 	app.get('/pictures', function(req, res) {
-		fs.readFile('./stream/video.gif', function(err, data) {
-			if (err) logger.error('error reading image_stream', err); // Fail if the file can't be read.
-			res.writeHead(200, { 'Content-Type': 'image/gif' });
-			res.end(data); // Send the file data to the browser.
-		});
+		if (auth(req)) {
+			fs.readFile('./stream/video.gif', function(err, data) {
+				if (err) logger.error('error reading image_stream', err); // Fail if the file can't be read.
+				res.writeHead(200, { 'Content-Type': 'image/gif' });
+				res.end(data); // Send the file data to the browser.
+			});
+		} else {
+			logger.fatal('Unauthorized request for image_stream.jpg', req.connection.remoteAddress);
+			res.status(401);
+			res.send('not auth');
+		}
 	});
 
 	app.post('/', bodyParser.urlencoded({ extended: false }), function(req, res) {
@@ -195,17 +202,22 @@ module.exports = function(app, logger, io, debugMode, cron) {
 	}
 
 	app.post('/video', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		io.sockets.emit('garageOpenStatus', 'Recording video');
-		video
-			.streamVideo()
-			.then(() => {
-				var msg = 'Sending video via website';
-				var btnPress = true;
-				messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
-				io.sockets.emit('garageOpenStatus', 'Video sent');
-			})
-			.catch(() => {});
-		res.send('Ok');
+		if (auth(req)) {
+			io.sockets.emit('garageOpenStatus', 'Recording video');
+			video
+				.streamVideo()
+				.then(() => {
+					var msg = 'Sending video via website';
+					var btnPress = true;
+					messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
+					io.sockets.emit('garageOpenStatus', 'Video sent');
+				})
+				.catch(() => {});
+			res.send('Ok');
+		} else {
+			res.status(401);
+			res.send('not auth');
+		}
 	});
 
 	app.post('/gpsToggle', bodyParser.urlencoded({ extended: false }), function(req, res) {
@@ -225,81 +237,33 @@ module.exports = function(app, logger, io, debugMode, cron) {
 	});
 
 	app.post('/lights/:brightness', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		io.sockets.emit('garageLightStatus', 'Changing light brightness');
-		hue
-			.lightsOn(req.params.brightness)
-			.then(() => {
-				setTimeout(() => {
-					io.sockets.emit('garageLightStatus', 'Light brightness changed, wait for image to update');
-					setTimeout(() => {
-						io.sockets.emit('garageLightStatus', null);
-					}, 3 * 1000);
-				}, 2 * 1000);
-			})
-			.catch((e) => {
-				logger.error('Error setting light brightness:', e);
-			});
-		res.send(`Set to brightness ${req.params.brightness}`);
-	});
-
-	app.post('/sms', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		var incomingPhoneNumber = req.body.From;
-
-		var msg = {
-			sid: req.body.MessageSid,
-			type: 'text',
-			textMessage: req.body.Body,
-			fromCity: req.body.FromCity,
-			fromState: req.body.FromState,
-			fromCountry: req.body.FromCountry
-		};
-		logger.info(`SMS containing: "${msg.textMessage}". Recieved from: ${incomingPhoneNumber}`);
-
-		var alertInfo = [
-			{
-				number: incomingPhoneNumber
-			}
-		];
-
-		if (msg.textMessage.toLowerCase().trim() == 'video' || msg.textMessage.toLowerCase().trim() == 'stream') {
-			video
-				.streamVideo()
+		if (auth(req)) {
+			io.sockets.emit('garageLightStatus', 'Changing light brightness');
+			hue
+				.lightsOn(req.params.brightness)
 				.then(() => {
-					var txtMsg = 'Video requested from ' + incomingPhoneNumber;
-					var btnPress = true;
-					video
-						.streamVideo()
-						.then(() => {
-							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, txtMsg, options.alertSendPictureText, btnPress);
-						})
-						.catch(() => {});
-					io.sockets.emit('garageOpenStatus', 'Video sent');
+					setTimeout(() => {
+						io.sockets.emit('garageLightStatus', 'Light brightness changed, wait for image to update');
+						setTimeout(() => {
+							io.sockets.emit('garageLightStatus', null);
+						}, 3 * 1000);
+					}, 2 * 1000);
 				})
-				.catch(() => {});
-		} else if (containsString(msg.textMessage.toLowerCase(), 'pause')) {
-			var parsedTime = msg.textMessage.toLowerCase().split(' ')[1];
-
-			var hoursToPause = isInt(parsedTime) ? parsedTime : 12;
-
-			var txtMsg = `Pausing home/away trigger for ${hoursToPause} hours`;
-			messenger.send(true, alertInfo, txtMsg, false, true);
-		} else if (msg.textMessage.toLowerCase().trim() == 'resume') {
-			var txtMsg = 'Resuming home/away trigger';
-			messenger.send(true, alertInfo, txtMsg, false, true);
+				.catch((e) => {
+					logger.error('Error setting light brightness:', e);
+				});
+			res.send(`Set to brightness ${req.params.brightness}`);
 		} else {
-			var txtMsg = 'Unrecognized command: ' + msg.textMessage + '. Video, pause, stream, resume are the only recognized commands at the moment.';
-			messenger.send(true, alertInfo, txtMsg, false, true);
+			res.status(401);
+			res.send('not auth');
 		}
-
-		res.status(204);
-		res.send('No content');
 	});
 
 	app.post('/openViaGps', bodyParser.text(), function(req, res) {
 		if (options.garageGpsEnabledPersonOne) {
 			logger.debug('openViaGpsOne attempting to open');
 			var isSecondPerson = false;
-			iot.toggleGarageOpenAlert(isSecondPerson);
+			iot.activateGarageGpsOpenAwayTimer(isSecondPerson);
 			openViaGps(res, req, false);
 			setPersonOneHome();
 		} else {
@@ -313,7 +277,7 @@ module.exports = function(app, logger, io, debugMode, cron) {
 		if (options.garageGpsEnabledPersonTwo) {
 			logger.debug('openViaGpsTwo attempting to open');
 			var isSecondPerson = true;
-			iot.toggleGarageOpenAlert(isSecondPerson);
+			iot.activateGarageGpsOpenAwayTimer(isSecondPerson);
 			openViaGps(res, req, true);
 			setPersonTwoHome();
 		} else {
@@ -544,7 +508,7 @@ module.exports = function(app, logger, io, debugMode, cron) {
 			messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
 		}
 
-		iot.toggleGarageOpenAlert(isPersonTwo);
+		iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 		logger.debug(`Garage set to away via ${personText}`);
 		messenger.sendGenericIfttt(`${personName} Set to Away`);
 		res.send('Ok');

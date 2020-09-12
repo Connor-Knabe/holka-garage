@@ -191,16 +191,17 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		}
 	}
 
-	function toggleGarageOpenAlert(personTwo) {
+	function activateGarageGpsOpenAwayTimer(personTwo) {
 		if (personTwo) {
 			clearTimeout(personTwoShouldOpenTimerTimeout);
+			logger.debug(`personTwoTimer QUEUED for ${options.minsToWaitAfterLeavingHouseForGPSOpen}`);
 			personTwoShouldOpenTimerTimeout = setTimeout(() => {
 				personTwoShouldOpenTimer = true;
+				logger.debug('personTwoTimer Active');
 			}, options.minsToWaitAfterLeavingHouseForGPSOpen * 60 * 1000);
 		} else {
 			clearTimeout(personOneShouldOpenTimerTimeout);
 			logger.debug(`personOneTimer QUEUED for ${options.minsToWaitAfterLeavingHouseForGPSOpen}`);
-
 			personOneShouldOpenTimerTimeout = setTimeout(() => {
 				personOneShouldOpenTimer = true;
 				logger.debug('personOneTimer Active');
@@ -216,9 +217,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			messenger.sendGenericIfttt(logMsg);
 		} else {
 			logger.debug('should open garage');
-		}
-
-		if (personTimerShouldOpen) {
 			if (isPersonTwo) {
 				personTwoShouldOpenTimer = false;
 			} else {
@@ -260,7 +258,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	return {
 		garageIsOpen: garageIsOpen,
 		toggleGarageDoor: toggleGarageDoor,
-		toggleGarageOpenAlert: toggleGarageOpenAlert,
+		activateGarageGpsOpenAwayTimer: activateGarageGpsOpenAwayTimer,
 		garageDoorOpenHandler: garageDoorOpenHandler,
 		openCloseGarageDoor: openCloseGarageDoor,
 		setHome: setHome,
