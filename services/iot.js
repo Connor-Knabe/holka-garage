@@ -96,16 +96,18 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		logger.debug(`possibly alert home owners not home? expectedGarageOpen${expectedGarageOpen} | personOneAway && personTwoAway ${personOneAway} && ${personTwoAway}`);
 		if (!expectedGarageOpen) {
 			if (personOneAway && personTwoAway) {
+				var sendPictureText = true;
 				video
 					.streamVideo()
 					.then(() => {
 						var garageAlertMsg = `The garage has been ${status} but the homeowners are not home!`;
-						messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
+						messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, sendPictureText, true);
 						video.stopStreaming();
 					})
 					.catch(() => {
 						var garageAlertMsg = `The garage has been ${status} but the homeowners are not home! Error taking new video.`;
-						messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, options.alertSendPictureText, true);
+						sendPictureText = false;
+						messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, sendPictureText, true);
 						video.stopStreaming();
 					});
 			}
