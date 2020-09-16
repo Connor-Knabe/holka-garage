@@ -83,15 +83,26 @@ var nestEnergyUsageIftttOptions = {
 	}
 };
 
-function authChecker(req, res, next) {
-	var redirectToUrl = req.originalUrl ? req.originalUrl : '/';
-	req.session.redirectTo = redirectToUrl;
+function auth(req) {
+	var user = null;
 	if (req && req.cookies) {
 		login.users.forEach((userLogin) => {
 			if (userLogin.secretCookie === req.cookies.holkaCookie) {
-				next();
+				user = userLogin;
 			}
 		});
+	}
+	if (!user) {
+		logger.info('unauthorized request for ', req.path);
+	}
+	return user;
+}
+
+function authChecker(req, res, next) {
+	var redirectToUrl = req.originalUrl ? req.originalUrl : '/';
+	req.session.redirectTo = redirectToUrl;
+	if (auth(req)) {
+		next();
 	} else {
 		res.status(401);
 		res.redirect('/');
@@ -150,6 +161,23 @@ if (options.debugMode) {
 
 app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
 
+app.get('/pictures', function(req, res) {
+	//uses basic auth see app.js
+	fs.readFile('./stream/video.gif', function(err, data) {
+		if (err) logger.error('error reading image_stream', err); // Fail if the file can't be read.
+		res.writeHead(200, { 'Content-Type': 'image/gif' });
+		res.end(data); // Send the file data to the browser.
+	});
+});
+
+app.get('/', function(req, res) {
+	if (auth(req)) {
+		res.sendFile('admin.html', { root: './views/' });
+	} else {
+		res.sendFile('index.html', { root: './views/' });
+	}
+});
+
 require('./controllers/routes.js')(app, logger, io, options.debugMode, cron);
 
 if (options.enableNestEnergyUsageReport) {
@@ -160,7 +188,10 @@ if (options.enableHueEnergyUsageReport) {
 	app.use('/proxy/hue-energy-usage/health', proxy(hueEnergyUsageHealthOptions));
 }
 
+//routes below this line are checked for logged in user
 app.use(authChecker);
+
+require('./controllers/authRoutes.js')(app, logger, io, options.debugMode, cron);
 
 if (options.enableWebcamStream) {
 	app.use('/proxy/stream', proxy(proxyOptions));

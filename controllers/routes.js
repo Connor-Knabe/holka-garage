@@ -149,15 +149,6 @@ module.exports = function(app, logger, io, debugMode, cron) {
 		}
 	});
 
-	app.get('/pictures', function(req, res) {
-		//uses basic auth see app.js
-		fs.readFile('./stream/video.gif', function(err, data) {
-			if (err) logger.error('error reading image_stream', err); // Fail if the file can't be read.
-			res.writeHead(200, { 'Content-Type': 'image/gif' });
-			res.end(data); // Send the file data to the browser.
-		});
-	});
-
 	app.post('/', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var options = {
 			maxAge: 1000 * 60 * 60 * 24 * 180,
