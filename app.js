@@ -7,13 +7,21 @@ var https = require('https');
 const { constants } = require('crypto');
 
 const login = require('./settings/login.js');
+
 const options = require('./settings/options.js');
 const helmet = require('helmet');
 const favicon = require('serve-favicon');
 
+const hue = require('./services/hue.js')(logger);
+var messenger = require('./services/messenger.js')(logger, options.debugMode);
+var sockets = {};
+const video = require('./services/video.js')(app, logger, io, hue, sockets);
+var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron);
+
 // @ts-ignore
 var log4js = require('log4js');
 var logger = log4js.getLogger();
+const authService = require('./services/auth.js')(logger, login);
 
 const messengerInfo = require('./settings/messengerInfo.js');
 // @ts-ignore
@@ -83,32 +91,6 @@ var nestEnergyUsageIftttOptions = {
 	}
 };
 
-function auth(req) {
-	var user = null;
-	if (req && req.cookies) {
-		login.users.forEach((userLogin) => {
-			if (userLogin.secretCookie === req.cookies.holkaCookie) {
-				user = userLogin;
-			}
-		});
-	}
-	if (!user) {
-		logger.info('unauthorized request for ', req.path);
-	}
-	return user;
-}
-
-function authChecker(req, res, next) {
-	var redirectToUrl = req.originalUrl ? req.originalUrl : '/';
-	req.session.redirectTo = redirectToUrl;
-	if (auth(req)) {
-		next();
-	} else {
-		res.status(401);
-		res.redirect('/');
-	}
-}
-
 var httpsServer = https.createServer(
 	{
 		secureOptions: constants.SSL_OP_NO_TLSv1 | constants.SSL_OP_NO_TLSv1_1,
@@ -170,14 +152,6 @@ app.get('/pictures', function(req, res) {
 	});
 });
 
-app.get('/', function(req, res) {
-	if (auth(req)) {
-		res.sendFile('admin.html', { root: './views/' });
-	} else {
-		res.sendFile('index.html', { root: './views/' });
-	}
-});
-
 require('./controllers/routes.js')(app, logger, io, options.debugMode, cron);
 
 if (options.enableNestEnergyUsageReport) {
@@ -188,10 +162,12 @@ if (options.enableHueEnergyUsageReport) {
 	app.use('/proxy/hue-energy-usage/health', proxy(hueEnergyUsageHealthOptions));
 }
 
-//routes below this line are checked for logged in user
-app.use(authChecker);
+require('./controllers/gpsAuthRoutes.js')(app, logger, io, options.debugMode, sockets);
 
-require('./controllers/authRoutes.js')(app, logger, io, options.debugMode, cron);
+//routes below this line are checked for logged in user
+app.use(authService.authChecker);
+
+require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, iot, video, authService);
 
 if (options.enableWebcamStream) {
 	app.use('/proxy/stream', proxy(proxyOptions));
