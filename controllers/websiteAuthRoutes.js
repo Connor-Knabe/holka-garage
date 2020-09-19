@@ -23,43 +23,6 @@ module.exports = function(app, logger, io, hue, messenger, iot, video, authServi
 		});
 	});
 
-	app.post('/', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		var options = {
-			maxAge: 1000 * 60 * 60 * 24 * 180,
-			httpOnly: true
-		};
-
-		var shouldRedirect = false;
-		var user = req.body.username && req.body.password ? isValidLogin(req.body.username, req.body.password) : null;
-
-		if (user) {
-			req.session.userInfo = req.body;
-			res.cookie('holkaCookie', user.secretCookie, options);
-			shouldRedirect = true;
-		} else {
-			res.status(401);
-			res.send('Access denied wrong username/password');
-		}
-
-		if (shouldRedirect) {
-			if (req && req.session && req.session.redirectTo) {
-				res.redirect(req.session.redirectTo);
-			} else {
-				res.redirect('/');
-			}
-		}
-	});
-
-	function isValidLogin(username, password) {
-		var user = null;
-		login.users.forEach((userLogin) => {
-			if (userLogin.username.toLowerCase() === username.toLowerCase() && userLogin.password === password) {
-				user = userLogin;
-			}
-		});
-		return user;
-	}
-
 	app.post('/video', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		io.sockets.emit('garageOpenStatus', 'Recording video');
 		video

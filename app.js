@@ -39,7 +39,6 @@ var session = require('express-session');
 var cookieParser = require('cookie-parser');
 // @ts-ignore
 var basicAuth = require('basic-auth-connect');
-const homeAaway = require('./services/homeAaway.js');
 
 var cron = require('cron').CronJob;
 
@@ -165,7 +164,7 @@ if (options.enableHueEnergyUsageReport) {
 	app.use('/proxy/hue-energy-usage/health', proxy(hueEnergyUsageHealthOptions));
 }
 
-require('./services/homeAaway.js')(logger, login, messenger,messengerInfo, iot, io)
+require('./services/homeAway.js')(logger, login, messenger,messengerInfo, iot, io)
 require('./controllers/gpsAuthRoutes.js')(app, logger, io, options.debugMode, messenger);
 
 //routes below this line are checked for logged in user
