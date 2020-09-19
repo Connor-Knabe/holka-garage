@@ -164,12 +164,12 @@ if (options.enableHueEnergyUsageReport) {
 	app.use('/proxy/hue-energy-usage/health', proxy(hueEnergyUsageHealthOptions));
 }
 
-require('./services/homeAway.js')(logger, login, messenger,messengerInfo, iot, io)
-require('./controllers/gpsAuthRoutes.js')(app, logger, io, options.debugMode, messenger);
+const homeAway = require('./services/homeAway.js')(logger, login, messenger,messengerInfo, iot, io)
+require('./controllers/gpsAuthRoutes.js')(app, logger, options.debugMode, messenger, homeAway);
 
 //routes below this line are checked for logged in user
 app.use(authService.authChecker);
-require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, iot, video, authService, homeAaway);
+require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, iot, video, authService, homeAway);
 
 if (options.enableWebcamStream) {
 	app.use('/proxy/stream', proxy(proxyOptions));
