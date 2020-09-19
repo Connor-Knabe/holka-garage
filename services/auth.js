@@ -1,4 +1,9 @@
-module.exports = function(logger, login) {
+module.exports = function(logger, login, messengerInfo, options) {
+
+	var securityMsgTimeout = null;
+	var shouldSendSecurityAlert = true;
+
+
 	function auth(req) {
 		var user = null;
 		if (req && req.cookies) {

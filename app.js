@@ -21,9 +21,11 @@ var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video
 // @ts-ignore
 var log4js = require('log4js');
 var logger = log4js.getLogger();
-const authService = require('./services/auth.js')(logger, login);
 
 const messengerInfo = require('./settings/messengerInfo.js');
+
+const authService = require('./services/auth.js')(logger, login, messengerInfo, options);
+
 // @ts-ignore
 const proxy = require('http-proxy-middleware');
 const fs = require('fs');
@@ -37,6 +39,7 @@ var session = require('express-session');
 var cookieParser = require('cookie-parser');
 // @ts-ignore
 var basicAuth = require('basic-auth-connect');
+const homeAaway = require('./services/homeAaway.js');
 
 var cron = require('cron').CronJob;
 
@@ -152,7 +155,7 @@ app.get('/pictures', function(req, res) {
 	});
 });
 
-require('./controllers/routes.js')(app, logger, io, options.debugMode, cron);
+require('./controllers/routes.js')(app, logger, io, options.debugMode, cron, authService);
 
 if (options.enableNestEnergyUsageReport) {
 	app.use('/proxy/nest-energy-usage/ifttt', proxy(nestEnergyUsageIftttOptions));
@@ -162,12 +165,12 @@ if (options.enableHueEnergyUsageReport) {
 	app.use('/proxy/hue-energy-usage/health', proxy(hueEnergyUsageHealthOptions));
 }
 
-require('./controllers/gpsAuthRoutes.js')(app, logger, io, options.debugMode, sockets);
+require('./services/homeAaway.js')(logger, login, messenger,messengerInfo, iot, io)
+require('./controllers/gpsAuthRoutes.js')(app, logger, io, options.debugMode, messenger);
 
 //routes below this line are checked for logged in user
 app.use(authService.authChecker);
-
-require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, iot, video, authService);
+require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, iot, video, authService, homeAaway);
 
 if (options.enableWebcamStream) {
 	app.use('/proxy/stream', proxy(proxyOptions));

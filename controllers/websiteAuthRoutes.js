@@ -6,19 +6,14 @@ var garageOpenStatus = null;
 const geoip = require('geoip-lite');
 const { constants } = require('buffer');
 
-var personOneAway = false;
-var personTwoAway = false;
-var personOneTime = new Date();
-var personTwoTime = new Date();
+
 const rebootTime = new Date();
 
-module.exports = function(app, logger, io, hue, messenger, iot, video, authService) {
+module.exports = function(app, logger, io, hue, messenger, iot, video, authService, homeAway) {
 	var fs = require('fs');
 	var bodyParser = require('body-parser');
 
-	var securityMsgTimeout = null;
 	var garageErrorStatus = null;
-	var shouldSendSecurityAlert = true;
 
 	app.get('/stream/image_stream.jpg', function(req, res) {
 		fs.readFile('./stream/image_stream.jpg', function(err, data) {
@@ -108,15 +103,6 @@ module.exports = function(app, logger, io, hue, messenger, iot, video, authServi
 		res.send(`Set to brightness ${req.params.brightness}`);
 	});
 
-	function containsString(str, containsStr) {
-		return str.indexOf(containsStr) > -1;
-	}
-
-	function isInt(value) {
-		var x = parseFloat(value);
-		return !isNaN(value) && (x | 0) === x;
-	}
-
 	app.post('/openOrCloseGarage', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var user = authService.auth(req);
 
@@ -177,135 +163,23 @@ module.exports = function(app, logger, io, hue, messenger, iot, video, authServi
 	});
 
 	app.post('/togglePersonOneHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		if (auth(req)) {
-			if (personOneAway) {
-				setPersonOneHome();
-			} else {
-				const isPersonTwo = false;
-				setPersonAway(req, res, isPersonTwo);
-			}
+		var personTwo = false;
+		if (homeAway.isPersonAway(personTwo)) {
+			homeAway.setPersonOneHome();
 		} else {
-			res.status(401);
-			res.send('not auth');
+			const isPersonTwo = false;
+			homeAway.setPersonAway(req, res, isPersonTwo);
 		}
 	});
 
 	app.post('/togglePersonTwoHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		if (auth(req)) {
-			if (personTwoAway) {
-				setPersonTwoHome();
-			} else {
-				const isPersonTwo = true;
-				setPersonAway(req, res, isPersonTwo);
-			}
+		var personTwo = true;
+		if (homeAway.isPersonAway(personTwo)){
+			homeAway.setPersonTwoHome();
 		} else {
-			res.status(401);
-			res.send('not auth');
+			const isPersonTwo = true;
+			homeAway.setPersonAway(req, res, isPersonTwo);
 		}
 	});
-
-	app.post('/personOneAway', bodyParser.text(), function(req, res) {
-		//away from home turn alert on
-		const isPersonTwo = false;
-		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
-		var personText = isPersonTwo ? 'personTwo' : 'personOne';
-		if (req.body && req.body.includes(gpsKey)) {
-			setPersonAway(req, res, isPersonTwo);
-		} else {
-			logger.error(`malformed request for ${personText}Away or wrong key`);
-			res.status(401);
-			res.send('None shall pass');
-		}
-	});
-
-	app.post('/personTwoAway', bodyParser.text(), function(req, res) {
-		//away from home turn alert on
-		const isPersonTwo = true;
-		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
-		var personText = isPersonTwo ? 'personTwo' : 'personOne';
-
-		if (req.body && req.body.includes(gpsKey)) {
-			setPersonAway(req, res, isPersonTwo);
-		} else {
-			logger.error(`malformed request for ${personText}Away or wrong key`);
-			res.status(401);
-			res.send('None shall pass');
-		}
-	});
-
-	function setPersonAway(req, res, isPersonTwo) {
-		var personName = isPersonTwo ? login.users[1].name : login.users[0].name;
-		var personText = isPersonTwo ? 'personTwo' : 'personOne';
-
-		if (isPersonTwo) {
-			iot.setHome(true, true);
-
-			personTwoAway = true;
-			personTwoTime = new Date();
-			const timeAway = getTimeAway(personTwoTime);
-			io.sockets.emit('personTwoTime', `${timeAway}`);
-			io.sockets.emit('personTwoAway', 'away');
-		} else {
-			iot.setHome(false, true);
-			personOneAway = true;
-			personOneTime = new Date();
-			const timeAway = getTimeAway(personOneTime);
-			io.sockets.emit('personOneTime', `${timeAway}`);
-			io.sockets.emit('personOneAway', 'away');
-		}
-
-		if (personOneAway && personTwoAway) {
-			messenger.sendGenericIfttt(`Home going to sleep as both home owners are away`);
-			messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
-		}
-
-		iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
-		logger.debug(`Garage set to away via ${personText}`);
-		messenger.sendGenericIfttt(`${personName} Set to Away`);
-		res.send('Ok');
-	}
-	function getTimeAway(startDate) {
-		var minsBetweenDates = 0;
-		const curDate = new Date();
-
-		if (startDate && curDate) {
-			var diff = curDate.getTime() - startDate.getTime();
-			minsBetweenDates = Math.floor(diff / 60000);
-		}
-
-		var timeAway;
-		var hours = Math.floor(minsBetweenDates / 60);
-
-		if (hours >= 24) {
-			var days = Math.floor(hours / 24);
-			hours = hours - days * 24;
-			timeAway = `for ${days} day(s) ${hours} hrs`;
-		} else {
-			timeAway = hours >= 2 ? `for ${hours} hours` : `for ${minsBetweenDates} mins`;
-		}
-
-		return timeAway;
-	}
-
-	function setPersonOneHome() {
-		iot.setHome(false, false);
-		personOneAway = false;
-		personOneTime = new Date();
-		io.sockets.emit('personOneAway', 'home');
-		const timeAway = getTimeAway(personOneTime);
-		io.sockets.emit('personOneTime', `${timeAway}`);
-		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
-		messenger.sendGenericIfttt(`${login.users[0].name} Set to Home`);
-	}
-
-	function setPersonTwoHome() {
-		iot.setHome(true, false);
-		personTwoAway = false;
-		personTwoTime = new Date();
-		io.sockets.emit('personTwoAway', 'home');
-		const timeAway = getTimeAway(personOneTime);
-		io.sockets.emit('personTwoTime', `${timeAway}`);
-		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
-		messenger.sendGenericIfttt(`${login.users[1].name} Set to Home`);
-	}
+	
 };

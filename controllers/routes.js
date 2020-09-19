@@ -11,7 +11,7 @@ var personOneTime = new Date();
 var personTwoTime = new Date();
 const rebootTime = new Date();
 
-module.exports = function(app, logger, io, debugMode, cron) {
+module.exports = function(app, logger, io, debugMode, cron, authService) {
 	const hue = require('../services/hue.js')(logger);
 	const video = require('../services/video.js')(app, logger, io, hue, sockets);
 	var messenger = require('../services/messenger.js')(logger, debugMode);
@@ -25,6 +25,17 @@ module.exports = function(app, logger, io, debugMode, cron) {
 	var fs = require('fs');
 	var bodyParser = require('body-parser');
 	var login = require('../settings/login.js');
+
+
+	function isValidLogin(username, password) {
+		var user = null;
+		login.users.forEach((userLogin) => {
+			if (userLogin.username.toLowerCase() === username.toLowerCase() && userLogin.password === password) {
+				user = userLogin;
+			}
+		});
+		return user;
+	}
 
 	io.on('connection', function(socket) {
 		sockets[socket.id] = socket;
@@ -87,33 +98,10 @@ module.exports = function(app, logger, io, debugMode, cron) {
 		});
 	});
 
-	function auth(req) {
-		var user = null;
-		if (req && req.cookies) {
-			login.users.forEach((userLogin) => {
-				if (userLogin.secretCookie === req.cookies.holkaCookie) {
-					user = userLogin;
-				}
-			});
-		}
-		return user;
-	}
-
-	function vpnAuth(req) {
-		var clientIp = req.connection.remoteAddress;
-		var isOnVpn = clientIp.includes(options.vpnIp) || clientIp.includes(options.localIp) || debugMode || (options.vpnIp === '' && options.localIp === '');
-		return isOnVpn;
-	}
-
-	function regionAuth(req) {
-		var clientIp = req.connection.remoteAddress;
-		var geo = geoip.lookup(clientIp);
-		logger.debug(`Region auth from ${geo.region}`);
-		return options.geoIpFilter.includes(geo.region) || options.geoIpFilter === '';
-	}
+	
 
 	app.get('/', function(req, res) {
-		if (auth(req)) {
+		if (authService.auth(req)) {
 			res.sendFile('admin.html', { root: './views/' });
 		} else {
 			res.sendFile('index.html', { root: './views/' });
@@ -135,19 +123,7 @@ module.exports = function(app, logger, io, debugMode, cron) {
 		res.send(login.acmeChallengeKey3);
 	});
 
-	app.get('/stream/image_stream.jpg', function(req, res) {
-		if (auth(req)) {
-			fs.readFile('./stream/image_stream.jpg', function(err, data) {
-				if (err) logger.error('failed to read image stream', err); // Fail if the file can't be read.
-				res.writeHead(200, { 'Content-Type': 'image/jpeg' });
-				res.end(data); // Send the file data to the browser.
-			});
-		} else {
-			logger.fatal('Unauthorized request for image_stream.jpg', req.connection.remoteAddress);
-			res.status(401);
-			res.send('not auth');
-		}
-	});
+
 
 	app.post('/', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var options = {
@@ -175,375 +151,4 @@ module.exports = function(app, logger, io, debugMode, cron) {
 			}
 		}
 	});
-
-	function isValidLogin(username, password) {
-		var user = null;
-		login.users.forEach((userLogin) => {
-			if (userLogin.username.toLowerCase() === username.toLowerCase() && userLogin.password === password) {
-				user = userLogin;
-			}
-		});
-		return user;
-	}
-
-	app.post('/video', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		if (auth(req)) {
-			io.sockets.emit('garageOpenStatus', 'Recording video');
-			video
-				.streamVideo()
-				.then(() => {
-					var msg = 'Sending video via website';
-					var btnPress = true;
-					messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
-					io.sockets.emit('garageOpenStatus', 'Video sent');
-				})
-				.catch(() => {});
-			res.send('Ok');
-		} else {
-			res.status(401);
-			res.send('not auth');
-		}
-	});
-
-	app.post('/gpsToggle', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		if (auth(req)) {
-			if (options.garageGpsEnabledMain) {
-				options.garageGpsEnabledMain = false;
-			} else {
-				options.garageGpsEnabledMain = true;
-			}
-			var garageGPSStatus = options.garageGpsEnabledMain ? 'enabled' : 'disabled';
-			io.sockets.emit('garageGPSStatus', garageGPSStatus);
-			res.send('Ok');
-		} else {
-			res.status(401);
-			res.send('not auth');
-		}
-	});
-
-	app.post('/lights/:brightness', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		if (auth(req)) {
-			io.sockets.emit('garageLightStatus', 'Changing light brightness');
-			hue
-				.lightsOn(req.params.brightness)
-				.then(() => {
-					setTimeout(() => {
-						io.sockets.emit('garageLightStatus', 'Light brightness changed, wait for image to update');
-						setTimeout(() => {
-							io.sockets.emit('garageLightStatus', null);
-						}, 3 * 1000);
-					}, 2 * 1000);
-				})
-				.catch((e) => {
-					logger.error('Error setting light brightness:', e);
-				});
-			res.send(`Set to brightness ${req.params.brightness}`);
-		} else {
-			res.status(401);
-			res.send('not auth');
-		}
-	});
-
-	app.post('/openViaGps', bodyParser.text(), function(req, res) {
-		if (options.garageGpsEnabledPersonOne) {
-			logger.debug('openViaGpsOne attempting to open');
-			var isSecondPerson = false;
-			iot.activateGarageGpsOpenAwayTimer(isSecondPerson);
-			openViaGps(res, req, false);
-			setPersonOneHome();
-		} else {
-			logger.info('garage gps open is disabled for person one!');
-			res.status(200);
-			res.send('OK');
-		}
-	});
-
-	app.post('/openViaGpsTwo', bodyParser.text(), function(req, res) {
-		if (options.garageGpsEnabledPersonTwo) {
-			logger.debug('openViaGpsTwo attempting to open');
-			var isSecondPerson = true;
-			iot.activateGarageGpsOpenAwayTimer(isSecondPerson);
-			openViaGps(res, req, true);
-			setPersonTwoHome();
-		} else {
-			logger.info('garage gps open is disabled for person two!');
-			res.status(200);
-			res.send('OK');
-		}
-	});
-
-	function containsString(str, containsStr) {
-		return str.indexOf(containsStr) > -1;
-	}
-
-	function isInt(value) {
-		var x = parseFloat(value);
-		return !isNaN(value) && (x | 0) === x;
-	}
-
-	function openViaGps(res, req, two) {
-		var gpsOpenKey = login.gpsPersonOneKey;
-		var gpsPerson = 'one';
-
-		if (two) {
-			logger.debug('person two!');
-			gpsOpenKey = login.gpsPersonTwoKey;
-			gpsPerson = 'two';
-			if (!personTwoAway) {
-				logger.debug(`person two already home not opening garage!`);
-				res.status(200);
-				res.send('OK');
-				return;
-			}
-		} else {
-			if (!personOneAway) {
-				logger.debug(`person one already home not opening garage!`);
-				res.status(200);
-				res.send('OK');
-				return;
-			}
-		}
-
-		logger.debug(`open garage via gps ${gpsPerson}`);
-
-		if (req.body && req.body.includes(gpsOpenKey)) {
-			if (options.garageGpsEnabledMain) {
-				iot.garageDoorOpenHandler(two, gpsPerson, req.connection.remoteAddress);
-			} else {
-				messenger.sendGenericIfttt(`NOT opening GPS open disabled person:${gpsPerson}`);
-			}
-
-			res.status(200);
-			res.send('OK');
-		} else {
-			const minsToWaitBeforeNextSecurityAlert = 5;
-			possibleHackAlert('openViaGPS', req, minsToWaitBeforeNextSecurityAlert);
-
-			logger.info(`Failed attempt to open garage for person ${gpsPerson} via gps from ip: ${req.connection.remoteAddress} with body of ${JSON.stringify(req.body)}, Possible Hack?`);
-			res.status(401);
-			res.send('not auth to open garage');
-		}
-	}
-
-	app.post('/openOrCloseGarage', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		if (auth(req)) {
-			var user = auth(req);
-
-			if (req.body && req.body.garageSwitch == 'open') {
-				if (!iot.garageIsOpen()) {
-					iot.openCloseGarageDoor();
-					garageOpenStatus = 'Opening...';
-					video.updateGarageStatus(garageOpenStatus);
-					io.sockets.emit('garageOpenStatus', garageOpenStatus);
-					var msg = `${garageOpenStatus} garage via button for ${user.name}`;
-					var btnPress = true;
-					video
-						.streamVideo()
-						.then(() => {
-							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
-						})
-						.catch(() => {
-							logger.debug('failed to stream video when garage was opening');
-							video.stopStreaming();
-							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
-						});
-
-					io.sockets.emit('garageErrorStatus', null);
-				} else {
-					logger.debug('err');
-					io.sockets.emit('garageOpenStatus', null);
-					garageErrorStatus = 'Garage is already open!!';
-					io.sockets.emit('garageErrorStatus', garageErrorStatus);
-				}
-			} else if (req.body && req.body.garageSwitch == 'close') {
-				if (iot.garageIsOpen()) {
-					iot.openCloseGarageDoor();
-					garageOpenStatus = 'Closing...';
-					video.updateGarageStatus(garageOpenStatus);
-					io.sockets.emit('garageOpenStatus', garageOpenStatus);
-					var msg = `${garageOpenStatus} garage via button for ${user.name}`;
-					var btnPress = true;
-					video
-						.streamVideo()
-						.then(() => {
-							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
-						})
-						.catch(() => {
-							logger.debug('failed to stream video when garage was closing');
-							video.stopStreaming();
-							messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
-						});
-					io.sockets.emit('garageErrorStatus', null);
-				} else {
-					logger.debug('err');
-					video.updateGarageStatus(null);
-					io.sockets.emit('garageOpenStatus', null);
-					io.sockets.emit('garageErrorStatus', 'Garage is already closed!!');
-				}
-			}
-			logger.info(msg);
-			res.send(garageOpenStatus);
-		} else {
-			var garageStatus = 'hack';
-			const minsToWaitBeforeNextSecurityAlert = 5;
-			if (req.body && req.body.garageSwitch == 'open') {
-				garageStatus = 'open';
-			} else if (req.body && req.body.garageSwitch == 'close') {
-				garageStatus = 'close';
-			}
-			possibleHackAlert(garageStatus, req, minsToWaitBeforeNextSecurityAlert);
-			io.sockets.emit('garageErrorStatus', 'You are not authorized to do this!');
-			res.status(401);
-			res.send('not auth');
-		}
-	});
-
-	function possibleHackAlert(garageStatus, req, minsToWaitBeforeNextSecurityAlert) {
-		var securityMsg = 'SECURITY: tried to ' + garageStatus + ' garage via post without being authenticated!! From ip: ' + req.connection.remoteAddress;
-
-		clearTimeout(securityMsgTimeout);
-		securityMsgTimeout = setTimeout(function() {
-			shouldSendSecurityAlert = true;
-		}, minsToWaitBeforeNextSecurityAlert * 60 * 1000);
-		logger.fatal(securityMsg, 'Ip address is: ', req.connection.remoteAddress);
-
-		if (shouldSendSecurityAlert) {
-			var btnPress = true;
-			messenger.send(true, messengerInfo.toNumbers, securityMsg, options.alertSendPictureText, btnPress);
-			shouldSendSecurityAlert = false;
-		}
-	}
-
-	app.post('/togglePersonOneHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		if (auth(req)) {
-			if (personOneAway) {
-				setPersonOneHome();
-			} else {
-				const isPersonTwo = false;
-				setPersonAway(req, res, isPersonTwo);
-			}
-		} else {
-			res.status(401);
-			res.send('not auth');
-		}
-	});
-
-	app.post('/togglePersonTwoHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		if (auth(req)) {
-			if (personTwoAway) {
-				setPersonTwoHome();
-			} else {
-				const isPersonTwo = true;
-				setPersonAway(req, res, isPersonTwo);
-			}
-		} else {
-			res.status(401);
-			res.send('not auth');
-		}
-	});
-
-	app.post('/personOneAway', bodyParser.text(), function(req, res) {
-		//away from home turn alert on
-		const isPersonTwo = false;
-		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
-		var personText = isPersonTwo ? 'personTwo' : 'personOne';
-		if (req.body && req.body.includes(gpsKey)) {
-			setPersonAway(req, res, isPersonTwo);
-		} else {
-			logger.error(`malformed request for ${personText}Away or wrong key`);
-			res.status(401);
-			res.send('None shall pass');
-		}
-	});
-
-	app.post('/personTwoAway', bodyParser.text(), function(req, res) {
-		//away from home turn alert on
-		const isPersonTwo = true;
-		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
-		var personText = isPersonTwo ? 'personTwo' : 'personOne';
-
-		if (req.body && req.body.includes(gpsKey)) {
-			setPersonAway(req, res, isPersonTwo);
-		} else {
-			logger.error(`malformed request for ${personText}Away or wrong key`);
-			res.status(401);
-			res.send('None shall pass');
-		}
-	});
-
-	function setPersonAway(req, res, isPersonTwo) {
-		var personName = isPersonTwo ? login.users[1].name : login.users[0].name;
-		var personText = isPersonTwo ? 'personTwo' : 'personOne';
-
-		if (isPersonTwo) {
-			iot.setHome(true, true);
-
-			personTwoAway = true;
-			personTwoTime = new Date();
-			const timeAway = getTimeAway(personTwoTime);
-			io.sockets.emit('personTwoTime', `${timeAway}`);
-			io.sockets.emit('personTwoAway', 'away');
-		} else {
-			iot.setHome(false, true);
-			personOneAway = true;
-			personOneTime = new Date();
-			const timeAway = getTimeAway(personOneTime);
-			io.sockets.emit('personOneTime', `${timeAway}`);
-			io.sockets.emit('personOneAway', 'away');
-		}
-
-		if (personOneAway && personTwoAway) {
-			messenger.sendGenericIfttt(`Home going to sleep as both home owners are away`);
-			messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
-		}
-
-		iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
-		logger.debug(`Garage set to away via ${personText}`);
-		messenger.sendGenericIfttt(`${personName} Set to Away`);
-		res.send('Ok');
-	}
-	function getTimeAway(startDate) {
-		var minsBetweenDates = 0;
-		const curDate = new Date();
-
-		if (startDate && curDate) {
-			var diff = curDate.getTime() - startDate.getTime();
-			minsBetweenDates = Math.floor(diff / 60000);
-		}
-
-		var timeAway;
-		var hours = Math.floor(minsBetweenDates / 60);
-
-		if (hours >= 24) {
-			var days = Math.floor(hours / 24);
-			hours = hours - days * 24;
-			timeAway = `for ${days} day(s) ${hours} hrs`;
-		} else {
-			timeAway = hours >= 2 ? `for ${hours} hours` : `for ${minsBetweenDates} mins`;
-		}
-
-		return timeAway;
-	}
-
-	function setPersonOneHome() {
-		iot.setHome(false, false);
-		personOneAway = false;
-		personOneTime = new Date();
-		io.sockets.emit('personOneAway', 'home');
-		const timeAway = getTimeAway(personOneTime);
-		io.sockets.emit('personOneTime', `${timeAway}`);
-		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
-		messenger.sendGenericIfttt(`${login.users[0].name} Set to Home`);
-	}
-
-	function setPersonTwoHome() {
-		iot.setHome(true, false);
-		personTwoAway = false;
-		personTwoTime = new Date();
-		io.sockets.emit('personTwoAway', 'home');
-		const timeAway = getTimeAway(personOneTime);
-		io.sockets.emit('personTwoTime', `${timeAway}`);
-		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
-		messenger.sendGenericIfttt(`${login.users[1].name} Set to Home`);
-	}
 };

@@ -6,7 +6,7 @@ var personTwoAway = false;
 var personOneTime = new Date();
 var personTwoTime = new Date();
 
-module.exports = function(app, logger, io, iot, sockets) {
+module.exports = function(app, logger, io, iot, messenger) {
 	var securityMsgTimeout = null;
 	var shouldSendSecurityAlert = true;
 
@@ -161,6 +161,7 @@ module.exports = function(app, logger, io, iot, sockets) {
 		messenger.sendGenericIfttt(`${personName} Set to Away`);
 		res.send('Ok');
 	}
+	
 	function getTimeAway(startDate) {
 		var minsBetweenDates = 0;
 		const curDate = new Date();
