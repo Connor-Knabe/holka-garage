@@ -1,9 +1,6 @@
-var messengerInfo = require('../settings/messengerInfo.js');
 var options = require('../settings/options.js');
 
-var garageOpenStatus = null;
 const geoip = require('geoip-lite');
-const { constants } = require('buffer');
 var sockets = {};
 var personOneAway = false;
 var personTwoAway = false;
@@ -11,18 +8,13 @@ var personOneTime = new Date();
 var personTwoTime = new Date();
 const rebootTime = new Date();
 
-module.exports = function(app, logger, io, debugMode, cron, authService) {
+module.exports = function(app, logger, io, debugMode, cron, authService, homeAway) {
 	const hue = require('../services/hue.js')(logger);
 	const video = require('../services/video.js')(app, logger, io, hue, sockets);
 	var messenger = require('../services/messenger.js')(logger, debugMode);
 	var iot = require('../services/iot.js')(app, debugMode, io, logger, video, messenger, hue, cron);
 	const rp = require('request-promise');
 
-	var securityMsgTimeout = null;
-	var garageErrorStatus = null;
-	var shouldSendSecurityAlert = true;
-
-	var fs = require('fs');
 	var bodyParser = require('body-parser');
 	var login = require('../settings/login.js');
 
@@ -60,7 +52,7 @@ module.exports = function(app, logger, io, debugMode, cron, authService) {
 		}
 
 		if (options.garageGpsEnabledPersonTwo) {
-			const timeAway = getTimeAway(personTwoTime);
+			const timeAway = homeAway.getTimeAway(personTwoTime);
 			io.sockets.emit('personTwoTime', `${timeAway}`);
 			io.sockets.emit('personTwoName', `${login.users[1].name}: `);
 			if (personTwoAway) {
@@ -71,7 +63,7 @@ module.exports = function(app, logger, io, debugMode, cron, authService) {
 		}
 
 		if (options.garageGpsEnabledPersonOne) {
-			const timeAway = getTimeAway(personOneTime);
+			const timeAway = homeAway.getTimeAway(personOneTime);
 			io.sockets.emit('personOneTime', `${timeAway}`);
 			io.sockets.emit('personOneName', `${login.users[0].name}: `);
 			if (personOneAway) {
@@ -81,7 +73,7 @@ module.exports = function(app, logger, io, debugMode, cron, authService) {
 			}
 		}
 
-		const timeSinceReboot = getTimeAway(rebootTime);
+		const timeSinceReboot = homeAway.getTimeAway(rebootTime);
 
 		io.sockets.emit('rebootTime', timeSinceReboot);
 
@@ -98,8 +90,6 @@ module.exports = function(app, logger, io, debugMode, cron, authService) {
 		});
 	});
 
-	
-
 	app.get('/', function(req, res) {
 		if (authService.auth(req)) {
 			res.sendFile('admin.html', { root: './views/' });
@@ -107,23 +97,6 @@ module.exports = function(app, logger, io, debugMode, cron, authService) {
 			res.sendFile('index.html', { root: './views/' });
 		}
 	});
-
-	//Used to verify letsencrypt manually
-	app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey.split('.')[0], function(req, res) {
-		res.send(login.acmeChallengeKey);
-	});
-
-	//Used to verify letsencrypt manually
-	app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey2.split('.')[0], function(req, res) {
-		res.send(login.acmeChallengeKey2);
-	});
-
-	//Used to verify letsencrypt manually
-	app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey3.split('.')[0], function(req, res) {
-		res.send(login.acmeChallengeKey3);
-	});
-
-
 
 	app.post('/', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var options = {
@@ -150,5 +123,20 @@ module.exports = function(app, logger, io, debugMode, cron, authService) {
 				res.redirect('/');
 			}
 		}
+	});
+
+	//Used to verify letsencrypt manually
+	app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey.split('.')[0], function(req, res) {
+		res.send(login.acmeChallengeKey);
+	});
+
+	//Used to verify letsencrypt manually
+	app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey2.split('.')[0], function(req, res) {
+		res.send(login.acmeChallengeKey2);
+	});
+
+	//Used to verify letsencrypt manually
+	app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey3.split('.')[0], function(req, res) {
+		res.send(login.acmeChallengeKey3);
 	});
 };

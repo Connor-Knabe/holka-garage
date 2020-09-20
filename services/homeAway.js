@@ -94,6 +94,7 @@ module.exports = function(logger, login, messenger, messengerInfo,iot,io) {
         setPersonAway: setPersonAway,
         isPersonAway: isPersonAway,
         setPersonOneHome:setPersonOneHome,
-        setPersonTwoHome:setPersonTwoHome
+		setPersonTwoHome:setPersonTwoHome,
+		getTimeAway:getTimeAway
 	};
 };

@@ -1,4 +1,4 @@
-module.exports = function(logger, login, messengerInfo, options) {
+module.exports = function(logger, login, messengerInfo, options, messenger) {
 
 	var securityMsgTimeout = null;
 	var shouldSendSecurityAlert = true;

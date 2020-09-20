@@ -1,19 +1,25 @@
 var messengerInfo = require('../settings/messengerInfo.js');
 var options = require('../settings/options.js');
-var login = require('../settings/login.js');
-
+var basicAuth = require('basic-auth-connect');
+var fs = require('fs');
+var bodyParser = require('body-parser');
 var garageOpenStatus = null;
-const geoip = require('geoip-lite');
-const { constants } = require('buffer');
 
-
-const rebootTime = new Date();
-
-module.exports = function(app, logger, io, hue, messenger, iot, video, authService, homeAway) {
-	var fs = require('fs');
-	var bodyParser = require('body-parser');
-
+module.exports = function(app, logger, io, hue, messenger, iot, video, authService, homeAway, proxy) {
 	var garageErrorStatus = null;
+
+	app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
+	app.get('/pictures', function(req, res) {
+		//uses basic auth see app.js
+		fs.readFile('./stream/video.gif', function(err, data) {
+			if (err) logger.error('error reading image_stream', err); // Fail if the file can't be read.
+			res.writeHead(200, { 'Content-Type': 'image/gif' });
+			res.end(data); // Send the file data to the browser.
+		});
+	});
+
+	//routes below this line check for logged in user
+	app.use(authService.authChecker);
 
 	app.get('/stream/image_stream.jpg', function(req, res) {
 		fs.readFile('./stream/image_stream.jpg', function(err, data) {
@@ -144,5 +150,27 @@ module.exports = function(app, logger, io, hue, messenger, iot, video, authServi
 			homeAway.setPersonAway(req, res, isPersonTwo);
 		}
 	});
+
+	//if using https://github.com/Connor-Knabe/hue-energy-usage
+	if (options.enableHueEnergyUsageReport) {
+		var hueEnergyUsageOptions = {
+			target: 'http://localhost:1234',
+			changeOrigin: false,
+			pathRewrite: {
+				'^/proxy/hue-energy-usage': ''
+			}
+		};
+		app.use('/proxy/hue-energy-usage', proxy(hueEnergyUsageOptions));
+	}
+	if (options.enableNestEnergyUsageReport) {
+		var nestEnergyUsageOptions = {
+			target: 'http://localhost:1235',
+			changeOrigin: false,
+			pathRewrite: {
+				'^/proxy/nest-energy-usage': ''
+			}
+		};
+		app.use('/proxy/nest-energy-usage', proxy(nestEnergyUsageOptions));
+	}
 	
 };
