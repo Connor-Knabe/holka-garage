@@ -7,7 +7,6 @@ const garageSwitch = new Gpio(21, 'out');
 var motionSensorTimeoutOne = null,
 	motionSensorTimeoutTwo = null,
 	hasTurnedLightsOn = false,
-	garageOpened = false,
 	garageOpenAlertOneTimeout = null,
 	garageOpenAlertTwoTimeout = null,
 	personOneAway = false,
@@ -18,7 +17,8 @@ var motionSensorTimeoutOne = null,
 	personTwoShouldOpenTimer = false,
 	personOneShouldOpenTimerTimeout = null,
 	personTwoShouldOpenTimerTimeout = null,
-	garageLastOpenedTime = null;
+	garageLastOpenedTime = null,
+	garageLastClosedTime = null;
 
 module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron) {
 	var hasBeenOpened = garageIsOpen();
@@ -36,7 +36,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			io.sockets.emit('garageStatus', 'open');
 
 			hasBeenOpened = true;
-			garageOpened = true;
 			garageLastOpenedTime = new Date();
 			io.sockets.emit('garageLastOpenedTime', garageLastOpenedTime);
 
@@ -59,7 +58,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			io.sockets.emit('garageStatus', 'closed');
 
 			hasBeenOpened = false;
-			garageOpened = false;
+			garageLastClosedTime = new Date();
+			io.sockets.emit('garageLastClosedTime', garageLastClosedTime);
+
 			var msg = 'Garage door closed';
 			clearTimeout(garageOpenAlertOneTimeout);
 			clearTimeout(garageOpenAlertTwoTimeout);
@@ -72,6 +73,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		}
 	});
 
+	//if motion is detected in garage turn on hue lights
 	if (options.enableMotionSensor && options.enableHue) {
 		motionSensor.watch((err, value) => {
 			if (err) {
@@ -131,14 +133,13 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	function garageAlert(timeUntilAlert, shouldCall) {
-		var garageAlertMsg = `Garage has been open for more than: ${timeUntilAlert} minutes!`;
+
+		var garageAlertOpenMins = shouldCall ? timeUntilAlert + options.garageOpenAlertOneMins : timeUntilAlert
+
+		var garageAlertMsg = `Garage has been open for more than: ${garageAlertOpenMins} minutes!`;
 		logger.debug(garageAlertMsg);
 		if (options.garageOpenMinsAlert) {
 			logger.debug(garageAlertMsg);
-
-			if (shouldCall) {
-				garageAlertMsg = `Garage has been open for more than: ${timeUntilAlert + options.garageOpenAlertOneMins} minutes!`;
-			}
 			video
 				.streamVideo()
 				.then(() => {
@@ -243,8 +244,11 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		return garageLastOpenedTime;
 	}
 
-	//cron
+	function getGarageLastClosedTime() {
+		return garageLastClosedTime;
+	}
 
+	//cron
 	var job = new cron(
 		'5 * * * *',
 		function() {
@@ -266,6 +270,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		garageDoorOpenHandler: garageDoorOpenHandler,
 		openCloseGarageDoor: openCloseGarageDoor,
 		setHome: setHome,
-		getGarageLastOpenedTime: getGarageLastOpenedTime
+		getGarageLastOpenedTime: getGarageLastOpenedTime,
+		getGarageLastClosedTime:getGarageLastClosedTime
 	};
 };

@@ -219,6 +219,28 @@
             }
         });
 
+        socket.on('garageLastClosedTime', function (status) {
+            if (status) {
+                $("#garageLastClosedTime").text(new Date(status).toLocaleString());
+
+                if($("#garageLastOpenedTime").text()){
+
+                    var garageLastOpened = new Date($("#garageLastOpenedTime").text());
+
+                    var garageLastClosed = new Date(status);
+
+                    var timeOpened = (garageLastOpened - garageLastClosed); 
+                    var timeOpened = Math.round((dif/1000)/60); 
+                    $("#garageTimeOpened").text(timeOpened + " mins");
+
+                }
+
+
+            } else {
+                $("#garageLastClosedTime").text("Unknown");
+            }
+        });
+
         socket.emit('start-stream');
     </script>
 </head>
@@ -319,6 +341,10 @@
         Open after away for: <div class="garageStatus" id="garageTimer" style="color:purple"></div>
         <br>
         Last opened: <div class="garageStatus" id="garageLastOpenedTime">N/a</div>
+        <br>
+        Last closed: <div class="garageStatus" id="garageLastClosedTime">N/a</div>
+        <br>
+        Garage was open for <div class="garageStatus" id="garageTimeOpened">N/a</div>
         
         <br><br>
 
