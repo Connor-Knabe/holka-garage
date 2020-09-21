@@ -5,6 +5,7 @@ var app = express();
 var http = require('http').Server(app);
 var https = require('https');
 const { constants } = require('crypto');
+var bodyParser = require('body-parser');
 
 const login = require('./settings/login.js');
 
@@ -26,18 +27,12 @@ const messengerInfo = require('./settings/messengerInfo.js');
 
 const authService = require('./services/auth.js')(logger, login, messengerInfo, options, messenger);
 
-// @ts-ignore
 const proxy = require('http-proxy-middleware');
 const fs = require('fs');
 
 var path = require('path');
-// @ts-ignore
-var bodyParser = require('body-parser');
-// @ts-ignore
 var session = require('express-session');
-// @ts-ignore
 var cookieParser = require('cookie-parser');
-// @ts-ignore
 
 var cron = require('cron').CronJob;
 
@@ -51,8 +46,6 @@ app.use(function(req, res, next) {
 	next();
 });
 
-
-
 var hueEnergyUsageHealthOptions = {
 	target: 'http://localhost:1234/health',
 	changeOrigin: false,
@@ -60,8 +53,6 @@ var hueEnergyUsageHealthOptions = {
 		'^/proxy/hue-energy-usage/health': ''
 	}
 };
-
-
 
 var nestEnergyUsageIftttOptions = {
 	target: 'http://localhost:1235/ifttt',
@@ -121,9 +112,7 @@ if (options.debugMode) {
 	logger.debug('___________________________________');
 }
 
-
 const homeAway = require('./services/homeAway.js')(logger, login, messenger,messengerInfo, iot, io)
-
 
 if (options.enableNestEnergyUsageReport) {
 	app.use('/proxy/nest-energy-usage/ifttt', proxy(nestEnergyUsageIftttOptions));
@@ -133,8 +122,8 @@ if (options.enableHueEnergyUsageReport) {
 	app.use('/proxy/hue-energy-usage/health', proxy(hueEnergyUsageHealthOptions));
 }
 
-require('./controllers/routes.js')(app, logger, io, options.debugMode, cron, authService, homeAway);
-require('./controllers/gpsAuthRoutes.js')(app, logger, options.debugMode, messenger, homeAway);
-require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, iot, video, authService, homeAway, proxy);
+require('./controllers/routes.js')(app, logger, io, options.debugMode, cron, authService, homeAway, bodyParser);
+require('./controllers/gpsAuthRoutes.js')(app, logger, options.debugMode, messenger, homeAway, bodyParser);
+require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, iot, video, authService, homeAway, proxy, bodyParser);
 
 

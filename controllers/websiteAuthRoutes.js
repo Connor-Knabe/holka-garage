@@ -2,15 +2,14 @@ var messengerInfo = require('../settings/messengerInfo.js');
 var options = require('../settings/options.js');
 var basicAuth = require('basic-auth-connect');
 var fs = require('fs');
-var bodyParser = require('body-parser');
 var garageOpenStatus = null;
 
-module.exports = function(app, logger, io, hue, messenger, iot, video, authService, homeAway, proxy) {
+module.exports = function(app, logger, io, hue, messenger, iot, video, authService, homeAway, proxy, bodyParser) {
 	var garageErrorStatus = null;
 
+	//requires basic auth for twilio mms
 	app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
 	app.get('/pictures', function(req, res) {
-		//uses basic auth see app.js
 		fs.readFile('./stream/video.gif', function(err, data) {
 			if (err) logger.error('error reading image_stream', err); // Fail if the file can't be read.
 			res.writeHead(200, { 'Content-Type': 'image/gif' });

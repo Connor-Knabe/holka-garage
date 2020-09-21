@@ -2,11 +2,10 @@ var messengerInfo = require('../settings/messengerInfo.js');
 var options = require('../settings/options.js');
 
 
-module.exports = function(app, logger, iot, messenger, homeAway) {
+module.exports = function(app, logger, iot, messenger, homeAway, bodyParser) {
 	var securityMsgTimeout = null;
 	var shouldSendSecurityAlert = true;
 
-	var bodyParser = require('body-parser');
 	var login = require('../settings/login.js');
 
 	app.post('/openViaGps', bodyParser.text(), function(req, res) {
