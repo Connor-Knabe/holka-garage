@@ -6,6 +6,8 @@ var http = require('http').Server(app);
 var https = require('https');
 const { constants } = require('crypto');
 var bodyParser = require('body-parser');
+var cron = require('cron').CronJob;
+
 
 const login = require('./settings/login.js');
 
@@ -34,7 +36,6 @@ var path = require('path');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
 
-var cron = require('cron').CronJob;
 
 app.use(helmet());
 app.use(cookieParser());
