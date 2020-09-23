@@ -7,34 +7,37 @@ var https = require('https');
 const { constants } = require('crypto');
 var bodyParser = require('body-parser');
 var cron = require('cron').CronJob;
-
-
-const login = require('./settings/login.js');
-
-const options = require('./settings/options.js');
 const helmet = require('helmet');
 const favicon = require('serve-favicon');
+var path = require('path');
+var session = require('express-session');
+var cookieParser = require('cookie-parser');
+const proxy = require('http-proxy-middleware');
+const fs = require('fs');
+var log4js = require('log4js');
+
+var logger = log4js.getLogger();
+
+var sockets = {};
+
+const login = require('./settings/login.js');
+const options = require('./settings/options.js');
+
 
 const hue = require('./services/hue.js')(logger);
-var sockets = {};
+
+
 const video = require('./services/video.js')(app, logger, io, hue, sockets);
+var messenger = require('./services/messenger.js')(logger, options.debugMode);
+
 var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron);
 
-// @ts-ignore
-var log4js = require('log4js');
-var logger = log4js.getLogger();
-var messenger = require('./services/messenger.js')(logger, options.debugMode);
+
 
 const messengerInfo = require('./settings/messengerInfo.js');
 
 const authService = require('./services/auth.js')(logger, login, messengerInfo, options, messenger);
 
-const proxy = require('http-proxy-middleware');
-const fs = require('fs');
-
-var path = require('path');
-var session = require('express-session');
-var cookieParser = require('cookie-parser');
 
 
 app.use(helmet());
