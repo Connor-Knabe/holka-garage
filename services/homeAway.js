@@ -1,11 +1,11 @@
-
+var personOneAway = false;
+var personTwoAway = false;
+var personOneTime = new Date();
+var personTwoTime = new Date();
 
 module.exports = function(logger, login, messenger, messengerInfo,iot,io) {
 
-    var personOneAway = false;
-    var personTwoAway = false;
-    var personOneTime = new Date();
-    var personTwoTime = new Date();
+
 
 	function setPersonAway(req, res, isPersonTwo) {
         var personName = isPersonTwo ? login.users[1].name : login.users[0].name;
