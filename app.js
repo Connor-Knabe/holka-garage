@@ -14,7 +14,6 @@ const helmet = require('helmet');
 const favicon = require('serve-favicon');
 
 const hue = require('./services/hue.js')(logger);
-var messenger = require('./services/messenger.js')(logger, options.debugMode);
 var sockets = {};
 const video = require('./services/video.js')(app, logger, io, hue, sockets);
 var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron);
@@ -22,6 +21,7 @@ var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video
 // @ts-ignore
 var log4js = require('log4js');
 var logger = log4js.getLogger();
+var messenger = require('./services/messenger.js')(logger, options.debugMode);
 
 const messengerInfo = require('./settings/messengerInfo.js');
 
