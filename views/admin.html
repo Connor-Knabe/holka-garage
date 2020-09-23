@@ -223,10 +223,9 @@
             if (status) {
                 $("#garageLastClosedTime").text(new Date(status).toLocaleString());
 
-                if($("#garageLastOpenedTime").text()){
+                if($("#garageLastOpenedTime").text() != "Unknown"){
 
                     var garageLastOpened = new Date($("#garageLastOpenedTime").text());
-
                     var garageLastClosed = new Date(status);
 
                     var timeOpened = (garageLastOpened - garageLastClosed); 
