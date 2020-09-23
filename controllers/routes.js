@@ -1,9 +1,6 @@
 var options = require('../settings/options.js');
 
-const geoip = require('geoip-lite');
 var sockets = {};
-var personOneAway = false;
-var personTwoAway = false;
 var personOneTime = new Date();
 var personTwoTime = new Date();
 const rebootTime = new Date();
@@ -11,9 +8,6 @@ const rebootTime = new Date();
 module.exports = function(app, logger, io, debugMode, authService, homeAway, bodyParser, iot) {
 	const hue = require('../services/hue.js')(logger);
 	const video = require('../services/video.js')(app, logger, io, hue, sockets);
-	var messenger = require('../services/messenger.js')(logger, debugMode);
-	const rp = require('request-promise');
-
 	var login = require('../settings/login.js');
 
 
@@ -40,10 +34,12 @@ module.exports = function(app, logger, io, debugMode, authService, homeAway, bod
 		}
 
 		if (options.garageGpsEnabledPersonTwo) {
+			var personTwo = true;
+			personTwoTime = homeAway.getPersonTime(personTwo)
 			const timeAway = homeAway.getTimeAway(personTwoTime);
 			io.sockets.emit('personTwoTime', `${timeAway}`);
 			io.sockets.emit('personTwoName', `${login.users[1].name}: `);
-			if (personTwoAway) {
+			if (homeAway.isPersonAway(personTwo)) {
 				io.sockets.emit('personTwoAway', `away`);
 			} else {
 				io.sockets.emit('personTwoAway', 'home');
@@ -51,10 +47,13 @@ module.exports = function(app, logger, io, debugMode, authService, homeAway, bod
 		}
 
 		if (options.garageGpsEnabledPersonOne) {
+			var personTwo = true;
+			personOneTime = homeAway.getPersonTime(personTwo)
 			const timeAway = homeAway.getTimeAway(personOneTime);
 			io.sockets.emit('personOneTime', `${timeAway}`);
 			io.sockets.emit('personOneName', `${login.users[0].name}: `);
-			if (personOneAway) {
+			var personTwo = false;
+			if (homeAway.isPersonAway(personTwo)) {
 				io.sockets.emit('personOneAway', `away`);
 			} else {
 				io.sockets.emit('personOneAway', 'home');

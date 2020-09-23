@@ -13,7 +13,6 @@ module.exports = function(logger, login, messenger, messengerInfo,iot,io) {
 
 		if (isPersonTwo) {
 			iot.setHome(true, true);
-
 			personTwoAway = true;
 			personTwoTime = new Date();
 			const timeAway = getTimeAway(personTwoTime);
@@ -88,13 +87,18 @@ module.exports = function(logger, login, messenger, messengerInfo,iot,io) {
     
     function isPersonAway(two){
         return two ? personTwoAway : personOneAway
-    }
+	}
+	
+	function getPersonTime(two){
+		return two ? personTwoTime : personOneTime
+	}
 
 	return {
         setPersonAway: setPersonAway,
         isPersonAway: isPersonAway,
         setPersonOneHome:setPersonOneHome,
 		setPersonTwoHome:setPersonTwoHome,
-		getTimeAway:getTimeAway
+		getTimeAway:getTimeAway,
+		getPersonTime:getPersonTime
 	};
 };
