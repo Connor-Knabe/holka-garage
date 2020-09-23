@@ -13,7 +13,7 @@ module.exports = function(logger, login, messengerInfo, options, messenger) {
 				}
 			});
 		}
-		if (!user) {
+		if (!user && req.path != '/') {
 			logger.info('unauthorized request for ', req.path);
 		}
 		return user;
