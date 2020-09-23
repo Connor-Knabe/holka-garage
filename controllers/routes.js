@@ -47,7 +47,7 @@ module.exports = function(app, logger, io, debugMode, authService, homeAway, bod
 		}
 
 		if (options.garageGpsEnabledPersonOne) {
-			var personTwo = true;
+			var personTwo = false;
 			personOneTime = homeAway.getPersonTime(personTwo)
 			const timeAway = homeAway.getTimeAway(personOneTime);
 			io.sockets.emit('personOneTime', `${timeAway}`);
