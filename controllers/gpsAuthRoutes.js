@@ -2,7 +2,7 @@ var messengerInfo = require('../settings/messengerInfo.js');
 var options = require('../settings/options.js');
 
 
-module.exports = function(app, logger, iot, messenger, homeAway, bodyParser) {
+module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 	var securityMsgTimeout = null;
 	var shouldSendSecurityAlert = true;
 

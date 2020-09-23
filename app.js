@@ -123,8 +123,8 @@ if (options.enableHueEnergyUsageReport) {
 	app.use('/proxy/hue-energy-usage/health', proxy(hueEnergyUsageHealthOptions));
 }
 
-require('./controllers/routes.js')(app, logger, io, options.debugMode, cron, authService, homeAway, bodyParser);
-require('./controllers/gpsAuthRoutes.js')(app, logger, options.debugMode, messenger, homeAway, bodyParser);
-require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, iot, video, authService, homeAway, proxy, bodyParser);
+require('./controllers/routes.js')(app, logger, io, options.debugMode, authService, homeAway, bodyParser, iot);
+require('./controllers/gpsAuthRoutes.js')(app, logger, messenger, homeAway, bodyParser, iot);
+require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, video, authService, homeAway, proxy, bodyParser, iot);
 
 

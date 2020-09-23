@@ -4,7 +4,7 @@ var basicAuth = require('basic-auth-connect');
 var fs = require('fs');
 var garageOpenStatus = null;
 
-module.exports = function(app, logger, io, hue, messenger, iot, video, authService, homeAway, proxy, bodyParser) {
+module.exports = function(app, logger, io, hue, messenger, video, authService, homeAway, proxy, bodyParser,iot) {
 	var garageErrorStatus = null;
 
 	//requires basic auth for twilio mms
