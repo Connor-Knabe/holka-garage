@@ -5,9 +5,8 @@ var personOneTime = new Date();
 var personTwoTime = new Date();
 const rebootTime = new Date();
 
-module.exports = function(app, logger, io, debugMode, authService, homeAway, bodyParser, iot) {
+module.exports = function(app, logger, io, video, authService, homeAway, bodyParser, iot) {
 	const hue = require('../services/hue.js')(logger);
-	const video = require('../services/video.js')(app, logger, io, hue, sockets);
 	var login = require('../settings/login.js');
 
 
@@ -17,6 +16,7 @@ module.exports = function(app, logger, io, debugMode, authService, homeAway, bod
 
 		socket.on('disconnect', function() {
 			delete sockets[socket.id];
+			
 			hue.garageLightsOffTimed();
 			video.stopStreaming();
 		});

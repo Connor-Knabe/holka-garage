@@ -10,12 +10,15 @@ var needsToConvert = true;
 const options = require('../settings/options.js');
 var garageOpenStatus = null;
 
-module.exports = (app, logger, io, hue, sockets) => {
+module.exports = (app, logger, io, hue) => {
 	const remove = require('./remove.js')(convertProc, logger);
 
 	function stopStreaming() {
 		// no more sockets, kill the stream
-		if (Object.keys(sockets).length === 0 && !app.get('takingVideo')) {
+		var srvSockets = io.sockets.sockets;
+		var connectedClients = Object.keys(srvSockets).length;
+
+		if (connectedClients === 0 && !app.get('takingVideo')) {
 			app.set('cameraOn', false);
 			if (raspistillProc) raspistillProc.kill();
 			fs.unwatchFile('./stream/image_stream.jpg');

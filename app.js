@@ -4,6 +4,7 @@ var app = express();
 // @ts-ignore
 var http = require('http').Server(app);
 var https = require('https');
+
 const { constants } = require('crypto');
 var bodyParser = require('body-parser');
 var cron = require('cron').CronJob;
@@ -15,22 +16,28 @@ var cookieParser = require('cookie-parser');
 const proxy = require('http-proxy-middleware');
 const fs = require('fs');
 var log4js = require('log4js');
-
 var logger = log4js.getLogger();
-
-var sockets = {};
 
 const login = require('./settings/login.js');
 const options = require('./settings/options.js');
 
+var httpsServer = https.createServer(
+	{
+		secureOptions: constants.SSL_OP_NO_TLSv1 | constants.SSL_OP_NO_TLSv1_1,
+		key: fs.readFileSync(login.sslPath + 'privkey.pem'),
+		cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
+	},
+	app
+);
+var io = require('socket.io')(httpsServer);
 
 const hue = require('./services/hue.js')(logger);
 
 
-const video = require('./services/video.js')(app, logger, io, hue, sockets);
+const video = require('./services/video.js')(app, logger, io, hue);
 var messenger = require('./services/messenger.js')(logger, options.debugMode);
 
-var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron, sockets);
+var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron);
 
 
 
@@ -66,15 +73,7 @@ var nestEnergyUsageIftttOptions = {
 	}
 };
 
-var httpsServer = https.createServer(
-	{
-		secureOptions: constants.SSL_OP_NO_TLSv1 | constants.SSL_OP_NO_TLSv1_1,
-		key: fs.readFileSync(login.sslPath + 'privkey.pem'),
-		cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
-	},
-	app
-);
-var io = require('socket.io')(httpsServer);
+
 
 app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -126,7 +125,7 @@ if (options.enableHueEnergyUsageReport) {
 	app.use('/proxy/hue-energy-usage/health', proxy(hueEnergyUsageHealthOptions));
 }
 
-require('./controllers/routes.js')(app, logger, io, options.debugMode, authService, homeAway, bodyParser, iot);
+require('./controllers/routes.js')(app, logger, io, video, authService, homeAway, bodyParser, iot);
 require('./controllers/gpsAuthRoutes.js')(app, logger, messenger, homeAway, bodyParser, iot);
 require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, video, authService, homeAway, proxy, bodyParser, iot);
 
