@@ -20,7 +20,7 @@ var motionSensorTimeoutOne = null,
 	garageLastOpenedTime = null,
 	garageLastClosedTime = null;
 
-module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron) {
+module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron, sockets) {
 	var hasBeenOpened = garageIsOpen();
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const options = require('../settings/options.js');

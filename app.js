@@ -30,7 +30,7 @@ const hue = require('./services/hue.js')(logger);
 const video = require('./services/video.js')(app, logger, io, hue, sockets);
 var messenger = require('./services/messenger.js')(logger, options.debugMode);
 
-var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron);
+var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron, sockets);
 
 
 
