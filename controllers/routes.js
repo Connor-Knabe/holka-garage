@@ -18,16 +18,6 @@ module.exports = function(app, logger, io, debugMode, cron, authService, homeAwa
 	var login = require('../settings/login.js');
 
 
-	function isValidLogin(username, password) {
-		var user = null;
-		login.users.forEach((userLogin) => {
-			if (userLogin.username.toLowerCase() === username.toLowerCase() && userLogin.password === password) {
-				user = userLogin;
-			}
-		});
-		return user;
-	}
-
 	io.on('connection', function(socket) {
 		sockets[socket.id] = socket;
 		io.sockets.emit('clients', Object.keys(sockets).length);
@@ -140,4 +130,15 @@ module.exports = function(app, logger, io, debugMode, cron, authService, homeAwa
 	app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey3.split('.')[0], function(req, res) {
 		res.send(login.acmeChallengeKey3);
 	});
+
+	function isValidLogin(username, password) {
+		var user = null;
+		login.users.forEach((userLogin) => {
+			if (userLogin.username.toLowerCase() === username.toLowerCase() && userLogin.password === password) {
+				user = userLogin;
+			}
+		});
+		return user;
+	}
+
 };
