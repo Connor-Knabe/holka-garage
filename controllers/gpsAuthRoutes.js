@@ -63,7 +63,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 
 		logger.debug(`open garage via gps ${gpsPerson}`);
 
-		if (req.body && req.body.includes(gpsOpenKey)) {
+		if (req.body && typeof req.body == "string" && req.body.includes(gpsOpenKey)) {
 			if (options.garageGpsEnabledMain) {
 				iot.garageDoorOpenHandler(two, gpsPerson, req.connection.remoteAddress);
 			} else {
@@ -103,7 +103,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		const isPersonTwo = false;
 		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
-		if (req.body && req.body.includes(gpsKey)) {
+		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
 			homeAway.setPersonAway(req, res, isPersonTwo);
 		} else {
 			logger.error(`malformed request for ${personText}Away or wrong key`);
@@ -118,7 +118,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
 
-		if (req.body && req.body.includes(gpsKey)) {
+		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
 			homeAway.setPersonAway(req, res, isPersonTwo);
 		} else {
 			logger.error(`malformed request for ${personText}Away or wrong key`);
