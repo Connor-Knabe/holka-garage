@@ -20,6 +20,8 @@ var logger = log4js.getLogger();
 
 const login = require('./settings/login.js');
 const options = require('./settings/options.js');
+var sockets = {};
+
 
 var httpsServer = https.createServer(
 	{
@@ -34,7 +36,7 @@ var io = require('socket.io')(httpsServer);
 const hue = require('./services/hue.js')(logger);
 
 
-const video = require('./services/video.js')(app, logger, io, hue);
+const video = require('./services/video.js')(app, logger, io, hue, sockets);
 var messenger = require('./services/messenger.js')(logger, options.debugMode);
 
 var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron);
@@ -125,7 +127,7 @@ if (options.enableHueEnergyUsageReport) {
 	app.use('/proxy/hue-energy-usage/health', proxy(hueEnergyUsageHealthOptions));
 }
 
-require('./controllers/routes.js')(app, logger, io, video, authService, homeAway, bodyParser, iot);
+require('./controllers/routes.js')(app, logger, io, video, authService, homeAway, bodyParser, iot, sockets);
 require('./controllers/gpsAuthRoutes.js')(app, logger, messenger, homeAway, bodyParser, iot);
 require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, video, authService, homeAway, proxy, bodyParser, iot);
 
