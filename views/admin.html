@@ -228,8 +228,8 @@
                     var garageLastOpened = new Date($("#garageLastOpenedTime").text());
                     var garageLastClosed = new Date(status);
 
-                    var timeOpened = (garageLastOpened - garageLastClosed); 
-                    var timeOpened = Math.round((dif/1000)/60); 
+                    var diff = (garageLastClosed - garageLastOpened); 
+                    var timeOpened = Math.round((diff/1000)/60); 
                     $("#garageTimeOpened").text(timeOpened + " mins");
 
                 }

@@ -38,7 +38,11 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
 				io.sockets.emit('garageOpenStatus', 'Video sent');
 			})
-			.catch(() => {});
+			.catch(() => {
+
+				io.sockets.emit('garageOpenStatus', 'Video failed to send');
+
+			});
 		res.send('Ok');
 	});
 
