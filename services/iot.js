@@ -259,7 +259,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	function toggleTemporaryDisableGarageStillOpenAlert(){
-		if(tempGarageDisableStillOpenAlertTimeout){
+		if(temporaryDisableGarageStillOpenAlert){
 			temporaryDisableGarageStillOpenAlert = false;
 			clearTimeout(tempGarageDisableStillOpenAlertTimeout);
 		} else {
