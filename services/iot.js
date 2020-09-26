@@ -20,7 +20,8 @@ var motionSensorTimeoutOne = null,
 	garageLastOpenedTime = null,
 	garageLastClosedTime = null,
 	temporaryDisableGarageStillOpenAlert = false,
-	tempGarageDisableStillOpenAlertTimeout = null;
+	tempGarageDisableStillOpenAlertTimeout = null,
+	temporaryDisableGarageStillOpenAlertTime = null;
 
 module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron) {
 	var hasBeenOpened = garageIsOpen();
@@ -253,7 +254,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	function getTemporaryDisableGarageStillOpenAlertStatus(){
-		return temporaryDisableGarageStillOpenAlert
+		var status = temporaryDisableGarageStillOpenAlert ? `Still Open Alert Disabled unitl ${temporaryDisableGarageStillOpenAlertTime.toLocaleTimeString()}` : 'Still Open Alert Enabled';
+		return status
 	}
 
 	function toggleTemporaryDisableGarageStillOpenAlert(){
@@ -262,12 +264,14 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			clearTimeout(tempGarageDisableStillOpenAlertTimeout);
 		} else {
 			temporaryDisableGarageStillOpenAlert = true;
+			temporaryDisableGarageStillOpenAlertTime = new Date().setHours(new Date().getHours() + 4);
+
 			tempGarageDisableStillOpenAlertTimeout = setTimeout(()=>{
 				temporaryDisableGarageStillOpenAlert = false;
-			},3*60*60*1000)
+			},options.garageStillOpenAlertDisableForHours*60*60*1000)
 		}
 
-		return temporaryDisableGarageStillOpenAlert;
+		return getTemporaryDisableGarageStillOpenAlertStatus();
 	}
 
 	//cron
