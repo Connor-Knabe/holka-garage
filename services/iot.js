@@ -270,8 +270,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 				temporaryDisableGarageStillOpenAlert = false;
 			},options.garageStillOpenAlertDisableForHours*60*60*1000)
 		}
-
-		return getTemporaryDisableGarageStillOpenAlertStatus();
 	}
 
 	//cron
