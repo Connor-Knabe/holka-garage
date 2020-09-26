@@ -33,7 +33,7 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		}
 
 		var garageStillOpenAlertStatus = iot.getTemporaryDisableGarageStillOpenAlertStatus() ? "Disabled" : "Enabled";
-		garageStillOpenAlertStatus = `Garage Open Alert ${garageStillOpenAlertStatus}`
+		garageStillOpenAlertStatus = `Still Open Alert ${garageStillOpenAlertStatus}`
 		io.sockets.emit('toggleGarageStillOpenAlert', garageStillOpenAlertStatus);
 
 

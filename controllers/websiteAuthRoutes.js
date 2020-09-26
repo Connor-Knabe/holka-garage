@@ -49,7 +49,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 	app.post('/toggleGarageStillOpenAlert', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var isDisabled = iot.toggleTemporaryDisableGarageStillOpenAlert();
 		var statusText = isDisabled ? "Disabled" : "Enabled";
-		statusText = `Garage Open Alert ${statusText}`
+		statusText = `Still Open Alert ${statusText}`
 		res.send(statusText);
 	});
 
