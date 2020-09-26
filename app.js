@@ -22,6 +22,12 @@ const login = require('./settings/login.js');
 const options = require('./settings/options.js');
 var sockets = {};
 
+process.argv.forEach((val, index, array)=> {
+	if(array[2]=='debug'){
+		options.debugMode = true;
+		logger.debug("debug enabled");
+	}
+});
 
 var httpsServer = https.createServer(
 	{
