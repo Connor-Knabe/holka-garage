@@ -224,17 +224,13 @@
                 $("#garageLastClosedTime").text(new Date(status).toLocaleString());
 
                 if($("#garageLastOpenedTime").text() != "Unknown"){
-
                     var garageLastOpened = new Date($("#garageLastOpenedTime").text());
                     var garageLastClosed = new Date(status);
 
                     var diff = (garageLastClosed - garageLastOpened); 
                     var timeOpened = Math.round((diff/1000)/60); 
                     $("#garageTimeOpened").text(timeOpened + " mins");
-
                 }
-
-
             } else {
                 $("#garageLastClosedTime").text("Unknown");
             }
