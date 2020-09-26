@@ -264,11 +264,13 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			clearTimeout(tempGarageDisableStillOpenAlertTimeout);
 		} else {
 			temporaryDisableGarageStillOpenAlert = true;
-			temporaryDisableGarageStillOpenAlertTime = new Date(new Date().setHours(new Date().getHours() + 4));
+			temporaryDisableGarageStillOpenAlertTime = new Date(new Date().setHours(new Date().getHours() + options.garageStillOpenAlertDisableForHours));
 			tempGarageDisableStillOpenAlertTimeout = setTimeout(()=>{
 				temporaryDisableGarageStillOpenAlert = false;
 			},options.garageStillOpenAlertDisableForHours*60*60*1000)
 		}
+
+		return getTemporaryDisableGarageStillOpenAlertStatus();
 	}
 
 	//cron
