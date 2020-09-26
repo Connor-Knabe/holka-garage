@@ -63,6 +63,18 @@ $(document).ready(function() {
 		});
 	});
 
+	$('#toggleGarageStillOpenAlert').click(function(e) {
+		e.preventDefault();
+		$.ajax({
+			type: 'POST',
+			url: '/toggleGarageStillOpenAlert',
+			success: function(result) {
+				$('#toggleGarageStillOpenAlert').text(result);
+			}
+		});
+	});
+
+
 	$('#gps').click(function(e) {
 		e.preventDefault();
 		$('#gps').attr('disabled', 'disabled');

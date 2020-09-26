@@ -1,3 +1,5 @@
+v2.4.1 - adding garage door opened for time
+v2.4.0 - major refactor of auth routes
 v2.3.0 - fixing security vulnerabilites with unsecured routes
 v2.2.0 - adding cron to check for away every hour
 v2.1.1 - using home/away to alert if garage opened when no one home

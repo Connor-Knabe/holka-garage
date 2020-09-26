@@ -18,7 +18,9 @@ var motionSensorTimeoutOne = null,
 	personOneShouldOpenTimerTimeout = null,
 	personTwoShouldOpenTimerTimeout = null,
 	garageLastOpenedTime = null,
-	garageLastClosedTime = null;
+	garageLastClosedTime = null,
+	temporaryDisableGarageStillOpenAlert = false,
+	tempGarageDisableStillOpenAlertTimeout = null;
 
 module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron) {
 	var hasBeenOpened = garageIsOpen();
@@ -55,6 +57,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			logger.debug(msg);
 			io.sockets.emit('garageErrorStatus', null);
 		} else if (value == 0 && hasBeenOpened) {
+			clearTimeout(tempGarageDisableStillOpenAlertTimeout);
+			temporaryDisableGarageStillOpenAlert = false;
 			io.sockets.emit('garageStatus', 'closed');
 
 			hasBeenOpened = false;
@@ -119,7 +123,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	function garageAlertOpenCheck(timeUntilAlert, timeOut, shouldCall) {
 		clearTimeout(timeOut);
 		timeOut = setTimeout(() => {
-			if (garageIsOpen()) {
+			if (garageIsOpen() && !temporaryDisableGarageStillOpenAlert) {
 				setTimeout(() => {
 					garageAlert(timeUntilAlert, shouldCall);
 				}, 45 * 1000);
@@ -248,6 +252,24 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		return garageLastClosedTime;
 	}
 
+	function getTemporaryDisableGarageStillOpenAlertStatus(){
+		return temporaryDisableGarageStillOpenAlert
+	}
+
+	function toggleTemporaryDisableGarageStillOpenAlert(){
+		if(tempGarageDisableStillOpenAlertTimeout){
+			temporaryDisableGarageStillOpenAlert = false;
+			clearTimeout(tempGarageDisableStillOpenAlertTimeout);
+		} else {
+			temporaryDisableGarageStillOpenAlert = true;
+			tempGarageDisableStillOpenAlertTimeout = setTimeout(()=>{
+				temporaryDisableGarageStillOpenAlert = false;
+			},3*60*60*1000)
+		}
+
+		return temporaryDisableGarageStillOpenAlert;
+	}
+
 	//cron
 	var job = new cron(
 		'5 * * * *',
@@ -271,6 +293,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		openCloseGarageDoor: openCloseGarageDoor,
 		setHome: setHome,
 		getGarageLastOpenedTime: getGarageLastOpenedTime,
-		getGarageLastClosedTime:getGarageLastClosedTime
+		getGarageLastClosedTime:getGarageLastClosedTime,
+		toggleTemporaryDisableGarageStillOpenAlert:toggleTemporaryDisableGarageStillOpenAlert,
+		getTemporaryDisableGarageStillOpenAlertStatus:getTemporaryDisableGarageStillOpenAlertStatus
 	};
 };

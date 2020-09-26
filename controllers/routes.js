@@ -32,6 +32,11 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 			io.sockets.emit('garageGPSStatus', 'disabled');
 		}
 
+		var garageStillOpenAlertStatus = iot.getTemporaryDisableGarageStillOpenAlertStatus() ? "Disabled" : "Enabled";
+		garageStillOpenAlertStatus = `Garage Open Alert ${garageStillOpenAlertStatus}`
+		io.sockets.emit('toggleGarageStillOpenAlert', garageStillOpenAlertStatus);
+
+
 		if (options.garageGpsEnabledPersonTwo) {
 			var personTwo = true;
 			personTwoTime = homeAway.getPersonTime(personTwo)
