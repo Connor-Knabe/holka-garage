@@ -264,8 +264,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			clearTimeout(tempGarageDisableStillOpenAlertTimeout);
 		} else {
 			temporaryDisableGarageStillOpenAlert = true;
-			temporaryDisableGarageStillOpenAlertTime = new Date().setHours(new Date().getHours() + 4);
-
+			temporaryDisableGarageStillOpenAlertTime = new Date(new Date().setHours(new Date().getHours() + 4));
 			tempGarageDisableStillOpenAlertTimeout = setTimeout(()=>{
 				temporaryDisableGarageStillOpenAlert = false;
 			},options.garageStillOpenAlertDisableForHours*60*60*1000)
