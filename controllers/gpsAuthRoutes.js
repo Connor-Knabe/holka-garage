@@ -105,6 +105,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
 		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
 			homeAway.setPersonAway(req, res, isPersonTwo);
+			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 		} else {
 			logger.error(`malformed request for ${personText}Away or wrong key`);
 			res.status(401);
@@ -120,6 +121,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 
 		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
 			homeAway.setPersonAway(req, res, isPersonTwo);
+			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 		} else {
 			logger.error(`malformed request for ${personText}Away or wrong key`);
 			res.status(401);

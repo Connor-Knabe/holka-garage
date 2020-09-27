@@ -18,8 +18,11 @@ const fs = require('fs');
 var log4js = require('log4js');
 var logger = log4js.getLogger();
 
+//settings
 const login = require('./settings/login.js');
 const options = require('./settings/options.js');
+const messengerInfo = require('./settings/messengerInfo.js');
+
 var sockets = {};
 
 process.argv.forEach((val, index, array)=> {
@@ -45,15 +48,12 @@ const hue = require('./services/hue.js')(logger);
 const video = require('./services/video.js')(app, logger, io, hue, sockets);
 var messenger = require('./services/messenger.js')(logger, options.debugMode);
 
-var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron);
 
+const homeAway = require('./services/homeAway.js')(logger, login, messenger,messengerInfo, io)
+var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron, homeAway);
 
-
-const messengerInfo = require('./settings/messengerInfo.js');
 
 const authService = require('./services/auth.js')(logger, login, messengerInfo, options, messenger);
-
-
 
 app.use(helmet());
 app.use(cookieParser());
@@ -122,8 +122,6 @@ if (options.debugMode) {
 	logger.debug('In debug mode not sending texts or opening garage!!!');
 	logger.debug('___________________________________');
 }
-
-const homeAway = require('./services/homeAway.js')(logger, login, messenger,messengerInfo, iot, io)
 
 if (options.enableNestEnergyUsageReport) {
 	app.use('/proxy/nest-energy-usage/ifttt', proxy(nestEnergyUsageIftttOptions));

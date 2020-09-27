@@ -23,7 +23,7 @@ var motionSensorTimeoutOne = null,
 	shouldAlertTimeoutOne = null,
 	shouldAlertTimeoutTwo = null;
 
-module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron,homeAway) {
+module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron, homeAway) {
 	var hasBeenOpened = garageIsOpen();
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const options = require('../settings/options.js');
@@ -241,14 +241,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		}
 	}
 
-	function setHome(personTwo, setAway) {
-		if (personTwo) {
-			homeAway.Status.personTwoAway = setAway;
-		} else {
-			homeAway.Status.personOneAway = setAway;
-		}
-	}
-
 	function getGarageLastOpenedTime() {
 		return garageLastOpenedTime;
 	}
@@ -298,7 +290,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		activateGarageGpsOpenAwayTimer: activateGarageGpsOpenAwayTimer,
 		garageDoorOpenHandler: garageDoorOpenHandler,
 		openCloseGarageDoor: openCloseGarageDoor,
-		setHome: setHome,
 		getGarageLastOpenedTime: getGarageLastOpenedTime,
 		getGarageLastClosedTime:getGarageLastClosedTime,
 		toggleTemporaryDisableGarageStillOpenAlert:toggleTemporaryDisableGarageStillOpenAlert,

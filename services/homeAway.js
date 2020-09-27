@@ -9,7 +9,7 @@ var Status = {
 	isHome: ()=>{return !Status.personOneAway || !Status.personTwoAway}
 };
 
-module.exports = function(logger, login, messenger, messengerInfo, iot, io) {
+module.exports = function(logger, login, messenger, messengerInfo, io) {
 	function setPersonAway(req, res, isPersonTwo) {
         var personName = isPersonTwo ? login.users[1].name : login.users[0].name;
         var personText = isPersonTwo ? 'personTwo' : 'personOne';
@@ -33,7 +33,6 @@ module.exports = function(logger, login, messenger, messengerInfo, iot, io) {
 			messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
 		}
 
-		iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 		logger.debug(`Garage set to away via ${personText}`);
 		messenger.sendGenericIfttt(`${personName} Set to Away`);
 		res.send('Ok');
@@ -65,7 +64,6 @@ module.exports = function(logger, login, messenger, messengerInfo, iot, io) {
 
     //need to refactor these into one function 
 	function setPersonOneHome() {
-		iot.setHome(false, false);
 		Status.personOneAway = false;
 		Status.personOneTime = new Date();
 		io.sockets.emit('personOneAway', 'home');
@@ -76,7 +74,6 @@ module.exports = function(logger, login, messenger, messengerInfo, iot, io) {
 	}
 
 	function setPersonTwoHome() {
-		iot.setHome(true, false);
 		Status.personTwoAway = false;
 		Status.personTwoTime = new Date();
 		io.sockets.emit('personTwoAway', 'home');

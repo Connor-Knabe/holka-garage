@@ -146,6 +146,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		} else {
 			const isPersonTwo = false;
 			homeAway.setPersonAway(req, res, isPersonTwo);
+			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 		}
 	});
 
@@ -156,6 +157,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		} else {
 			const isPersonTwo = true;
 			homeAway.setPersonAway(req, res, isPersonTwo);
+			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 		}
 	});
 
