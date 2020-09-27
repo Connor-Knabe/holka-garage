@@ -9,8 +9,6 @@ var motionSensorTimeoutOne = null,
 	hasTurnedLightsOn = false,
 	garageOpenAlertOneTimeout = null,
 	garageOpenAlertTwoTimeout = null,
-	personOneAway = false,
-	personTwoAway = false,
 	expectedGarageOpen = false,
 	manualGarageOpenTimeout = null,
 	personOneShouldOpenTimer = false,
@@ -21,9 +19,11 @@ var motionSensorTimeoutOne = null,
 	garageLastClosedTime = null,
 	temporaryDisableGarageStillOpenAlert = false,
 	tempGarageDisableStillOpenAlertTimeout = null,
-	temporaryDisableGarageStillOpenAlertTime = null;
+	temporaryDisableGarageStillOpenAlertTime = null,
+	shouldAlertTimeoutOne = null,
+	shouldAlertTimeoutTwo = null;
 
-module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron) {
+module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron,homeAway) {
 	var hasBeenOpened = garageIsOpen();
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const options = require('../settings/options.js');
@@ -51,9 +51,11 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			logger.debug('garage open');
 
 			garageAlertOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
-			setTimeout(() => {
+			clearTimeout(shouldAlertTimeoutOne)
+			clearTimeout(shouldAlertTimeoutTwo)
+			shouldAlertTimeoutOne = setTimeout(() => {
 				shouldAlertHomeOwners('opened');
-			}, 2 * 1000);
+			}, 30 * 1000);
 
 			logger.debug(msg);
 			io.sockets.emit('garageErrorStatus', null);
@@ -69,9 +71,11 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			var msg = 'Garage door closed';
 			clearTimeout(garageOpenAlertOneTimeout);
 			clearTimeout(garageOpenAlertTwoTimeout);
-			setTimeout(() => {
+			clearTimeout(shouldAlertTimeoutOne)
+			clearTimeout(shouldAlertTimeoutTwo)
+			shouldAlertTimeoutTwo = setTimeout(() => {
 				shouldAlertHomeOwners('closed');
-			}, 2 * 1000);
+			}, 30 * 1000);
 
 			logger.debug(msg);
 			io.sockets.emit('garageErrorStatus', null);
@@ -100,9 +104,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	function shouldAlertHomeOwners(status) {
-		logger.debug(`possibly alert home owners not home? expectedGarageOpen${expectedGarageOpen} | personOneAway && personTwoAway ${personOneAway} && ${personTwoAway}`);
+		logger.debug(`possibly alert home owners not home? expectedGarageOpen${expectedGarageOpen} | homeAway.Status.personOneAway && homeAway.Status.personTwoAway ${homeAway.Status.personOneAway} && ${homeAway.Status.personTwoAway}`);
 		if (!expectedGarageOpen) {
-			if (personOneAway && personTwoAway) {
+			if (homeAway.Status.personOneAway && homeAway.Status.personTwoAway) {
 				var sendPictureText = true;
 				video
 					.streamVideo()
@@ -239,9 +243,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	function setHome(personTwo, setAway) {
 		if (personTwo) {
-			personTwoAway = setAway;
+			homeAway.Status.personTwoAway = setAway;
 		} else {
-			personOneAway = setAway;
+			homeAway.Status.personOneAway = setAway;
 		}
 	}
 
@@ -277,7 +281,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	var job = new cron(
 		'5 * * * *',
 		function() {
-			if (personOneAway && personTwoAway) {
+			if (homeAway.getIsHome()) {
 				//turn off specific iot devices that may be on a schedule to turn on at top of the hour
 				messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAway2Url);
 			}

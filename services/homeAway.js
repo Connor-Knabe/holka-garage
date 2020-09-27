@@ -1,7 +1,13 @@
-var personOneAway = false;
-var personTwoAway = false;
-var personOneTime = new Date();
-var personTwoTime = new Date();
+const { iftttGarageSetHomeUrl } = require("../settings/messengerInfoExample");
+
+var Status = {
+	personOneAway: false,
+	personTwoAway: false,
+	personOneTime: new Date(),
+	personTwoTime: new Date(),
+	homeManualEnable: false,
+	isHome: ()=>{return !Status.personOneAway || !Status.personTwoAway}
+};
 
 module.exports = function(logger, login, messenger, messengerInfo, iot, io) {
 	function setPersonAway(req, res, isPersonTwo) {
@@ -9,22 +15,20 @@ module.exports = function(logger, login, messenger, messengerInfo, iot, io) {
         var personText = isPersonTwo ? 'personTwo' : 'personOne';
 
 		if (isPersonTwo) {
-			iot.setHome(true, true);
-			personTwoAway = true;
-			personTwoTime = new Date();
-			const timeAway = getTimeAway(personTwoTime);
+			Status.personTwoAway = true;
+			Status.personTwoTime = new Date();
+			const timeAway = getTimeAway(Status.personTwoTime);
 			io.sockets.emit('personTwoTime', `${timeAway}`);
 			io.sockets.emit('personTwoAway', 'away');
 		} else {
-			iot.setHome(false, true);
-			personOneAway = true;
-			personOneTime = new Date();
-			const timeAway = getTimeAway(personOneTime);
+			Status.personOneAway = true;
+			Status.personOneTime = new Date();
+			const timeAway = getTimeAway(Status.personOneTime);
 			io.sockets.emit('personOneTime', `${timeAway}`);
 			io.sockets.emit('personOneAway', 'away');
 		}
 
-		if (personOneAway && personTwoAway) {
+		if (!Status.getIsHome()) {
 			messenger.sendGenericIfttt(`Home going to sleep as both home owners are away`);
 			messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
 		}
@@ -62,10 +66,10 @@ module.exports = function(logger, login, messenger, messengerInfo, iot, io) {
     //need to refactor these into one function 
 	function setPersonOneHome() {
 		iot.setHome(false, false);
-		personOneAway = false;
-		personOneTime = new Date();
+		Status.personOneAway = false;
+		Status.personOneTime = new Date();
 		io.sockets.emit('personOneAway', 'home');
-		const timeAway = getTimeAway(personOneTime);
+		const timeAway = getTimeAway(Status.personOneTime);
 		io.sockets.emit('personOneTime', `${timeAway}`);
 		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 		messenger.sendGenericIfttt(`${login.users[0].name} Set to Home`);
@@ -73,21 +77,27 @@ module.exports = function(logger, login, messenger, messengerInfo, iot, io) {
 
 	function setPersonTwoHome() {
 		iot.setHome(true, false);
-		personTwoAway = false;
-		personTwoTime = new Date();
+		Status.personTwoAway = false;
+		Status.personTwoTime = new Date();
 		io.sockets.emit('personTwoAway', 'home');
-		const timeAway = getTimeAway(personOneTime);
+		const timeAway = getTimeAway(Status.personOneTime);
 		io.sockets.emit('personTwoTime', `${timeAway}`);
 		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 		messenger.sendGenericIfttt(`${login.users[1].name} Set to Home`);
     }
     
     function isPersonAway(two){
-        return two ? personTwoAway : personOneAway
+        return two ? Status.personTwoAway : Status.personOneAway
 	}
 	
 	function getPersonTime(two){
-		return two ? personTwoTime : personOneTime
+		return two ? Status.personTwoTime : Status.personOneTime
+	}
+
+
+
+	function toggleIsHomeManualEnable(){
+		Status.isHome = Status.isHome ? false : true;
 	}
 
 	return {
@@ -96,6 +106,7 @@ module.exports = function(logger, login, messenger, messengerInfo, iot, io) {
         setPersonOneHome:setPersonOneHome,
 		setPersonTwoHome:setPersonTwoHome,
 		getTimeAway:getTimeAway,
-		getPersonTime:getPersonTime
+		getPersonTime:getPersonTime,
+		toggleIsHomeManualEnable: toggleIsHomeManualEnable
 	};
 };

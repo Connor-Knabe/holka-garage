@@ -1,3 +1,5 @@
+v2.4.3 - refactoring homeAway to move all logic there instead of some in iot.js
+v2.4.2 - adding button to disable garage door still open alert
 v2.4.1 - adding garage door opened for time
 v2.4.0 - major refactor of auth routes
 v2.3.0 - fixing security vulnerabilites with unsecured routes
