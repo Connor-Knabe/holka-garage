@@ -28,7 +28,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 			io.sockets.emit('personOneAway', 'away');
 		}
 
-		if (!Status.getIsHome()) {
+		if (!Status.isHome()) {
 			messenger.sendGenericIfttt(`Home going to sleep as both home owners are away`);
 			messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
 		}
@@ -94,7 +94,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 
 
 	function toggleIsHomeManualEnable(){
-		Status.isHome = Status.isHome ? false : true;
+		Status.homeManualEnable = Status.homeManualEnable ? false : true;
 	}
 
 	return {
