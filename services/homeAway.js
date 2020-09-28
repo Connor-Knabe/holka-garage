@@ -104,6 +104,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 		setPersonTwoHome:setPersonTwoHome,
 		getTimeAway:getTimeAway,
 		getPersonTime:getPersonTime,
-		toggleIsHomeManualEnable: toggleIsHomeManualEnable
+		toggleIsHomeManualEnable: toggleIsHomeManualEnable,
+		Status:Status
 	};
 };
