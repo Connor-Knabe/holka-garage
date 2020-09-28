@@ -14,7 +14,7 @@ module.exports = function(logger, login, messengerInfo, options, messenger) {
 			});
 		}
 		if (!user && req.path != '/') {
-			logger.info('unauthorized request for ', req.path);
+			logger.info(`Unauthorized request for ${req.path} from ip:${req.connection.remoteAddress}`);
 		}
 		return user;
 	}
