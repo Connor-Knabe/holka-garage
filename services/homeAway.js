@@ -6,7 +6,7 @@ var Status = {
 	personOneTime: new Date(),
 	personTwoTime: new Date(),
 	homeManualEnable: false,
-	isHome: ()=>{return !Status.personOneAway || !Status.personTwoAway}
+	isAway: ()=>{return Status.personOneAway && Status.personTwoAway}
 };
 
 module.exports = function(logger, login, messenger, messengerInfo, io) {
@@ -28,7 +28,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 			io.sockets.emit('personOneAway', 'away');
 		}
 
-		if (!Status.isHome()) {
+		if (Status.isAway()) {
 			messenger.sendGenericIfttt(`Home going to sleep as both home owners are away`);
 			messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
 		}

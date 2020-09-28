@@ -273,7 +273,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	var job = new cron(
 		'5 * * * *',
 		function() {
-			if (homeAway.Status.isHome()) {
+			if (homeAway.Status.isAway()) {
 				//turn off specific iot devices that may be on a schedule to turn on at top of the hour
 				messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAway2Url);
 			}
