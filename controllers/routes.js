@@ -33,6 +33,8 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		}
 
 		io.sockets.emit('toggleGarageStillOpenAlert', iot.getTemporaryDisableGarageStillOpenAlertStatus());
+		io.sockets.emit('toggleGuestIsHome', iot.getTemporaryGuestIsHomeStatus());
+
 		io.sockets.emit('garageLightStatus', null);
 
 

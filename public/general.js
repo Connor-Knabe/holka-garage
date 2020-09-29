@@ -74,6 +74,19 @@ $(document).ready(function() {
 		});
 	});
 
+	$('#toggleGuestIsHome').click(function(e) {
+		e.preventDefault();
+		$.ajax({
+			type: 'POST',
+			url: '/toggleGuestIsHome',
+			success: function(result) {
+				$('#toggleGuestIsHome').text(result);
+			}
+		});
+	});
+
+	
+
 
 	$('#gps').click(function(e) {
 		e.preventDefault();

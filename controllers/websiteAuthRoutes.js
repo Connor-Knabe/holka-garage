@@ -47,8 +47,11 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 	});
 
 	app.post('/toggleGarageStillOpenAlert', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		;
 		res.send(iot.toggleTemporaryDisableGarageStillOpenAlert());
+	});
+
+	app.post('/toggleGuestIsHome', bodyParser.urlencoded({ extended: false }), function(req, res) {
+		res.send(iot.toggleTemporaryEnableGuestIsHome());
 	});
 
 	app.post('/gpsToggle', bodyParser.urlencoded({ extended: false }), function(req, res) {

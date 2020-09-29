@@ -29,8 +29,12 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 		}
 
 		if (Status.isAway()) {
-			messenger.sendGenericIfttt(`Home going to sleep as both home owners are away`);
-			messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
+			if(Status.homeManualEnable){
+				messenger.sendGenericIfttt(`Home NOT going to sleep as guest is home`);
+			} else {
+				messenger.sendGenericIfttt(`Home going to sleep as both home owners are away`);
+				messenger.sendIftt(null, 'set away', messengerInfo.iftttGarageSetAwayUrl);
+			}
 		}
 
 		logger.debug(`Garage set to away via ${personText}`);
@@ -91,12 +95,6 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 		return two ? Status.personTwoTime : Status.personOneTime
 	}
 
-
-
-	function toggleIsHomeManualEnable(){
-		Status.homeManualEnable = Status.homeManualEnable ? false : true;
-	}
-
 	return {
         setPersonAway: setPersonAway,
         isPersonAway: isPersonAway,
@@ -104,7 +102,6 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 		setPersonTwoHome:setPersonTwoHome,
 		getTimeAway:getTimeAway,
 		getPersonTime:getPersonTime,
-		toggleIsHomeManualEnable: toggleIsHomeManualEnable,
 		Status:Status
 	};
 };

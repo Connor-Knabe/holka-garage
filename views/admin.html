@@ -189,6 +189,13 @@
             }
         });
         
+        socket.on('toggleGuestIsHome', function (status) {
+            if (status) {
+                $("#toggleGuestIsHome").text(status);
+                $("#toggleGuestIsHome").show();
+            }
+        });
+        
 
         socket.on('garageStatus', function (status) {
             if (status) {
@@ -323,6 +330,8 @@
 
 		<br>
         <button type="button" class="btn btn-info" id="toggleGarageStillOpenAlert">Still Open Alert Enabled</button>
+        <br>
+        <button type="button" class="btn btn-info" id="toggleGuestIsHome">Guest Is Home Disabled</button>
 
         <h1 class="text-center">
         GPS auto open is: <div class="garageStatus" id="garageGPSStatus" style="color:green"></div>

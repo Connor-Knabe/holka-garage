@@ -28,4 +28,5 @@ module.exports.garageGpsEnabledPersonOne = true;
 module.exports.garageGpsEnabledPersonTwo = true;
 module.exports.minsToWaitAfterLeavingHouseForGPSOpen = 15;
 module.exports.garageStillOpenAlertDisableForHours = 3;
+module.exports.guestIsHomeEnableForHours = 5;
 

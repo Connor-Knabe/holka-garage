@@ -20,6 +20,9 @@ var motionSensorTimeoutOne = null,
 	temporaryDisableGarageStillOpenAlert = false,
 	tempGarageDisableStillOpenAlertTimeout = null,
 	temporaryDisableGarageStillOpenAlertTime = null,
+	temporaryEnableGuestIsHome = false,
+	temporaryEnableGuestIsHomeTimeout = null,
+	temporaryEnableGuestIsHomeTime = null,
 	shouldAlertTimeoutOne = null,
 	shouldAlertTimeoutTwo = null;
 
@@ -249,8 +252,31 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		return garageLastClosedTime;
 	}
 
+	//clean up these two functions 
+	function getTemporaryGuestIsHomeStatus(){
+		var status = temporaryEnableGuestIsHome ? `Guest Is Home Disabled` : `Guest Is Home Enabled until ${temporaryEnableGuestIsHomeTime.toLocaleTimeString()}`;
+
+		return status
+	}
+
+	function toggletemporaryEnableGuestIsHome(){
+		if(temporaryEnableGuestIsHome){
+			temporaryEnableGuestIsHome = false;
+			clearTimeout(temporaryEnableGuestIsHomeTimeout);
+		} else {
+			temporaryEnableGuestIsHome = true;
+			temporaryEnableGuestIsHomeTime = new Date(new Date().setHours(new Date().getHours() + options.garageStillOpenAlertDisableForHours));
+			temporaryEnableGuestIsHomeTimeout = setTimeout(()=>{
+				temporaryEnableGuestIsHome = false;
+			},options.guestIsHomeEnableForHours*60*60*1000)
+		}
+
+		return getTemporaryGuestIsHomeStatus();
+	}
+
 	function getTemporaryDisableGarageStillOpenAlertStatus(){
-		var status = temporaryDisableGarageStillOpenAlert ? `Still Open Alert Disabled unitl ${temporaryDisableGarageStillOpenAlertTime.toLocaleTimeString()}` : 'Still Open Alert Enabled';
+		var status = temporaryDisableGarageStillOpenAlert ? `Still Open Alert Disabled until ${temporaryDisableGarageStillOpenAlertTime.toLocaleTimeString()}` : 'Still Open Alert Enabled';
+
 		return status
 	}
 
@@ -293,6 +319,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		getGarageLastOpenedTime: getGarageLastOpenedTime,
 		getGarageLastClosedTime:getGarageLastClosedTime,
 		toggleTemporaryDisableGarageStillOpenAlert:toggleTemporaryDisableGarageStillOpenAlert,
-		getTemporaryDisableGarageStillOpenAlertStatus:getTemporaryDisableGarageStillOpenAlertStatus
+		getTemporaryDisableGarageStillOpenAlertStatus:getTemporaryDisableGarageStillOpenAlertStatus,
+		toggletemporaryEnableGuestIsHome:toggletemporaryEnableGuestIsHome,
+		getTemporaryGuestIsHomeStatus:getTemporaryGuestIsHomeStatus
 	};
 };
