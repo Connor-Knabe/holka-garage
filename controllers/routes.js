@@ -8,7 +8,6 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 	const hue = require('../services/hue.js')(logger);
 	var login = require('../settings/login.js');
 
-
 	io.on('connection', function(socket) {
 		sockets[socket.id] = socket;
 		io.sockets.emit('clients', Object.keys(sockets).length);
