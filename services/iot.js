@@ -19,10 +19,10 @@ var motionSensorTimeoutOne = null,
 	garageLastClosedTime = null,
 	temporaryDisableGarageStillOpenAlert = false,
 	tempGarageDisableStillOpenAlertTimeout = null,
-	temporaryDisableGarageStillOpenAlertTime = null,
+	temporaryDisableGarageStillOpenAlertTime = new Date(),
 	temporaryEnableGuestIsHome = false,
 	temporaryEnableGuestIsHomeTimeout = null,
-	temporaryEnableGuestIsHomeTime = null,
+	temporaryEnableGuestIsHomeTime = new Date(),
 	shouldAlertTimeoutOne = null,
 	shouldAlertTimeoutTwo = null;
 
