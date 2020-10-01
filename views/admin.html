@@ -181,6 +181,24 @@
             }
         });
 
+        socket.on('stillOpenAlert', function (status) {
+            if (status) {
+                $("#stillOpenAlert").text(status);
+                $("#stillOpenAlert").show();
+            } else {
+                $("#stillOpenAlert").hide();
+            }
+        });
+
+        socket.on('guestIsHome', function (status) {
+            if (status) {
+                $("#guestIsHome").text(status);
+                $("#guestIsHome").show();
+            } else {
+                $("#guestIsHome").hide();
+            }
+        });
+
         socket.on('toggleGarageStillOpenAlert', function (status) {
             if (status) {
                 $("#toggleGarageStillOpenAlert").text(status);
@@ -349,6 +367,10 @@
         System has been online: <div class="garageStatus" id="rebootTime"></div>
         <br>
         Open after away for: <div class="garageStatus" id="garageTimer" style="color:purple"></div>
+        <br>
+        Still open alert timeout: <div class="garageStatus" id="stillOpenAlert" style="color:purple"></div>
+        <br>
+        Home guest temporary enable: <div class="garageStatus" id="guestIsHome" style="color:purple"></div>
         <br>
         Last opened: <div class="garageStatus" id="garageLastOpenedTime">N/a</div>
         <br>

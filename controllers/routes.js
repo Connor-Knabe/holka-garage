@@ -70,6 +70,11 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 
 		io.sockets.emit('garageTimer', `${options.minsToWaitAfterLeavingHouseForGPSOpen} mins`);
 
+		io.sockets.emit('stillOpenAlert', `${options.garageStillOpenAlertDisableForHours} hours`);
+
+		io.sockets.emit('guestIsHome', `${options.guestIsHomeEnableForHours} hours`);
+
+
 		io.sockets.emit('garageLastOpenedTime', iot.getGarageLastOpenedTime());
 		io.sockets.emit('garageLastClosedTime', iot.getGarageLastClosedTime());
 
