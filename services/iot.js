@@ -254,7 +254,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	//clean up these two functions 
 	function getTemporaryGuestIsHomeStatus(){
-		var status = temporaryEnableGuestIsHome ? `Guest Is Home Disabled` : `Guest Is Home Enabled until ${temporaryEnableGuestIsHomeTime.toLocaleTimeString()}`;
+		var status = temporaryEnableGuestIsHome ? `Guest Is Home Enabled until ${temporaryEnableGuestIsHomeTime.toLocaleTimeString()}` : `Guest Is Home Disabled`;
 
 		return status
 	}
