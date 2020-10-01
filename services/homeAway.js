@@ -5,7 +5,7 @@ var Status = {
 	personTwoAway: false,
 	personOneTime: new Date(),
 	personTwoTime: new Date(),
-	homeManualEnable: false,
+	temporaryEnableGuestIsHome: false,
 	isAway: ()=>{return Status.personOneAway && Status.personTwoAway}
 };
 
@@ -29,7 +29,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 		}
 
 		if (Status.isAway()) {
-			if(Status.homeManualEnable){
+			if(Status.temporaryEnableGuestIsHome){
 				messenger.sendGenericIfttt(`Home NOT going to sleep as guest is home`);
 			} else {
 				messenger.sendGenericIfttt(`Home going to sleep as both home owners are away`);
@@ -64,7 +64,6 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 
 		return timeAway;
 	}
-
 
     //need to refactor these into one function 
 	function setPersonOneHome() {

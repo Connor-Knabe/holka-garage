@@ -20,7 +20,6 @@ var motionSensorTimeoutOne = null,
 	temporaryDisableGarageStillOpenAlert = false,
 	tempGarageDisableStillOpenAlertTimeout = null,
 	temporaryDisableGarageStillOpenAlertTime = new Date(),
-	temporaryEnableGuestIsHome = false,
 	temporaryEnableGuestIsHomeTimeout = null,
 	temporaryEnableGuestIsHomeTime = new Date(),
 	shouldAlertTimeoutOne = null,
@@ -254,20 +253,20 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	//clean up these two functions 
 	function getTemporaryGuestIsHomeStatus(){
-		var status = temporaryEnableGuestIsHome ? `Guest Is Home Enabled until ${temporaryEnableGuestIsHomeTime.toLocaleTimeString()}` : `Guest Is Home Disabled`;
+		var status = homeAway.Status.temporaryEnableGuestIsHome ? `Guest Is Home Enabled until ${temporaryEnableGuestIsHomeTime.toLocaleTimeString()}` : `Guest Is Home Disabled`;
 
 		return status
 	}
 
 	function toggleTemporaryEnableGuestIsHome(){
-		if(temporaryEnableGuestIsHome){
-			temporaryEnableGuestIsHome = false;
+		if(homeAway.Status.temporaryEnableGuestIsHome){
+			homeAway.Status.temporaryEnableGuestIsHome = false;
 			clearTimeout(temporaryEnableGuestIsHomeTimeout);
 		} else {
-			temporaryEnableGuestIsHome = true;
+			homeAway.Status.temporaryEnableGuestIsHome = true;
 			temporaryEnableGuestIsHomeTime = new Date(new Date().setHours(new Date().getHours() + options.garageStillOpenAlertDisableForHours));
 			temporaryEnableGuestIsHomeTimeout = setTimeout(()=>{
-				temporaryEnableGuestIsHome = false;
+				homeAway.Status.temporaryEnableGuestIsHome = false;
 			},options.guestIsHomeEnableForHours*60*60*1000)
 		}
 
