@@ -259,7 +259,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		return status
 	}
 
-	function toggletemporaryEnableGuestIsHome(){
+	function toggleTemporaryEnableGuestIsHome(){
 		if(temporaryEnableGuestIsHome){
 			temporaryEnableGuestIsHome = false;
 			clearTimeout(temporaryEnableGuestIsHomeTimeout);
@@ -320,7 +320,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		getGarageLastClosedTime:getGarageLastClosedTime,
 		toggleTemporaryDisableGarageStillOpenAlert:toggleTemporaryDisableGarageStillOpenAlert,
 		getTemporaryDisableGarageStillOpenAlertStatus:getTemporaryDisableGarageStillOpenAlertStatus,
-		toggletemporaryEnableGuestIsHome:toggletemporaryEnableGuestIsHome,
+		toggleTemporaryEnableGuestIsHome:toggleTemporaryEnableGuestIsHome,
 		getTemporaryGuestIsHomeStatus:getTemporaryGuestIsHomeStatus
 	};
 };
