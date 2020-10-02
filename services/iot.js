@@ -264,7 +264,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			clearTimeout(temporaryEnableGuestIsHomeTimeout);
 		} else {
 			homeAway.Status.temporaryEnableGuestIsHome = true;
-			temporaryEnableGuestIsHomeTime = new Date(new Date().setHours(new Date().getHours() + options.garageStillOpenAlertDisableForHours));
+			temporaryEnableGuestIsHomeTime = new Date(new Date().setHours(new Date().getHours() + options.guestIsHomeEnableForHours));
 			temporaryEnableGuestIsHomeTimeout = setTimeout(()=>{
 				homeAway.Status.temporaryEnableGuestIsHome = false;
 			},options.guestIsHomeEnableForHours*60*60*1000)
