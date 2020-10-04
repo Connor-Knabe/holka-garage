@@ -1,15 +1,27 @@
 const { iftttGarageSetHomeUrl } = require("../settings/messengerInfoExample");
 
-var Status = {
-	personOneAway: false,
-	personTwoAway: false,
-	personOneTime: new Date(),
-	personTwoTime: new Date(),
-	temporaryEnableGuestIsHome: false,
-	isAway: ()=>{return Status.personOneAway && Status.personTwoAway}
-};
-
 module.exports = function(logger, login, messenger, messengerInfo, io) {
+
+	var Status = {
+		personOneAway: false,
+		personTwoAway: false,
+		personOneTime: new Date(),
+		personTwoTime: new Date(),
+		temporaryEnableGuestIsHome: false,
+		isAway: ()=>{return Status.personOneAway && Status.personTwoAway},
+		isOnlyOnePersonHome: ()=>{
+			var personName = null;
+				if(Status.personOneAway && !Status.personTwoAway){
+					personName = login.users[1].name
+				} else if(!Status.personOneAway && Status.personTwoAway) {
+					personName = login.users[0].name
+				} else if(Status.temporaryEnableGuestIsHome){
+					personName = "Guest?";
+				}
+
+			return personName;
+		}
+	};
 	function setPersonAway(req, res, isPersonTwo) {
         var personName = isPersonTwo ? login.users[1].name : login.users[0].name;
         var personText = isPersonTwo ? 'personTwo' : 'personOne';
