@@ -204,7 +204,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		manualGarageOpenTimeout = setTimeout(() => {
 			expectedGarageOpen = false;
 		}, 60 * 1000);
-
+		
 		if (!debugMode) {
 			logger.debug('Opening/closing door now');
 			garageSwitch.writeSync(1);
