@@ -11,16 +11,41 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 		isAway: ()=>{return Status.personOneAway && Status.personTwoAway},
 		isOnlyOnePersonHome: ()=>{
 			var personName = null;
-				if(Status.personOneAway && !Status.personTwoAway){
-					personName = login.users[1].name
-				} else if(!Status.personOneAway && Status.personTwoAway) {
-					personName = login.users[0].name
-				} else if(Status.temporaryEnableGuestIsHome){
-					personName = "Guest?";
-				}
+				
+			if(Status.temporaryEnableGuestIsHome){
+				personName = "Guest?";
+			} else if(Status.personOneAway && !Status.personTwoAway){
+				personName = login.users[1].name
+			} else if(!Status.personOneAway && Status.personTwoAway) {
+				personName = login.users[0].name
+			} 
 
 			return personName;
-		}
+		},
+		getWhoJustOpenedOrClosedGarage: (opened)=>{
+			const personTwoTimeAway = getMinsAway(Status.personTwoTime);
+			const personOneTimeAway = getMinsAway(Status.personOneTime);
+			var whoOpenOrClosedGarage = "unknown";
+			if(personTwoTimeAway > 2 && personOneTimeAway > 2){
+				whoOpenOrClosedGarage = Status.isOnlyOnePersonHome();
+			} else if (personTwoTimeAway < 2 && personOneTimeAway < 2){
+				whoOpenOrClosedGarage = "both?";
+			} else if(personTwoTimeAway < 2){
+				whoOpenOrClosedGarage = login.users[1].name;
+			} else if(personOneTimeAway < 2){
+				whoOpenOrClosedGarage = login.users[0].name;
+			}
+
+			if(opened){
+				Status.whoOpenedGarageLast = whoOpenOrClosedGarage;
+			} else{
+				Status.whoClosedGarageLast = whoOpenOrClosedGarage;
+			}
+			
+			return whoOpenOrClosedGarage;
+		},
+		whoOpenedGarageLast: "unknown..",
+		whoClosedGarageLast: "unknown.."
 	};
 	function setPersonAway(req, res, isPersonTwo) {
         var personName = isPersonTwo ? login.users[1].name : login.users[0].name;
@@ -53,8 +78,8 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 		messenger.sendGenericIfttt(`${personName} Set to Away`);
 		res.send('Ok');
 	}
-	
-	function getTimeAway(startDate) {
+
+	function getMinsAway(startDate){
 		var minsBetweenDates = 0;
 		const curDate = new Date();
 
@@ -62,7 +87,12 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 			var diff = curDate.getTime() - startDate.getTime();
 			minsBetweenDates = Math.floor(diff / 60000);
 		}
-
+		return minsBetweenDates;
+	}
+	
+	function getTimeAway(startDate) {
+		var minsBetweenDates = getMinsAway(startDate);
+	
 		var timeAway;
 		var hours = Math.floor(minsBetweenDates / 60);
 
@@ -113,6 +143,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 		setPersonTwoHome:setPersonTwoHome,
 		getTimeAway:getTimeAway,
 		getPersonTime:getPersonTime,
-		Status:Status
+		Status:Status,
+		getMinsAway:getMinsAway
 	};
 };

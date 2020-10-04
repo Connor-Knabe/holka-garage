@@ -62,6 +62,8 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 			} else {
 				io.sockets.emit('personOneAway', 'home');
 			}
+
+			io.sockets.emit('whoOpenedGarageLast', homeAway.Status.whoOpenedGarageLast);
 		}
 
 		const timeSinceReboot = homeAway.getTimeAway(rebootTime);

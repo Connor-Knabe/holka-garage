@@ -250,6 +250,24 @@
             }
         });
 
+        socket.on('whoOpenedGarageLast', function (status) {
+            if (status) {
+                $("#whoOpenedGarageLast").text(status);
+            } else {
+                $("#whoOpenedGarageLast").text("Unknown!");
+            }
+        });
+
+        socket.on('whoClosedGarageLast', function (status) {
+            if (status) {
+                $("#whoClosedGarageLast").text(status);
+            } else {
+                $("#whoClosedGarageLast").text("Unknown!");
+            }
+        });
+
+        
+
         socket.on('garageLastClosedTime', function (status) {
             if (status) {
                 $("#garageLastClosedTime").text(new Date(status).toLocaleString());
@@ -377,8 +395,15 @@
         Last closed: <div class="garageStatus" id="garageLastClosedTime">N/a</div>
         <br>
         Garage was open for <div class="garageStatus" id="garageTimeOpened">N/a</div>
+        <br>
+        Garage was last opened by <div class="garageStatus" id="whoOpenedGarageLast">N/a</div>
+        <br>
+        Garage was last closed by <div class="garageStatus" id="whoClosedGarageLast">N/a</div>
         
         <br><br>
+
+
+
 
     </div>
 

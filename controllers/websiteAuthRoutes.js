@@ -93,6 +93,9 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				video.updateGarageStatus(garageOpenStatus);
 				io.sockets.emit('garageOpenStatus', garageOpenStatus);
 				var msg = `${garageOpenStatus} garage via button for ${user.name}`;
+				setTimeout(()=>{
+					homeAway.Status.whoOpenedGarageLast = user.name;
+				}, 5*1000);
 				var btnPress = true;
 				video
 					.streamVideo()
@@ -119,6 +122,9 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				video.updateGarageStatus(garageOpenStatus);
 				io.sockets.emit('garageOpenStatus', garageOpenStatus);
 				var msg = `${garageOpenStatus} garage via button for ${user.name}`;
+				setTimeout(()=>{
+					homeAway.Status.whoClosedGarageLast = user.name;
+				}, 5*1000);
 				var btnPress = true;
 				video
 					.streamVideo()
