@@ -19,7 +19,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 			} else if(!Status.personOneAway && Status.personTwoAway) {
 				personName = login.users[0].name
 			} 
-
+			logger.debug(`Is only one person home ${personName}`);
 			return personName;
 		},
 		getWhoJustOpenedOrClosedGarage: (opened)=>{
@@ -39,6 +39,8 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 			} else {
 				whoOpenOrClosedGarage = "either home owner";
 			}
+
+			logger.debug(`Who openclosed garage? ${whoOpenOrClosedGarage}`)
 
 			if(opened){
 				Status.whoOpenedGarageLast = whoOpenOrClosedGarage;
