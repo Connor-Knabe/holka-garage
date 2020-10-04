@@ -25,9 +25,11 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 		getWhoJustOpenedOrClosedGarage: (opened)=>{
 			const personTwoTime = getMinsAway(Status.personTwoTime);
 			const personOneTime = getMinsAway(Status.personOneTime);
-			var whoOpenOrClosedGarage = Status.isOnlyOnePersonHome();
-			if(personTwoTime > 2 && personOneTime > 2){
-				whoOpenOrClosedGarage = "unknown as both owners are away 2+ mins";
+			var whoOpenOrClosedGarage = "Unknown";
+			if(Status.isOnlyOnePersonHome()){
+				whoOpenOrClosedGarage = Status.isOnlyOnePersonHome();
+			} else if(personTwoTime > 2 && personOneTime > 2){
+				whoOpenOrClosedGarage = "unknown as both owners are home/away 2+ mins";
 			} else if (personTwoTime < 2 && personOneTime < 2){
 				whoOpenOrClosedGarage = "both, home/away at same time";
 			} else if(personTwoTime < 2){
