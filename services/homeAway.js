@@ -22,21 +22,26 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 			logger.debug(`Is only one person home ${personName}`);
 			return personName;
 		},
-		getWhoJustOpenedOrClosedGarage: (opened)=>{
+		getWhoJustOpenedOrClosedGarage: (opened,recheck)=>{
 			const personTwoTime = getMinsAway(Status.personTwoTime);
 			const personOneTime = getMinsAway(Status.personOneTime);
 			var whoOpenOrClosedGarage = "Unknown";
-			if(Status.isOnlyOnePersonHome()){
-				whoOpenOrClosedGarage = Status.isOnlyOnePersonHome();
-			} else if(personTwoTime > 2 && personOneTime > 2){
-				whoOpenOrClosedGarage = "unknown as both owners are home/away 2+ mins";
-			} else if (personTwoTime < 2 && personOneTime < 2){
+			if(personTwoTime > 10 && personOneTime > 10){
+				whoOpenOrClosedGarage = "unknown as both owners are home/away 10+ mins";
+				if(recheck){
+					setTimeout(()=>{
+						Status.getWhoJustOpenedOrClosedGarage(opened,false)
+					},8*60*1000);
+				}				
+			} else if (personTwoTime < 10 && personOneTime < 10){
 				whoOpenOrClosedGarage = "both, home/away at same time";
-			} else if(personTwoTime < 2){
+			} else if(personTwoTime < 10){
 				whoOpenOrClosedGarage = login.users[1].name;
-			} else if(personOneTime < 2){
+			} else if(personOneTime < 10){
 				whoOpenOrClosedGarage = login.users[0].name;
-			} else {
+			} else if(Status.isOnlyOnePersonHome()){
+				whoOpenOrClosedGarage = Status.isOnlyOnePersonHome();
+			} else  {
 				whoOpenOrClosedGarage = "either home owner";
 			}
 

@@ -63,7 +63,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			io.sockets.emit('garageErrorStatus', null);
 			setTimeout(()=>{
 				const open = true;
-				io.sockets.emit('whoOpenedGarageLast', homeAway.Status.getWhoJustOpenedOrClosedGarage(open));
+				io.sockets.emit('whoOpenedGarageLast', homeAway.Status.getWhoJustOpenedOrClosedGarage(open,true));
 			} ,2*1000)
 			
 		} else if (value == 0 && hasBeenOpened) {
@@ -88,7 +88,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			io.sockets.emit('garageErrorStatus', null);
 			setTimeout(()=>{
 				const open = false;
-				io.sockets.emit('whoClosedGarageLast', homeAway.Status.getWhoJustOpenedOrClosedGarage(open));
+				io.sockets.emit('whoClosedGarageLast', homeAway.Status.getWhoJustOpenedOrClosedGarage(open,true));
 			},2*1000);
 		}
 	});
@@ -204,7 +204,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		manualGarageOpenTimeout = setTimeout(() => {
 			expectedGarageOpen = false;
 		}, 60 * 1000);
-		
+
 		if (!debugMode) {
 			logger.debug('Opening/closing door now');
 			garageSwitch.writeSync(1);
