@@ -52,8 +52,6 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 				whoOpenOrClosedGarage = "either home owner";
 			}
 
-			logger.debug(`Who openclosed garage? ${whoOpenOrClosedGarage}`)
-
 			if(opened){
 				Status.whoOpenedGarageLast = whoOpenOrClosedGarage;
 			} else{
@@ -92,7 +90,6 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 			}
 		}
 
-		logger.debug(`Garage set to away via ${personText}`);
 		messenger.sendGenericIfttt(`${personName} Set to Away`);
 		res.send('Ok');
 	}
