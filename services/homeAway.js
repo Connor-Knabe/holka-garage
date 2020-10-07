@@ -65,7 +65,6 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 	};
 	function setPersonAway(req, res, isPersonTwo) {
         var personName = isPersonTwo ? login.users[1].name : login.users[0].name;
-        var personText = isPersonTwo ? 'personTwo' : 'personOne';
 
 		if (isPersonTwo) {
 			Status.personTwoAway = true;

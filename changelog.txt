@@ -1,3 +1,4 @@
+v2.5.2 - if opened/closed via website don't overwrite 
 v2.5.1 - add to website who last opened the garage
 v2.5.0 - adding guest is home feature
 v2.4.3 - refactoring homeAway to move all logic there instead of some in iot.js

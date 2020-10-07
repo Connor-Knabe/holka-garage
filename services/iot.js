@@ -26,6 +26,11 @@ var motionSensorTimeoutOne = null,
 	shouldAlertTimeoutTwo = null;
 
 module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron, homeAway, login) {
+	var Status = {
+		wasOpenedViaWebsite: false,
+		wasClosedViaWebsite: false
+	};
+
 	var hasBeenOpened = garageIsOpen();
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const options = require('../settings/options.js');
@@ -52,7 +57,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 			logger.debug('garage open');
 
-			garageAlertOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
+			garageAlertStillOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
 			clearTimeout(shouldAlertTimeoutOne)
 			clearTimeout(shouldAlertTimeoutTwo)
 			shouldAlertTimeoutOne = setTimeout(() => {
@@ -63,7 +68,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			io.sockets.emit('garageErrorStatus', null);
 			setTimeout(()=>{
 				const open = true;
-				io.sockets.emit('whoOpenedGarageLast', homeAway.Status.getWhoJustOpenedOrClosedGarage(open,true));
+				if(!Status.wasOpenedViaWebsite){
+					io.sockets.emit('whoOpenedGarageLast', homeAway.Status.getWhoJustOpenedOrClosedGarage(open,true));
+				}
 			} ,2*1000)
 			
 		} else if (value == 0 && hasBeenOpened) {
@@ -88,7 +95,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			io.sockets.emit('garageErrorStatus', null);
 			setTimeout(()=>{
 				const open = false;
-				io.sockets.emit('whoClosedGarageLast', homeAway.Status.getWhoJustOpenedOrClosedGarage(open,true));
+				if(!Status.wasClosedViaWebsite){
+					io.sockets.emit('whoClosedGarageLast', homeAway.Status.getWhoJustOpenedOrClosedGarage(open,true));
+				}
 			},2*1000);
 		}
 	});
@@ -136,7 +145,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		}
 	}
 
-	function garageAlertOpenCheck(timeUntilAlert, timeOut, shouldCall) {
+	function garageAlertStillOpenCheck(timeUntilAlert, timeOut, shouldCall) {
 		clearTimeout(timeOut);
 		timeOut = setTimeout(() => {
 			if (garageIsOpen() && !temporaryDisableGarageStillOpenAlert) {
@@ -177,7 +186,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 					video.stopStreaming();
 				});
 			if (!shouldCall) {
-				garageAlertOpenCheck(options.garageOpenAlertTwoMins, garageOpenAlertTwoTimeout, true);
+				garageAlertStillOpenCheck(options.garageOpenAlertTwoMins, garageOpenAlertTwoTimeout, true);
 			}
 		}
 		messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert, timeUntilAlert);
@@ -329,6 +338,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		toggleTemporaryDisableGarageStillOpenAlert:toggleTemporaryDisableGarageStillOpenAlert,
 		getTemporaryDisableGarageStillOpenAlertStatus:getTemporaryDisableGarageStillOpenAlertStatus,
 		toggleTemporaryEnableGuestIsHome:toggleTemporaryEnableGuestIsHome,
-		getTemporaryGuestIsHomeStatus:getTemporaryGuestIsHomeStatus
+		getTemporaryGuestIsHomeStatus:getTemporaryGuestIsHomeStatus,
+		Status:Status
 	};
 };

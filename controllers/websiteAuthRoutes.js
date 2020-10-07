@@ -88,6 +88,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 
 		if (req.body && req.body.garageSwitch == 'open') {
 			if (!iot.garageIsOpen()) {
+				iot.Status.wasOpenedViaWebsite = true; 
 				iot.openCloseGarageDoor();
 				garageOpenStatus = 'Opening...';
 				video.updateGarageStatus(garageOpenStatus);
@@ -95,6 +96,8 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				var msg = `${garageOpenStatus} garage via button for ${user.name}`;
 				setTimeout(()=>{
 					homeAway.Status.whoOpenedGarageLast = user.name;
+					io.sockets.emit('whoOpenedGarageLast', homeAway.Status.whoOpenedGarageLast);
+					iot.Status.wasOpenedViaWebsite = false;
 				}, 5*1000);
 				var btnPress = true;
 				video
@@ -117,6 +120,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 			}
 		} else if (req.body && req.body.garageSwitch == 'close') {
 			if (iot.garageIsOpen()) {
+				iot.Status.wasClosedViaWebsite = true; 
 				iot.openCloseGarageDoor();
 				garageOpenStatus = 'Closing...';
 				video.updateGarageStatus(garageOpenStatus);
@@ -124,6 +128,8 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				var msg = `${garageOpenStatus} garage via button for ${user.name}`;
 				setTimeout(()=>{
 					homeAway.Status.whoClosedGarageLast = user.name;
+					io.sockets.emit('whoCloseGarageLast', homeAway.Status.whoClosedGarageLast);
+					iot.Status.wasClosedViaWebsite = false;
 				}, 5*1000);
 				var btnPress = true;
 				video
