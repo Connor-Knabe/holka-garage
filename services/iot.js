@@ -299,11 +299,14 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	function toggleTemporaryDisableGarageStillOpenAlert(){
 		if(temporaryDisableGarageStillOpenAlert){
+			messenger.sendGenericIfttt(`Alerting users when garage has been left open`);
 			temporaryDisableGarageStillOpenAlert = false;
 			clearTimeout(tempGarageDisableStillOpenAlertTimeout);
 		} else {
 			temporaryDisableGarageStillOpenAlert = true;
 			temporaryDisableGarageStillOpenAlertTime = new Date(new Date().setHours(new Date().getHours() + options.garageStillOpenAlertDisableForHours));
+			messenger.sendGenericIfttt(`NOT alerting users when garage has been left open until ${temporaryDisableGarageStillOpenAlertTime}`);
+
 			tempGarageDisableStillOpenAlertTimeout = setTimeout(()=>{
 				temporaryDisableGarageStillOpenAlert = false;
 			},options.garageStillOpenAlertDisableForHours*60*60*1000)
