@@ -66,12 +66,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 			logger.debug(msg);
 			io.sockets.emit('garageErrorStatus', null);
-			setTimeout(()=>{
-				const open = true;
-				if(!Status.wasOpenedViaWebsite){
-					io.sockets.emit('whoOpenedGarageLast', homeAway.Status.getWhoJustOpenedOrClosedGarage(open,true));
-				}
-			} ,2*1000)
+			const open = true;
+			if(!Status.wasOpenedViaWebsite){
+				io.sockets.emit('whoOpenedGarageLast', homeAway.Status.getWhoJustOpenedOrClosedGarage(open,true));
+			}
 			
 		} else if (value == 0 && hasBeenOpened) {
 			clearTimeout(tempGarageDisableStillOpenAlertTimeout);
@@ -93,12 +91,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 			logger.debug(msg);
 			io.sockets.emit('garageErrorStatus', null);
-			setTimeout(()=>{
-				const open = false;
-				if(!Status.wasClosedViaWebsite){
-					io.sockets.emit('whoClosedGarageLast', homeAway.Status.getWhoJustOpenedOrClosedGarage(open,true));
-				}
-			},2*1000);
+			const open = false;
+			if(!Status.wasClosedViaWebsite){
+				io.sockets.emit('whoClosedGarageLast', homeAway.Status.getWhoJustOpenedOrClosedGarage(open,true));
+			}
 		}
 	});
 
