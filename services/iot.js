@@ -57,6 +57,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 			logger.debug('garage open');
 
+			logger.debug(`{Status.wasOpenedViaWebsite} ${Status.wasOpenedViaWebsite}`);
+
 			garageAlertStillOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
 			clearTimeout(shouldAlertTimeoutOne)
 			clearTimeout(shouldAlertTimeoutTwo)
@@ -90,6 +92,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			}, 30 * 1000);
 
 			logger.debug(msg);
+			logger.debug(`{Status.wasOpenedViaWebsite} ${Status.wasOpenedViaWebsite}`);
+
 			io.sockets.emit('garageErrorStatus', null);
 			const open = false;
 			if(!Status.wasClosedViaWebsite){
