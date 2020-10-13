@@ -51,6 +51,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io) {
 			} else  {
 				whoOpenOrClosedGarage = "either home owner";
 			}
+			logger.debug(`getWhoJustOpenedOrClosedGarage() opened ${opened} recheck ${recheck} personOneTime ${personOneTime} personTwoTime ${personTwoTime} whoOpenOrClosedGarage ${whoOpenOrClosedGarage}`)
 
 			if(opened){
 				Status.whoOpenedGarageLast = whoOpenOrClosedGarage;

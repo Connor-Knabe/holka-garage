@@ -89,7 +89,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			clearTimeout(shouldAlertTimeoutTwo)
 			shouldAlertTimeoutTwo = setTimeout(() => {
 				shouldAlertHomeOwners('closed');
-			}, 30 * 1000);
+			}, 30 * 1000);4
 
 			logger.debug(msg);
 			logger.debug(`{Status.wasOpenedViaWebsite} ${Status.wasOpenedViaWebsite}`);
