@@ -3,6 +3,8 @@ var options = require('../settings/options.js');
 var basicAuth = require('basic-auth-connect');
 var fs = require('fs');
 var garageOpenStatus = null;
+var wasOpenedViaWebsiteTimeout = null;
+var wasClosedViaWebsiteTimeout = null;
 
 module.exports = function(app, logger, io, hue, messenger, video, authService, homeAway, proxy, bodyParser,iot) {
 	var garageErrorStatus = null;
@@ -94,11 +96,12 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				video.updateGarageStatus(garageOpenStatus);
 				io.sockets.emit('garageOpenStatus', garageOpenStatus);
 				var msg = `${garageOpenStatus} garage via button for ${user.name}`;
-				setTimeout(()=>{
-					homeAway.Status.whoOpenedGarageLast = user.name;
-					io.sockets.emit('whoOpenedGarageLast', homeAway.Status.whoOpenedGarageLast);
+				homeAway.Status.whoOpenedGarageLast = user.name;
+				io.sockets.emit('whoOpenedGarageLast', homeAway.Status.whoOpenedGarageLast);
+				clearTimeout(wasOpenedViaWebsiteTimeout);
+				wasOpenedViaWebsiteTimeout = setTimeout(()=>{
 					iot.Status.wasOpenedViaWebsite = false;
-				}, 5*1000);
+				}, 10*1000);
 				var btnPress = true;
 				video
 					.streamVideo()
@@ -126,11 +129,12 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				video.updateGarageStatus(garageOpenStatus);
 				io.sockets.emit('garageOpenStatus', garageOpenStatus);
 				var msg = `${garageOpenStatus} garage via button for ${user.name}`;
-				setTimeout(()=>{
-					homeAway.Status.whoClosedGarageLast = user.name;
-					io.sockets.emit('whoCloseGarageLast', homeAway.Status.whoClosedGarageLast);
+				homeAway.Status.whoClosedGarageLast = user.name;
+				io.sockets.emit('whoCloseGarageLast', homeAway.Status.whoClosedGarageLast);
+				clearTimeout(wasClosedViaWebsiteTimeout);
+				wasClosedViaWebsiteTimeout = setTimeout(()=>{
 					iot.Status.wasClosedViaWebsite = false;
-				}, 5*1000);
+				}, 10*1000);
 				var btnPress = true;
 				video
 					.streamVideo()

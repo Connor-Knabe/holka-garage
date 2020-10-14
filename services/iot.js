@@ -25,7 +25,7 @@ var motionSensorTimeoutOne = null,
 	shouldAlertTimeoutOne = null,
 	shouldAlertTimeoutTwo = null;
 
-module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron, homeAway, login) {
+module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron, homeAway) {
 	var Status = {
 		wasOpenedViaWebsite: false,
 		wasClosedViaWebsite: false
@@ -92,7 +92,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			}, 30 * 1000);4
 
 			logger.debug(msg);
-			logger.debug(`{Status.wasOpenedViaWebsite} ${Status.wasOpenedViaWebsite}`);
+			logger.debug(`{Status.wasClosedViaWebsite} ${Status.wasClosedViaWebsite}`);
 
 			io.sockets.emit('garageErrorStatus', null);
 			const open = false;

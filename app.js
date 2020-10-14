@@ -50,7 +50,7 @@ var messenger = require('./services/messenger.js')(logger, options.debugMode);
 
 
 const homeAway = require('./services/homeAway.js')(logger, login, messenger,messengerInfo, io)
-var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron, homeAway, login);
+var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron, homeAway);
 
 
 const authService = require('./services/auth.js')(logger, login, messengerInfo, options, messenger);
