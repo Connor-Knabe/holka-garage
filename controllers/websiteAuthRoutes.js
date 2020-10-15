@@ -101,7 +101,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				clearTimeout(wasOpenedViaWebsiteTimeout);
 				wasOpenedViaWebsiteTimeout = setTimeout(()=>{
 					iot.Status.wasOpenedViaWebsite = false;
-				}, 10*1000);
+				}, 40*1000);
 				var btnPress = true;
 				video
 					.streamVideo()
@@ -134,7 +134,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				clearTimeout(wasClosedViaWebsiteTimeout);
 				wasClosedViaWebsiteTimeout = setTimeout(()=>{
 					iot.Status.wasClosedViaWebsite = false;
-				}, 10*1000);
+				}, 40*1000);
 				var btnPress = true;
 				video
 					.streamVideo()
