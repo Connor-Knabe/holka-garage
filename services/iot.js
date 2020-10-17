@@ -279,10 +279,12 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	function toggleTemporaryEnableGuestIsHome(){
 		if(homeAway.Status.temporaryEnableGuestIsHome){
 			homeAway.Status.temporaryEnableGuestIsHome = false;
+			messenger.sendGenericIfttt(`Guest is NOT home shutting off lights when home owners are away`);
 			clearTimeout(temporaryEnableGuestIsHomeTimeout);
 		} else {
 			homeAway.Status.temporaryEnableGuestIsHome = true;
 			temporaryEnableGuestIsHomeTime = new Date(new Date().setHours(new Date().getHours() + options.guestIsHomeEnableForHours));
+			messenger.sendGenericIfttt(`Guest is home until ${temporaryEnableGuestIsHomeTime} NOT shutting off lights when home owners are away`);
 			temporaryEnableGuestIsHomeTimeout = setTimeout(()=>{
 				homeAway.Status.temporaryEnableGuestIsHome = false;
 			},options.guestIsHomeEnableForHours*60*60*1000)
