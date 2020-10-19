@@ -54,10 +54,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			if (options.enableLightsOnGarageOpen) {
 				hue.garageLightsOnTimed(25);
 			}
-
-			logger.debug('garage open');
-
-			logger.debug(`{Status.wasOpenedViaWebsite} ${Status.wasOpenedViaWebsite}`);
+			logger.debug(`garage open {Status.wasOpenedViaWebsite} ${Status.wasOpenedViaWebsite}`);
 
 			garageAlertStillOpenCheck(options.garageOpenAlertOneMins, garageOpenAlertOneTimeout, false);
 			clearTimeout(shouldAlertTimeoutOne)
@@ -91,8 +88,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 				shouldAlertHomeOwners('closed');
 			}, 30 * 1000);4
 
-			logger.debug(msg);
-			logger.debug(`{Status.wasClosedViaWebsite} ${Status.wasClosedViaWebsite}`);
+			logger.debug(`Garage door closed {Status.wasClosedViaWebsite} ${Status.wasClosedViaWebsite}`);
 
 			io.sockets.emit('garageErrorStatus', null);
 			const open = false;
@@ -162,9 +158,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	function garageAlert(timeUntilAlert, shouldCall) {
-
 		var garageAlertOpenMins = shouldCall ? timeUntilAlert + options.garageOpenAlertOneMins : timeUntilAlert
-
 		var garageAlertMsg = `Garage has been open for more than: ${garageAlertOpenMins} minutes!`;
 		logger.debug(garageAlertMsg);
 		if (options.garageOpenMinsAlert) {
