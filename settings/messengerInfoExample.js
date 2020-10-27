@@ -29,6 +29,7 @@ module.exports.iftttGarageSetHomeUrl = 'https://maker.ifttt.com/trigger/garage_h
 module.exports.iftttGarageSetAwayUrl = 'https://maker.ifttt.com/trigger/garage_away/alert/with/key/';
 
 module.exports.iftttGarageSetAway2Url = 'https://maker.ifttt.com/trigger/garage_away2/alert/with/key/';
+module.exports.iftttGarageOutletsOffUrl = 'https://maker.ifttt.com/trigger/outletsoff/alert/with/key/';
 
 module.exports.iftttValue1 = 'This will be displayed in the notification';
 
