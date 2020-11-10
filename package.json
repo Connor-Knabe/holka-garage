@@ -20,7 +20,7 @@
 		"log4js": "~6.2.1",
 		"node-hue-api": "2.4.5",
 		"nodemailer": "4.7.0",
-		"onoff": "3.2.2",
+		"onoff": "3.2.9",
 		"request": "2.88.0",
 		"request-promise": "4.2.6",
 		"serve-favicon": "2.5.0",
