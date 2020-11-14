@@ -16,7 +16,7 @@
 		"express-session": "1.17.1",
 		"helmet": "^3.23.3",
 		"http-proxy-middleware": "0.21.0",
-		"log4js": "~6.2.1",
+		"log4js": "~6.3.0",
 		"node-hue-api": "2.4.5",
 		"nodemailer": "4.7.0",
 		"onoff": "3.2.2",
