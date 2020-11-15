@@ -104,9 +104,6 @@ module.exports = function(logger, debugMode) {
 
 		if (numbers && messageCount < 10) {
 			for (var i = 0; i < numbers.length; i++) {
-				if (numbers[i].email) {
-					sendEmail(numbers[i], msgContent);
-				}
 				if (numbers[i].number) {
 					if (options.generalTexts) {
 						sendText(numbers[i], msgContent, sendPicture);
@@ -188,34 +185,6 @@ module.exports = function(logger, debugMode) {
 			}, textTimeout * 1000);
 		} else {
 			logger.info('Not sending text in debug mode. Message contains:', msgContent);
-		}
-	}
-
-	function sendEmail(alertInfo, msgContent) {
-		if (options.emailAlerts) {
-			var transporter = nodemailer.createTransport({
-				service: 'Gmail',
-				auth: {
-					user: messengerInfo.gmailUsername,
-					pass: messengerInfo.gmailPass
-				}
-			});
-			var mailOptions = {
-				from: messengerInfo.gmailUsername,
-				to: alertInfo.email,
-				subject: 'Garage Monitor!',
-				text: msgContent
-			};
-			if (!debugMode) {
-				transporter.sendMail(mailOptions, function(error, info) {
-					if (error) {
-						return logger.error(error);
-					}
-					logger.info(new Date(), ' Email sent: ', msgContent);
-				});
-			} else {
-				logger.info(new Date(), 'not sending email in debug mode', msgContent);
-			}
 		}
 	}
 
