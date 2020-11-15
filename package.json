@@ -18,7 +18,7 @@
 		"http-proxy-middleware": "0.21.0",
 		"log4js": "~6.3.0",
 		"node-hue-api": "2.4.5",
-		"nodemailer": "4.7.0",
+		"nodemailer": "6.4.16",
 		"onoff": "3.2.2",
 		"request-promise": "4.2.6",
 		"serve-favicon": "2.5.0",
