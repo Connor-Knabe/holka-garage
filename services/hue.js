@@ -38,8 +38,7 @@ module.exports = function(logger) {
 	function lightsOn(brightness) {
 		if (options.enableHue) {
 			return new Promise((resolve, reject) => {
-				api
-					.setGroupState(8, new GroupLightState().on().brightness(brightness))
+				api.groups.setGroupState(8, new GroupLightState().on().brightness(brightness))
 					.then(() => {
 						resolve();
 					})
@@ -52,7 +51,7 @@ module.exports = function(logger) {
 	}
 
 	function lightsOff() {
-		api.setGroupLightState(8, new GroupLightState().off()).then(() => {}).catch(() => {});
+		api.groups.setGroupLightState(8, new GroupLightState().off()).then(() => {}).catch(() => {});
 	}
 
 
