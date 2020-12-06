@@ -14,7 +14,7 @@ module.exports = function() {
 	function isWeekendAndShouldOpen() {
 		var dayOfWeek = new Date().getDay();
 		var theTime = new Date();
-		return (dayOfWeek == 6 && (theTime.getHours() >= 8 && theTime.getHours() <= 20)) || (dayOfWeek == 0 && (theTime.getHours() >= 8 && theTime.getHours() <= 20));
+		return (dayOfWeek == 6 && (theTime.getHours() >= 8 && theTime.getHours() <= 19)) || (dayOfWeek == 0 && (theTime.getHours() >= 8 && theTime.getHours() <= 19));
 	}
 
 	function genericShouldOpenBasedOnTime() {
