@@ -4,11 +4,10 @@ var options = require('../settings/options.js');
 var v3 = require('node-hue-api').v3, 
 	discovery = v3.discovery,
 	HueApi = v3.api,
-	lightState = v3.lightStates.lightState,
+	LightState = v3.lightStates.lightState,
 	host = options.hueBridgeIp,
 	username = options.hueUser,
 	api = v3.api.createLocal(host).connect(username),
-	state = lightState.create(),
 	lightsOffTimeout = null,
 	lightsOffTimedTimeout = null;
 
@@ -37,7 +36,7 @@ module.exports = function(logger) {
 		if (options.enableHue) {
 			return new Promise((resolve, reject) => {
 				api
-					.setGroupLightState(8, state.on().brightness(brightness))
+					.setGroupLightState(8, new LightState().on().brightness(brightness))
 					.then(() => {
 						resolve();
 					})
@@ -50,7 +49,7 @@ module.exports = function(logger) {
 	}
 
 	function lightsOff() {
-		api.setGroupLightState(8, state.off()).then(() => {}).catch(() => {});
+		api.setGroupLightState(8, new LightState().off()).then(() => {}).catch(() => {});
 	}
 
 
