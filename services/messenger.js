@@ -4,7 +4,7 @@ module.exports = function(logger, debugMode) {
 	const twilio = require('twilio');
 
 	const messengerInfo = require('../settings/messengerInfo.js');
-	const rp = require('request-promise');
+	const got = require('got');
 	const options = require('../settings/options.js');
 	const nodemailer = require('nodemailer');
 	const client = twilio(messengerInfo.TWILIO_ACCOUNT_SID, messengerInfo.TWILIO_AUTH_TOKEN);
@@ -36,22 +36,16 @@ module.exports = function(logger, debugMode) {
 				// @ts-ignore
 				var url = messengerInfo.iftttGarageAlertUrl;
 				url += iftttRecipient.ApiKey;
-				var options = {
-					method: 'POST',
-					uri: url,
-					body: {
-						value1: message
-					},
-					json: true
-				};
-
-				rp(options)
-					.then(function(parsedBody) {
-						// POST succeeded...
-					})
-					.catch(function(err) {
-						// POST failed...
+	
+				(async () => {
+					const {body} = await got.post(url, {
+						json: {
+							value1: message
+						},
+						responseType: 'json'
 					});
+				})();
+
 			});
 		}
 	}
