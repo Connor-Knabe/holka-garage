@@ -1,11 +1,13 @@
-var hue = require('node-hue-api'),
-	options = require('../settings/options.js');
 
-var HueApi = hue.HueApi,
-	lightState = hue.lightState,
+var options = require('../settings/options.js');
+
+var v3 = require('node-hue-api').v3, 
+	discovery = v3.discovery,
+	HueApi = v3.api,
+	lightState = v3.lightStates.lightState,
 	host = options.hueBridgeIp,
 	username = options.hueUser,
-	api = new HueApi(host, username),
+	api = v3.api.createLocal(host).connect(username),
 	state = lightState.create(),
 	lightsOffTimeout = null,
 	lightsOffTimedTimeout = null;
@@ -58,7 +60,7 @@ module.exports = function(logger) {
 	}
 
 	function temporarilyDisableSchedule(){
-		
+
 	}
 
 	return {
