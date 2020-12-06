@@ -51,6 +51,16 @@ module.exports = function(logger) {
 		api.setGroupLightState(8, state.off()).then(() => {}).catch(() => {});
 	}
 
+
+	//refactor into separate app
+	function temporarilyDisableLRMotionSensor(){
+
+	}
+
+	function temporarilyDisableSchedule(){
+		
+	}
+
 	return {
 		lightsOn: lightsOn,
 		garageLightsOnTimed: garageLightsOnTimed,
