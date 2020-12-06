@@ -9,7 +9,10 @@ var v3 = require('node-hue-api').v3,
 	username = options.hueUser,
 	api = v3.api.createLocal(host).connect(username),
 	lightsOffTimeout = null,
-	lightsOffTimedTimeout = null;
+	lightsOffTimedTimeout = null,
+	GroupLightState = v3.model.lightStates.GroupLightState;
+	
+	
 
 module.exports = function(logger) {
 	function garageLightsOnTimed(brightness) {
@@ -36,7 +39,7 @@ module.exports = function(logger) {
 		if (options.enableHue) {
 			return new Promise((resolve, reject) => {
 				api
-					.setGroupLightState(8, new LightState().on().brightness(brightness))
+					.setGroupState(8, new GroupLightState().on().brightness(brightness))
 					.then(() => {
 						resolve();
 					})
@@ -49,7 +52,7 @@ module.exports = function(logger) {
 	}
 
 	function lightsOff() {
-		api.setGroupLightState(8, new LightState().off()).then(() => {}).catch(() => {});
+		api.setGroupLightState(8, new GroupLightState().off()).then(() => {}).catch(() => {});
 	}
 
 
