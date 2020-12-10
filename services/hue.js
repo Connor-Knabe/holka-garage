@@ -50,6 +50,7 @@ module.exports = function(logger) {
 			return new Promise((resolve, reject) => {
 				api.groups.setGroupState(8, new GroupLightState().on().brightness(brightness))
 					.then(() => {
+						logger.info('turned on lights successfully');
 						resolve();
 					})
 					.catch((e) => {
