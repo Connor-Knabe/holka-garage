@@ -35,6 +35,14 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const options = require('../settings/options.js');
 	const garageOpenRules = require('./garageOpenRules.js')();
+	const fs = require("fs");
+	// var garageTracking = {
+	// 	garageOpens:null
+	// };
+	var garageTracking = require("../garageTracking.json");
+
+
+	
 
 	app.set('takingVideo', false);
 
@@ -44,6 +52,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		}
 		if (value == 1 && !hasBeenOpened) {
 			io.sockets.emit('garageStatus', 'open');
+			garageTracking.garageOpens++;
+			fs.writeFile( "garageTracking.json", JSON.stringify( garageTracking ), "utf8", yourCallback );
 
 			hasBeenOpened = true;
 			garageLastOpenedTime = new Date();

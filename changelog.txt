@@ -1,3 +1,4 @@
+v2.6.1 - logging # of garage opens to keep track of health of garage spring
 v2.5.5 - turning outlets off if away from home if they are on a timer and turned on since homeowners went away
 v2.5.4 - alerting users when guest mode is enabled/disabled
 v2.5.2 - if opened/closed via website don't overwrite, sending ifttt alert when still open alert is active 
