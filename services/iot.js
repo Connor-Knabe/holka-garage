@@ -48,12 +48,11 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			io.sockets.emit('garageStatus', 'open');
 			garageTracking.garageOpens++;
 
-					try { 
-								fs.writeFileSync( "garageTracking.json", JSON.stringify( garageTracking ), "utf8");
-											
-										  } catch(err) { 
-									  				logger.error(`Error writing garageTracking file ${err}`); 
-											  			  } 		
+			try { 
+				fs.writeFileSync( "garageTracking.json", JSON.stringify( garageTracking ), "utf8");
+			} catch(err) { 
+				logger.error(`Error writing garageTracking file ${err}`); 
+			} 		
 
 
 			hasBeenOpened = true;
