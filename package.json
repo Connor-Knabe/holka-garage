@@ -17,7 +17,7 @@
 		"helmet": "^3.23.3",
 		"http-proxy-middleware": "0.21.0",
 		"log4js": "~6.3.0",
-		"node-hue-api": "2.4.6",
+		"node-hue-api": "4.0.8",
 		"onoff": "3.2.2",
 		"got": "11.8.0",
 		"serve-favicon": "2.5.0",

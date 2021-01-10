@@ -2,7 +2,6 @@
 var options = require('../settings/options.js');
 
 var v3 = require('node-hue-api').v3, 
-	discovery = v3.discovery,
 	HueApi = v3.api,
 	LightState = v3.lightStates.lightState,
 	host = options.hueBridgeIp,
