@@ -9,9 +9,13 @@ var v3 = require('node-hue-api').v3,
 	GroupLightState = v3.model.lightStates.GroupLightState;
 	
 
+const api = null;
+(async function() {
+	api = await v3.api.createLocal(host).connect(username);
+})();
 
-module.exports = async function(logger) {
-	const api = await v3.api.createLocal(host).connect(username);
+
+module.exports = function(logger) {
 
 	function garageLightsOnTimed(brightness) {
 		if (options.enableHue) {
