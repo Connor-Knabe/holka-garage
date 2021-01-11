@@ -4,12 +4,12 @@ var options = require('../settings/options.js');
 var v3 = require('node-hue-api').v3, 
 	host = options.hueBridgeIp,
 	username = options.hueUser,
-	api = v3.api.createLocal(host).connect(username),
 	lightsOffTimeout = null,
 	lightsOffTimedTimeout = null,
 	GroupLightState = v3.model.lightStates.GroupLightState;
 	
-	
+const api = await v3.api.createLocal(host).connect(username);
+
 
 module.exports = function(logger) {
 	function garageLightsOnTimed(brightness) {
