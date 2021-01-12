@@ -267,6 +267,13 @@
         });
 
         
+        socket.on('garageOpenCount', function (status) {
+            if (status) {
+                $("#garageOpenCount").text(status);
+            } else {
+                $("#garageOpenCount").text("Unknown!");
+            }
+        });
 
         socket.on('garageLastClosedTime', function (status) {
             if (status) {
@@ -402,7 +409,9 @@
         Garage was last opened by <div class="garageStatus" id="whoOpenedGarageLast">N/a</div>
         <br>
         Garage was last closed by <div class="garageStatus" id="whoClosedGarageLast">N/a</div>
-        
+        <br>
+        Number of garage opens <div class="garageStatus" id="garageOpenCount">N/a</div>
+
         <br><br>
 
 

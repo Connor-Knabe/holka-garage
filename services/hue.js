@@ -43,11 +43,10 @@ module.exports = function(logger) {
 		.then(allGroups => {
 			// Display the groups from the bridge
 			allGroups.forEach(group => {
-			console.log(group.toStringDetailed());
+			// console.log(group.toStringDetailed());
 			});
 		});
 
-		
 		if (options.enableHue) {
 			return new Promise((resolve, reject) => {
 				api.groups.setGroupState(8, new GroupLightState().on().brightness(brightness))
@@ -64,8 +63,6 @@ module.exports = function(logger) {
 	}
 
 	function lightsOff() {
-
-		
 		api.groups.setGroupLightState(8, new GroupLightState().off()).then(() => {}).catch(() => {});
 	}
 

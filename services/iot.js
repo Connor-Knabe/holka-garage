@@ -23,7 +23,8 @@ var motionSensorTimeoutOne = null,
 	temporaryEnableGuestIsHomeTimeout = null,
 	temporaryEnableGuestIsHomeTime = new Date(),
 	shouldAlertTimeoutOne = null,
-	shouldAlertTimeoutTwo = null;
+	shouldAlertTimeoutTwo = null,
+	garageTracking = null;
 
 module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron, homeAway) {
 	var Status = {
@@ -36,7 +37,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	const options = require('../settings/options.js');
 	const garageOpenRules = require('./garageOpenRules.js')();
 	const fs = require("fs");
-	var garageTracking = require("../garageTracking.json");
+	garageTracking = require("../garageTracking.json");
 
 	app.set('takingVideo', false);
 
@@ -149,6 +150,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 					});
 			}
 		}
+	}
+
+	function getGarageOpenCount(){
+		return garageTracking.garageOpens;
 	}
 
 	function garageAlertStillOpenCheck(timeUntilAlert, timeOut, shouldCall) {
@@ -351,6 +356,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		getTemporaryDisableGarageStillOpenAlertStatus:getTemporaryDisableGarageStillOpenAlertStatus,
 		toggleTemporaryEnableGuestIsHome:toggleTemporaryEnableGuestIsHome,
 		getTemporaryGuestIsHomeStatus:getTemporaryGuestIsHomeStatus,
-		Status:Status
+		Status:Status,
+		getGarageOpenCount:getGarageOpenCount
 	};
 };

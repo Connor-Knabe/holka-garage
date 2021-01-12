@@ -65,7 +65,7 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 
 			io.sockets.emit('whoOpenedGarageLast', homeAway.Status.whoOpenedGarageLast);
 			io.sockets.emit('whoClosedGarageLast', homeAway.Status.whoClosedGarageLast);
-
+			io.sockets.emit('garageOpenCount', )
 		}
 
 		const timeSinceReboot = homeAway.getTimeAway(rebootTime);
