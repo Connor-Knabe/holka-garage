@@ -48,6 +48,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		if (value == 1 && !hasBeenOpened) {
 			io.sockets.emit('garageStatus', 'open');
 			garageTracking.garageOpens++;
+			io.sockets.emit('garageOpenCount', getGarageOpenCount());
 
 			try { 
 				fs.writeFileSync( "garageTracking.json", JSON.stringify( garageTracking ), "utf8");
