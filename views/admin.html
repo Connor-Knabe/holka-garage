@@ -275,6 +275,15 @@
             }
         });
 
+        socket.on('springLifeRemaining', function (status) {
+            if (status) {
+                $("#springLifeRemaining").text(status);
+            } else {
+                $("#springLifeRemaining").text("Unknown!");
+            }
+        });
+        
+
         socket.on('garageLastClosedTime', function (status) {
             if (status) {
                 $("#garageLastClosedTime").text(new Date(status).toLocaleString());
@@ -411,6 +420,8 @@
         Garage was last closed by <div class="garageStatus" id="whoClosedGarageLast">N/a</div>
         <br>
         Garage opens: <div class="garageStatus" id="garageOpenCount">N/a</div>
+        <br>
+        Spring life remaining: <div class="garageStatus" id="springLifeRemaining">N/a</div>
 
         <br><br>
 

@@ -49,6 +49,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			io.sockets.emit('garageStatus', 'open');
 			garageTracking.garageOpens++;
 			io.sockets.emit('garageOpenCount', getGarageOpenCount());
+			io.sockets.emit('springLifeRemaining', springLifeRemaining());
 
 			try { 
 				fs.writeFileSync( "garageTracking.json", JSON.stringify( garageTracking ), "utf8");
@@ -154,6 +155,11 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	function getGarageOpenCount(){
+		return garageTracking.garageOpens;
+	}
+
+	function springLifeRemaining(){
+
 		var startDate = new Date(garageTracking.springReplacedDate);
 		var currentDate = new Date();
 		
@@ -166,10 +172,11 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		var daysTillNewSpring = 10000/timesOpenedPerDay;
 		var yearsTillNewSpring = daysTillNewSpring/365;
 
-		var years = Math.floor(yearsTillNewSpring);
-		var months = Math.floor((yearsTillNewSpring % 1)*12);
+		var years = yearsTillNewSpring;
+		var months = (yearsTillNewSpring % 1)*12;
+		var days = (months % 1)*31;
 
-		return `${garageTracking.garageOpens}. ${years} years and ${months} months estimated spring life remaining`;
+		return `${Math.floor(years)} years ${Math.floor(months)} months, days${Math.floor(days)} spring life left`;
 	}
 
 	function garageAlertStillOpenCheck(timeUntilAlert, timeOut, shouldCall) {
@@ -373,6 +380,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		toggleTemporaryEnableGuestIsHome:toggleTemporaryEnableGuestIsHome,
 		getTemporaryGuestIsHomeStatus:getTemporaryGuestIsHomeStatus,
 		Status:Status,
-		getGarageOpenCount:getGarageOpenCount
+		getGarageOpenCount:getGarageOpenCount,
+		springLifeRemaining:springLifeRemaining
 	};
 };
