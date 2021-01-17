@@ -176,7 +176,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		var months = (yearsTillNewSpring % 1)*12;
 		var days = (months % 1)*31;
 
-		return `${Math.floor(years)} years ${Math.floor(months)} months, days${Math.floor(days)} spring life left`;
+		return `${Math.floor(years)} years, ${Math.floor(months)} months, days ${Math.floor(days)}`;
 	}
 
 	function garageAlertStillOpenCheck(timeUntilAlert, timeOut, shouldCall) {
