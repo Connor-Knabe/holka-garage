@@ -49,7 +49,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			io.sockets.emit('garageStatus', 'open');
 			garageTracking.garageOpens++;
 			io.sockets.emit('garageOpenCount', getGarageOpenCount());
-			io.sockets.emit('springLifeRemaining', springLifeRemaining());
+			io.sockets.emit('springLifeRemaining', getSpringLifeRemaining());
 
 			try { 
 				fs.writeFileSync( "garageTracking.json", JSON.stringify( garageTracking ), "utf8");
@@ -158,7 +158,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		return garageTracking.garageOpens;
 	}
 
-	function springLifeRemaining(){
+	function getSpringLifeRemaining(){
 
 		var startDate = new Date(garageTracking.springReplacedDate);
 		var currentDate = new Date();
@@ -381,6 +381,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		getTemporaryGuestIsHomeStatus:getTemporaryGuestIsHomeStatus,
 		Status:Status,
 		getGarageOpenCount:getGarageOpenCount,
-		springLifeRemaining:springLifeRemaining
+		getSpringLifeRemaining:getSpringLifeRemaining
 	};
 };
