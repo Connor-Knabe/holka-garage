@@ -1,3 +1,5 @@
+v2.6.3 - estimate on lift of spring left
+v2.6.2 - deployed logging # of garage opens
 v2.6.1 - logging # of garage opens to keep track of health of garage spring
 v2.5.5 - turning outlets off if away from home if they are on a timer and turned on since homeowners went away
 v2.5.4 - alerting users when guest mode is enabled/disabled

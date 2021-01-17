@@ -154,7 +154,22 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	function getGarageOpenCount(){
-		return garageTracking.garageOpens;
+		var startDate = new Date(garageTracking.springReplacedDate);
+		var currentDate = new Date();
+		
+		var daysSinceNewSpringInstalled = (currentDate.getTime() - startDate.getTime()) / (1000 * 3600 * 24); 
+
+		const maxCycles = 10000;
+		
+		var timesOpenedPerDay = garageTracking.garageOpens/daysSinceNewSpringInstalled;
+
+		var daysTillNewSpring = 10000/timesOpenedPerDay;
+		var yearsTillNewSpring = daysTillNewSpring/365;
+
+		var years = Math.floor(yearsTillNewSpring);
+		var months = (yearsTillNewSpring % 1)*12;
+
+		return `${garageTracking.garageOpens}. ${years} years and ${months} estimated spring life remaining`;
 	}
 
 	function garageAlertStillOpenCheck(timeUntilAlert, timeOut, shouldCall) {
