@@ -169,7 +169,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		
 		var timesOpenedPerDay = garageTracking.garageOpens/daysSinceNewSpringInstalled;
 
-		var daysTillNewSpring = maxCycles/timesOpenedPerDay;
+		var cyclesLeft = maxCycles-garageTracking.garageOpens;
+		var daysTillNewSpring = cyclesLeft/timesOpenedPerDay;
 		var yearsTillNewSpring = daysTillNewSpring/365;
 
 		var years = yearsTillNewSpring;
