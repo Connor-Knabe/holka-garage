@@ -167,9 +167,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		var yearsTillNewSpring = daysTillNewSpring/365;
 
 		var years = Math.floor(yearsTillNewSpring);
-		var months = (yearsTillNewSpring % 1)*12;
+		var months = Math.floor((yearsTillNewSpring % 1)*12);
 
-		return `${garageTracking.garageOpens}. ${years} years and ${months} estimated spring life remaining`;
+		return `${garageTracking.garageOpens}. ${years} years and ${months} months estimated spring life remaining`;
 	}
 
 	function garageAlertStillOpenCheck(timeUntilAlert, timeOut, shouldCall) {
