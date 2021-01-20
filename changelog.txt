@@ -1,3 +1,4 @@
+v2.6.4 - adding route to temporarily disable motion sensor and schedule
 v2.6.3 - estimate on lift of spring left
 v2.6.2 - deployed logging # of garage opens
 v2.6.1 - logging # of garage opens to keep track of health of garage spring

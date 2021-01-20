@@ -30,3 +30,5 @@ module.exports.minsToWaitAfterLeavingHouseForGPSOpen = 15;
 module.exports.garageStillOpenAlertDisableForHours = 3;
 module.exports.guestIsHomeEnableForHours = 5;
 module.exports.enableOutletSwitchOff = false;
+module.exports.automatedHueHome = false;
+module.exports.automatedHueHomeUrl = "http://localhost:3000/disableSchedulesAndSensorsTemporarily"

@@ -180,6 +180,18 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		}
 	});
 
+	if (options.automatedHueHome) {
+		app.post('/disableSchedulesAndSensorsTemporarily', bodyParser.urlencoded({ extended: false }), function(req, res) {
+			logger.info('disableSchedulesAndSensorsTemporarily route');
+			(async () => {
+				const {body} = await got.post(options.automatedHueHomeUrl, {
+					responseType: 'json'
+				});
+			})();
+			res.send("OK");
+		});
+	} 
+
 	//if using https://github.com/Connor-Knabe/hue-energy-usage
 	if (options.enableHueEnergyUsageReport) {
 		var hueEnergyUsageOptions = {
@@ -191,6 +203,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		};
 		app.use('/proxy/hue-energy-usage', proxy(hueEnergyUsageOptions));
 	}
+
 	if (options.enableNestEnergyUsageReport) {
 		var nestEnergyUsageOptions = {
 			target: 'http://localhost:1235',
