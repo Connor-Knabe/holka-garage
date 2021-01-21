@@ -41,7 +41,7 @@ module.exports = function(logger, debugMode) {
 						json: {
 							value1: message
 						},
-						responseType: 'json'
+						responseType: 'text'
 					});
 				})();
 
@@ -81,6 +81,7 @@ module.exports = function(logger, debugMode) {
 					},
 					responseType: 'text'
 				});
+				console.log(body);
 			} catch (err){
 				logger.error('error making requestIfttt', err);
 			}
