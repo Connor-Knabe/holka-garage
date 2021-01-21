@@ -79,7 +79,7 @@ module.exports = function(logger, debugMode) {
 						value1: message,
 						value2: minsOpened
 					},
-					responseType: 'json'
+					responseType: 'text'
 				});
 			} catch (err){
 				logger.error('error making requestIfttt', err);
