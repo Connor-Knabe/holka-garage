@@ -9,7 +9,10 @@ var v3 = require('node-hue-api').v3,
 	GroupLightState = v3.model.lightStates.GroupLightState;
 	
 
-
+var api = null;
+(async function() {
+	api = await v3.api.createLocal(host).connect(username);
+})();
 
 
 module.exports = function(logger) {
@@ -35,12 +38,8 @@ module.exports = function(logger) {
 	}
 
 	function lightsOn(brightness) {
-
 		if (options.enableHue) {
 			return new Promise((resolve, reject) => {
-			
-			(async function() {
-				api = await v3.api.createLocal(host).connect(username);
 				api.groups.setGroupState(8, new GroupLightState().on().brightness(brightness))
 					.then(() => {
 						logger.info('turned on lights successfully');
@@ -50,17 +49,12 @@ module.exports = function(logger) {
 						logger.error(`Error setting light brightness ${e}`);
 						reject();
 					});
-			})();
-				
 			});
 		}
 	}
 
 	function lightsOff() {
-		(async function() {
-			api = await v3.api.createLocal(host).connect(username);
-			api.groups.setGroupLightState(8, new GroupLightState().off()).then(() => {}).catch(() => {});
-		})();
+		api.groups.setGroupState(8, new GroupLightState().off()).then(() => {}).catch(() => {});
 	}
 
 
