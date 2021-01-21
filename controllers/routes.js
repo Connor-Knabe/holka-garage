@@ -7,6 +7,7 @@ const rebootTime = new Date();
 module.exports = function(app, logger, io, video, authService, homeAway, bodyParser, iot, sockets) {
 	const hue = require('../services/hue.js')(logger);
 	var login = require('../settings/login.js');
+	const httpReq = require('../services/httpReq.js')(logger);
 
 	io.on('connection', function(socket) {
 		sockets[socket.id] = socket;
@@ -33,9 +34,12 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 
 		io.sockets.emit('toggleGarageStillOpenAlert', iot.getTemporaryDisableGarageStillOpenAlertStatus());
 		io.sockets.emit('toggleGuestIsHome', iot.getTemporaryGuestIsHomeStatus());
-
 		io.sockets.emit('garageLightStatus', null);
 
+		if(options.automatedHueHome){
+			
+			io.sockets.emit('automatedHueHomeStatus', httpReq.getAutomatedHueStatus())
+		}
 
 		if (options.garageGpsEnabledPersonTwo) {
 			var personTwo = true;

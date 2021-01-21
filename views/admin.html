@@ -62,7 +62,14 @@
             }
         });
 
-        
+        socket.on('automatedHueHomeStatus', function (status) {
+            if (status) {
+                $("#automatedHueHomeStatus").show();
+                $("#automatedHueHomeStatus").text(status);
+            } else {
+                $("#automatedHueHomeStatus").hide();
+            }
+        });
 
         socket.on('garageGPSStatus', function (status) {
             if (status) {
@@ -422,6 +429,8 @@
         Garage opens: <div class="garageStatus" id="garageOpenCount">N/a</div>
         <br>
         Spring life remaining: <div class="garageStatus" id="springLifeRemaining">N/a</div>
+
+
 
         <br><br>
 

@@ -72,13 +72,16 @@ module.exports = function(logger, debugMode) {
 			json: true
 		};
 
-		rp(options)
-			.then(function(parsedBody) {
-				// POST succeeded...
-			})
-			.catch(function(err) {
-				// POST failed...
+		(async () => {
+			const {body} = await got.post(url, {
+				json: {
+					value1: message,
+					value2: minsOpened
+				},
+				responseType: 'json'
 			});
+		})();
+
 	}
 
 	function send(shouldSend = true, numbers, msgContent, sendPicture = false, btnPress = false) {
