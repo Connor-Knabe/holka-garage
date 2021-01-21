@@ -62,24 +62,29 @@ module.exports = function(logger, debugMode) {
 
 		logger.debug('requesting ifttt with url: ', url + apiKey.substring(0, 5), '<--- key is truncated.');
 		url += apiKey;
-		var options = {
-			method: 'POST',
-			uri: url,
-			body: {
-				value1: message,
-				value2: minsOpened
-			},
-			json: true
-		};
+		// var options = {
+		// 	method: 'POST',
+		// 	uri: url,
+		// 	body: {
+		// 		value1: message,
+		// 		value2: minsOpened
+		// 	},
+		// 	json: true
+		// };
 
 		(async () => {
-			const {body} = await got.post(url, {
-				json: {
-					value1: message,
-					value2: minsOpened
-				},
-				responseType: 'json'
-			});
+			try{
+				const {body} = await got.post(url, {
+					json: {
+						value1: message,
+						value2: minsOpened
+					},
+					responseType: 'json'
+				});
+			} catch (err){
+				logger.error('error making requestIfttt', err);
+			}
+			
 		})();
 
 	}
