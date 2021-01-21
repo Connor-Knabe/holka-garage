@@ -230,7 +230,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			if (!garageIsOpen()) {
 				logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${remoteAddress}`);
 				openCloseGarageDoor();
-				messenger.sendIftt(true, `Garage open via GPS for person ${gpsPerson}`);
+			messenger.sendIftt(true, `Garage open via GPS for person ${gpsPerson}`);
 			} else {
 				logger.info(`Attempted to open garage via gps person ${gpsPerson} from ip: ${remoteAddress} but garage was open`);
 			}
