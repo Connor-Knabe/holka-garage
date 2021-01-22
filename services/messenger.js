@@ -59,19 +59,8 @@ module.exports = function(logger, debugMode) {
 
 	function requestIfttt(url, apiKey, minsOpened, message) {
 		logger.debug(`Request ifttt ${minsOpened}, with message ${message}`);
-
 		logger.debug('requesting ifttt with url: ', url + apiKey.substring(0, 5), '<--- key is truncated.');
 		url += apiKey;
-		// var options = {
-		// 	method: 'POST',
-		// 	uri: url,
-		// 	body: {
-		// 		value1: message,
-		// 		value2: minsOpened
-		// 	},
-		// 	json: true
-		// };
-
 		(async () => {
 			try{
 				const {body} = await got.post(url, {
@@ -85,9 +74,7 @@ module.exports = function(logger, debugMode) {
 			} catch (err){
 				logger.error('error making requestIfttt', err);
 			}
-			
 		})();
-
 	}
 
 	function send(shouldSend = true, numbers, msgContent, sendPicture = false, btnPress = false) {
