@@ -140,4 +140,16 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 			res.send('None shall pass');
 		}
 	}); 
+
+	app.post('/setAutomatedHueEnableLights', bodyParser.text(), async function(req, res) {
+		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
+			await httpReq.setAutomatedHueEnableLights();
+			res.send('Ok');
+		} else {
+			logger.error(`malformed request for setAutomatedHueEnableLights or wrong key`);
+			res.status(401);
+			res.send('None shall pass');
+		}
+	}); 
+	
 };
