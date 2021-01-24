@@ -1,9 +1,10 @@
-const httpReq = require('../services/httpReq.js');
 var messengerInfo = require('../settings/messengerInfo.js');
 var options = require('../settings/options.js');
 
 
 module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
+	const httpReq = require('../services/httpReq.js')(logger);
+
 	var securityMsgTimeout = null;
 	var shouldSendSecurityAlert = true;
 
