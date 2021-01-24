@@ -130,7 +130,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		}
 	});
 
-	app.post('/setAutomatedHueDisableLights', bodyParser.text(), function(req, res) {
+	app.post('/setAutomatedHueDisableLights', bodyParser.text(), async function(req, res) {
 		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
 			await httpReq.setAutomatedHueDisableLights();
 			res.send('Ok');
