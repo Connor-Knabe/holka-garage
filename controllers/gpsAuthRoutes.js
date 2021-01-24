@@ -131,7 +131,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 	});
 
 	app.post('/setAutomatedHueDisableLights', bodyParser.text(), async function(req, res) {
-		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
+		if (req.body && typeof req.body == "string" && req.body.includes(login.gpsPersonOneKey)) {
 			await httpReq.setAutomatedHueDisableLights();
 			res.send('Ok');
 		} else {
@@ -142,7 +142,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 	}); 
 
 	app.post('/setAutomatedHueEnableLights', bodyParser.text(), async function(req, res) {
-		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
+		if (req.body && typeof req.body == "string" && req.body.includes(login.gpsPersonOneKey)) {
 			await httpReq.setAutomatedHueEnableLights();
 			res.send('Ok');
 		} else {
