@@ -139,6 +139,5 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 			res.status(401);
 			res.send('None shall pass');
 		}
-	} 
-
+	}); 
 };
