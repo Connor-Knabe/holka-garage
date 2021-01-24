@@ -15,8 +15,22 @@ module.exports = function(logger) {
         })();
 	}
 
+    function setAutomatedHueDisableLights() {
+        (async () => {
+            try {
+                const {body} = await got.post(options.automatedHueHomeUrl+'/disableSchedulesAndSensors', {
+					responseType: 'json'
+				});
+                console.log(response.body);
+                return response.body;
+            } catch (error) {
+                logger.error(error.response.body);
+            }
+        })();
+	}
 
 	return {
-		getAutomatedHueStatus: getAutomatedHueStatus
+		getAutomatedHueStatus: getAutomatedHueStatus,
+        setAutomatedHueDisableLights:setAutomatedHueDisableLights
 	};
 };
