@@ -21,10 +21,9 @@ module.exports = function(logger) {
                 const {body} = await got.post(options.automatedHueHomeUrl+'/disableSchedulesAndSensors', {
 					responseType: 'json'
 				});
-                console.log(response.body);
-                return response.body;
+                console.log("setAutomatedHueDisableLights success");
             } catch (error) {
-                logger.error(error.response.body);
+                logger.error(error);
             }
         })();
 	}
@@ -35,10 +34,9 @@ module.exports = function(logger) {
                 const {body} = await got.post(options.automatedHueHomeUrl+'/enableSchedulesAndSensors', {
 					responseType: 'json'
 				});
-                console.log(response.body);
-                return response.body;
+                console.log("setAutomatedHueEnableLights success");
             } catch (error) {
-                logger.error(error.response.body);
+                logger.error(error);
             }
         })();
 	}
