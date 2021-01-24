@@ -132,7 +132,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 
 	app.post('/setAutomatedHueDisableLights', bodyParser.text(), async function(req, res) {
 		if (req.body && typeof req.body == "string" && req.body.includes(login.gpsPersonOneKey)) {
-			await httpReq.setAutomatedHueDisableLights();
+			httpReq.setAutomatedHueDisableLights();
 			res.send('Ok');
 		} else {
 			logger.error(`malformed request for setAutomatedHueDisableLights or wrong key`);
@@ -143,7 +143,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 
 	app.post('/setAutomatedHueEnableLights', bodyParser.text(), async function(req, res) {
 		if (req.body && typeof req.body == "string" && req.body.includes(login.gpsPersonOneKey)) {
-			await httpReq.setAutomatedHueEnableLights();
+			httpReq.setAutomatedHueEnableLights();
 			res.send('Ok');
 		} else {
 			logger.error(`malformed request for setAutomatedHueEnableLights or wrong key`);
