@@ -41,7 +41,7 @@ module.exports = function(logger, debugMode) {
 						json: {
 							value1: message
 						},
-						responseType: 'json'
+						responseType: 'text'
 					});
 				})();
 
@@ -59,26 +59,22 @@ module.exports = function(logger, debugMode) {
 
 	function requestIfttt(url, apiKey, minsOpened, message) {
 		logger.debug(`Request ifttt ${minsOpened}, with message ${message}`);
-
 		logger.debug('requesting ifttt with url: ', url + apiKey.substring(0, 5), '<--- key is truncated.');
 		url += apiKey;
-		var options = {
-			method: 'POST',
-			uri: url,
-			body: {
-				value1: message,
-				value2: minsOpened
-			},
-			json: true
-		};
-
-		rp(options)
-			.then(function(parsedBody) {
-				// POST succeeded...
-			})
-			.catch(function(err) {
-				// POST failed...
-			});
+		(async () => {
+			try{
+				const {body} = await got.post(url, {
+					json: {
+						value1: message,
+						value2: minsOpened
+					},
+					responseType: 'text'
+				});
+				console.log(body);
+			} catch (err){
+				logger.error('error making requestIfttt', err);
+			}
+		})();
 	}
 
 	function send(shouldSend = true, numbers, msgContent, sendPicture = false, btnPress = false) {

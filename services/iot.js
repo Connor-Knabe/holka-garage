@@ -226,11 +226,11 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	function toggleGarageDoor(gpsPerson, remoteAddress) {
-		if (garageOpenRules.isFridayAndShouldOpen() || garageOpenRules.isTuesdayAndShouldOpen() || garageOpenRules.genericShouldOpenBasedOnTime() || garageOpenRules.isWeekendAndShouldOpen()) {
+		if (shouldOpenGarageBaesdOnRules()) {
 			if (!garageIsOpen()) {
 				logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${remoteAddress}`);
 				openCloseGarageDoor();
-				messenger.sendIftt(true, `Garage open via GPS for person ${gpsPerson}`);
+			messenger.sendIftt(true, `Garage open via GPS for person ${gpsPerson}`);
 			} else {
 				logger.info(`Attempted to open garage via gps person ${gpsPerson} from ip: ${remoteAddress} but garage was open`);
 			}
@@ -238,6 +238,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			messenger.sendIftt(true, `Not opening for person ${gpsPerson} due to time range`);
 			logger.info(`Not opening garage for person ${gpsPerson} outside of time range from ip: ${remoteAddress}`);
 		}
+	}
+
+	function shouldOpenGarageBaesdOnRules(){
+		return garageOpenRules.isFridayAndShouldOpen() || garageOpenRules.isTuesdayAndShouldOpen() || garageOpenRules.genericShouldOpenBasedOnTime() || garageOpenRules.isWeekendAndShouldOpen();
 	}
 
 	function openCloseGarageDoor() {
@@ -382,6 +386,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		getTemporaryGuestIsHomeStatus:getTemporaryGuestIsHomeStatus,
 		Status:Status,
 		getGarageOpenCount:getGarageOpenCount,
-		getSpringLifeRemaining:getSpringLifeRemaining
+		getSpringLifeRemaining:getSpringLifeRemaining,
+		shouldOpenGarageBaesdOnRules:shouldOpenGarageBaesdOnRules
 	};
 };

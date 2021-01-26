@@ -19,7 +19,7 @@ module.exports = function() {
 
 	function genericShouldOpenBasedOnTime() {
 		var theTime = new Date();
-		return (theTime.getHours() >= 5 && theTime.getHours() <= 7) || (theTime.getHours() >= 11 && theTime.getHours() <= 13) || (theTime.getHours() >= 16 && theTime.getHours() <= 19);
+		return (theTime.getHours() >= 11 && theTime.getHours() <= 13) || (theTime.getHours() >= 16 && theTime.getHours() <= 19);
 	}
 
 	return {

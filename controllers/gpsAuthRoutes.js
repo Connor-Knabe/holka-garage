@@ -3,6 +3,8 @@ var options = require('../settings/options.js');
 
 
 module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
+	const httpReq = require('../services/httpReq.js')(logger);
+
 	var securityMsgTimeout = null;
 	var shouldSendSecurityAlert = true;
 
@@ -129,4 +131,26 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		}
 	});
 
+	app.post('/setAutomatedHueDisableLights', bodyParser.text(), function(req, res) {
+		if (req.body && typeof req.body == "string" && req.body.includes(login.gpsPersonOneKey)) {
+			httpReq.setAutomatedHueDisableLights();
+			res.send('Ok');
+		} else {
+			logger.error(`malformed request for setAutomatedHueDisableLights or wrong key`);
+			res.status(401);
+			res.send('None shall pass');
+		}
+	}); 
+
+	app.post('/setAutomatedHueEnableLights', bodyParser.text(), function(req, res) {
+		if (req.body && typeof req.body == "string" && req.body.includes(login.gpsPersonOneKey)) {
+			httpReq.setAutomatedHueEnableLights();
+			res.send('Ok');
+		} else {
+			logger.error(`malformed request for setAutomatedHueEnableLights or wrong key`);
+			res.status(401);
+			res.send('None shall pass');
+		}
+	}); 
+	
 };
