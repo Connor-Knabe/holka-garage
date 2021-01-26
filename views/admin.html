@@ -289,8 +289,15 @@
                 $("#springLifeRemaining").text("Unknown!");
             }
         });
-        
 
+        socket.on('shouldOpenGarageBaesdOnRules', function (status) {
+            if (status) {
+                $("#shouldOpenGarageBaesdOnRules").text(status);
+            } else {
+                $("#shouldOpenGarageBaesdOnRules").hide();
+            }
+        });      
+        
         socket.on('garageLastClosedTime', function (status) {
             if (status) {
                 $("#garageLastClosedTime").text(new Date(status).toLocaleString());
@@ -429,6 +436,8 @@
         Garage opens: <div class="garageStatus" id="garageOpenCount">N/a</div>
         <br>
         Spring life remaining: <div class="garageStatus" id="springLifeRemaining">N/a</div>
+        <br>
+        Will open garage based on rules: <div class="garageStatus" id="shouldOpenGarageBaesdOnRules">N/a</div>
 
 
 

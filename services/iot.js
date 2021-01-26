@@ -386,6 +386,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		getTemporaryGuestIsHomeStatus:getTemporaryGuestIsHomeStatus,
 		Status:Status,
 		getGarageOpenCount:getGarageOpenCount,
-		getSpringLifeRemaining:getSpringLifeRemaining
+		getSpringLifeRemaining:getSpringLifeRemaining,
+		shouldOpenGarageBaesdOnRules:shouldOpenGarageBaesdOnRules
 	};
 };
