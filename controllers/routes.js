@@ -37,7 +37,7 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		io.sockets.emit('garageLightStatus', null);
 
 		if(options.automatedHueHome){
-			// io.sockets.emit('automatedHueHomeStatus', httpReq.getAutomatedHueStatus())
+			io.sockets.emit('toggleAutomatedHueHome', httpReq.getAutomatedHueStatus())
 		}
 
 		if (options.garageGpsEnabledPersonTwo) {

@@ -80,10 +80,18 @@ $(document).ready(function() {
 			}
 		});
 	});
-
 	
-
-
+	$('#toggleAutomatedHueHome').click(function(e) {
+		e.preventDefault();
+		$.ajax({
+			type: 'POST',
+			url: '/toggleAutomatedHueHome',
+			success: function(result) {
+				$('#toggleAutomatedHueHome').text(result);
+			}
+		});
+	});
+	
 	$('#gps').click(function(e) {
 		e.preventDefault();
 		$('#gps').attr('disabled', 'disabled');

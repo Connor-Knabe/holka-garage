@@ -62,14 +62,17 @@
             }
         });
 
-        socket.on('automatedHueHomeStatus', function (status) {
+     
+
+        socket.on('toggleAutomatedHueHome', function (status) {
             if (status) {
-                $("#automatedHueHomeStatus").show();
-                $("#automatedHueHomeStatus").text(status);
+                $("#toggleAutomatedHueHome").text(status);
+                $("#toggleAutomatedHueHome").show();
             } else {
-                $("#automatedHueHomeStatus").hide();
+                $("#toggleAutomatedHueHome").hide();
             }
         });
+        
 
         socket.on('garageGPSStatus', function (status) {
             if (status) {
@@ -438,6 +441,8 @@
         Spring life remaining: <div class="garageStatus" id="springLifeRemaining">N/a</div>
         <br>
         Will open garage based on rules: <div class="garageStatus" id="shouldOpenGarageBaesdOnRules">N/a</div>
+        <br>
+        <button type="button" class="btn btn-info" id="toggleAutomatedHueHome">Light automation is Enabled</button>
 
 
 

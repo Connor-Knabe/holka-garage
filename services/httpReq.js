@@ -2,12 +2,13 @@ const got = require('got');
 const options = require('../settings/options.js');
 
 module.exports = function(logger) {
+    logger.debug("automatedHueStatus",getAutomatedHueStatus());
 
 	function getAutomatedHueStatus() {
         (async () => {
             try {
                 const response = await got(options.automatedHueHomeUrl+'/sensorScheduleStatus');
-                console.log(response.body);
+                logger.debug(response.body);
                 return response.body;
             } catch (error) {
                 logger.error(error.response.body);
@@ -21,7 +22,7 @@ module.exports = function(logger) {
                 const {body} = await got.post(options.automatedHueHomeUrl+'/disableSchedulesAndSensors', {
 					responseType: 'json'
 				});
-                console.log("setAutomatedHueDisableLights success");
+                logger.debug("setAutomatedHueDisableLights success");
             } catch (error) {
                 logger.error(error);
             }
