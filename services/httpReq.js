@@ -3,7 +3,6 @@ const options = require('../settings/options.js');
 
 module.exports = function(logger) {
     logger.debug("automatedHueStatus",getAutomatedHueStatus());
-
 	function getAutomatedHueStatus() {
         (async () => {
             try {
