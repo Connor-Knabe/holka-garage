@@ -70,7 +70,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 
 
 	if (options.automatedHueHome) {
-		app.post('/toggleAutomatedHueHome ', bodyParser.urlencoded({ extended: false }), function(req, res) {
+		app.post('/toggleAutomatedHueHome ', bodyParser.urlencoded({ extended: false }), async function(req, res) {
 
 			var automatedHueHomeEnabled = await httpReq.getAutomatedHueStatus();
 
