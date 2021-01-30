@@ -36,12 +36,12 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		io.sockets.emit('toggleGuestIsHome', iot.getTemporaryGuestIsHomeStatus());
 		io.sockets.emit('garageLightStatus', null);
 
-		if(options.automatedHueHome){
-			logger.debug('emitting automated hue home');
-			var automatedHueHomeEnabled = await httpReq.getAutomatedHueStatus();
-			var automatedHueHomeText = automatedHueHomeEnabled ? "Enabled" : "Disabled";
-			io.sockets.emit('toggleAutomatedHueHome',`Light automation is ${automatedHueHomeText}`);
-		}
+		// if(options.automatedHueHome){
+		// 	logger.debug('emitting automated hue home');
+		// 	var automatedHueHomeEnabled = await httpReq.getAutomatedHueStatus();
+		// 	var automatedHueHomeText = automatedHueHomeEnabled ? "Enabled" : "Disabled";
+		// 	io.sockets.emit('toggleAutomatedHueHome',`Light automation is ${automatedHueHomeText}`);
+		// }
 
 		if (options.garageGpsEnabledPersonTwo) {
 			var personTwo = true;
