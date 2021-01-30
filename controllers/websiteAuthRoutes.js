@@ -70,10 +70,8 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 
 
 	if (options.automatedHueHome) {
-		app.post('/toggleAutomatedHueHome ', bodyParser.urlencoded({ extended: false }), async function(req, res) {
-
+		app.post('/toggleAutomatedHueHome', bodyParser.urlencoded({ extended: false }), async function(req, res) {
 			var automatedHueHomeEnabled = await httpReq.getAutomatedHueStatus();
-
 			if(automatedHueHomeEnabled){
 				await httpReq.setAutomatedHueDisableLights();
 			} else {
@@ -199,18 +197,6 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 		}
 	});
-
-	if (options.automatedHueHome) {
-		app.post('/disableSchedulesAndSensorsTemporarily', bodyParser.urlencoded({ extended: false }), function(req, res) {
-			logger.info('disableSchedulesAndSensorsTemporarily route');
-			(async () => {
-				const {body} = await got.post(options.automatedHueHomeUrl, {
-					responseType: 'json'
-				});
-			})();
-			res.send("OK");
-		});
-	} 
 
 	//if using https://github.com/Connor-Knabe/hue-energy-usage
 	if (options.enableHueEnergyUsageReport) {
