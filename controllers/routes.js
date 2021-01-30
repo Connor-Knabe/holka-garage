@@ -9,7 +9,7 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 	var login = require('../settings/login.js');
 	const httpReq = require('../services/httpReq.js')(logger);
 
-	io.on('connection', function(socket) {
+	io.on('connection', async function(socket) {
 		sockets[socket.id] = socket;
 		io.sockets.emit('clients', Object.keys(sockets).length);
 
