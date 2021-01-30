@@ -2,8 +2,8 @@ const got = require('got');
 const options = require('../settings/options.js');
 
 module.exports = function(logger) {
-	function getAutomatedHueStatus() {
-        (async () => {
+	async function getAutomatedHueStatus() {
+        await (async () => {
             try {
                 const response = await got(options.automatedHueHomeUrl+'/sensorScheduleStatus');
                 logger.debug('sensorschedule status', response.body);
