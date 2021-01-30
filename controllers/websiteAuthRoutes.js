@@ -2,13 +2,13 @@ var messengerInfo = require('../settings/messengerInfo.js');
 var options = require('../settings/options.js');
 var basicAuth = require('basic-auth-connect');
 var fs = require('fs');
-const httpReq = require('../services/httpReq.js');
 var garageOpenStatus = null;
 var wasOpenedViaWebsiteTimeout = null;
 var wasClosedViaWebsiteTimeout = null;
 
 module.exports = function(app, logger, io, hue, messenger, video, authService, homeAway, proxy, bodyParser,iot) {
 	var garageErrorStatus = null;
+	const httpReq = require('../services/httpReq.js')(logger);
 
 	//requires basic auth for twilio mms
 	app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
