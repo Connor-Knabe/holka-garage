@@ -12,8 +12,7 @@ module.exports = function(logger) {
         }
 	}
 
-    function setAutomatedHueDisableLights() {
-        (async () => {
+    async function setAutomatedHueDisableLights() {
             try {
                 const {body} = await got.post(options.automatedHueHomeUrl+'/disableSchedulesAndSensors', {
 					responseType: 'json'
@@ -22,11 +21,9 @@ module.exports = function(logger) {
             } catch (error) {
                 logger.error(error);
             }
-        })();
 	}
 
-    function setAutomatedHueEnableLights() {
-        (async () => {
+    async function setAutomatedHueEnableLights() {
             try {
                 const {body} = await got.post(options.automatedHueHomeUrl+'/enableSchedulesAndSensors', {
 					responseType: 'json'
@@ -35,7 +32,6 @@ module.exports = function(logger) {
             } catch (error) {
                 logger.error(error);
             }
-        })();
 	}
 
 	return {

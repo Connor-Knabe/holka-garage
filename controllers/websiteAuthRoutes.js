@@ -2,6 +2,7 @@ var messengerInfo = require('../settings/messengerInfo.js');
 var options = require('../settings/options.js');
 var basicAuth = require('basic-auth-connect');
 var fs = require('fs');
+const httpReq = require('../services/httpReq.js');
 var garageOpenStatus = null;
 var wasOpenedViaWebsiteTimeout = null;
 var wasClosedViaWebsiteTimeout = null;
@@ -66,6 +67,25 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		io.sockets.emit('garageGPSStatus', garageGPSStatus);
 		res.send('Ok');
 	});
+
+
+	if (options.automatedHueHome) {
+		app.post('/toggleAutomatedHueHome ', bodyParser.urlencoded({ extended: false }), function(req, res) {
+
+			var automatedHueHomeEnabled = await httpReq.getAutomatedHueStatus();
+
+			if(automatedHueHomeEnabled){
+				await httpReq.setAutomatedHueDisableLights();
+			} else {
+				await httpReq.setAutomatedHueEnableLights();
+			}
+			automatedHueHomeEnabled = await httpReq.getAutomatedHueStatus();
+			var automatedHueHomeText = automatedHueHomeEnabled ? "Enabled" : "Disabled";
+			io.sockets.emit('toggleAutomatedHueHome',`Light automation is ${automatedHueHomeText}`);
+
+			res.send('Ok');
+		});
+	}
 
 	app.post('/lights/:brightness', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		io.sockets.emit('garageLightStatus', 'Changing light brightness');
