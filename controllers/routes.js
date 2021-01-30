@@ -98,8 +98,11 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		if(options.automatedHueHome){
 			logger.debug('emitting automated hue home');
 			var automatedHueHomeEnabled = await httpReq.getAutomatedHueStatus();
-			var automatedHueHomeText = automatedHueHomeEnabled ? "Enabled" : "Disabled";
-			io.sockets.emit('toggleAutomatedHueHome',`Light automation is ${automatedHueHomeText}`);
+			if(automatedHueHomeEnabled){
+				io.sockets.emit('toggleAutomatedHueHome',`Light automation is Enabled`);
+			} else {
+				io.sockets.emit('toggleAutomatedHueHome',`Light automation is Disabled`);
+			}
 		}
 	});
 
