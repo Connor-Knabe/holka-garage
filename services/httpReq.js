@@ -4,7 +4,7 @@ const options = require('../settings/options.js');
 module.exports = function(logger) {
 	async function automationDisabledUntilTime() {
         try {
-            const response = await got(options.automatedHueHomeUrl+'/sensorScheduleStatus');
+            var response = await got(options.automatedHueHomeUrl+'/sensorScheduleStatus');
             logger.debug('sensorschedule status', response);
             if (response){
                 response = new Date(response);
