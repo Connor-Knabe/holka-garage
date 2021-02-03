@@ -20,9 +20,16 @@ module.exports = function(logger) {
 
     async function setAutomatedHueDisableLights() {
             try {
-                const {body} = await got.post(options.automatedHueHomeUrl+'/disableSchedulesAndSensors', {
+                var response = await got.post(options.automatedHueHomeUrl+'/disableSchedulesAndSensors', {
 					responseType: 'json'
 				});
+
+                if (response && response.body){
+                    logger.debug('setAutomatedHueDisableLights status', response.body);
+                    disabledUntilDate = new Date(response.body);
+                    logger.debug('disabled until date', disabledUntilDate);
+                }
+                
                 logger.debug("setAutomatedHueDisableLights success");
             } catch (error) {
                 logger.error(error);
