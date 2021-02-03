@@ -97,14 +97,14 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 
 		if(options.automatedHueHome){
 			logger.debug('emitting automated hue home');
-			var automatedHueHomeEnabled = await httpReq.getAutomatedHueStatus();
+			var automationDisabledUntilTime = await httpReq.automationDisabledUntilTime();
 			logger.debug("auomated hue home enabled in routes", automatedHueHomeEnabled);
-			if(automatedHueHomeEnabled){
+			if(automationDisabledUntilTime == null){
 				logger.debug("set to enabled");
 				io.sockets.emit('toggleAutomatedHueHome',`Light automation is Enabled`);
 			} else {
 				logger.debug("set to disabled");
-				io.sockets.emit('toggleAutomatedHueHome',`Light automation is Disabled`);
+				io.sockets.emit('toggleAutomatedHueHome',`Light automation is Disabled until ${automationDisabledUntilTime.toLocaleTimeString()}`);
 			}
 		}
 	});
