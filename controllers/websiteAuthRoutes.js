@@ -73,8 +73,13 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		app.post('/toggleAutomatedHueHome', bodyParser.urlencoded({ extended: false }), async function(req, res) {
 			var automationDisabledUntilTime = await httpReq.automationDisabledUntilTime();
 			if(automationDisabledUntilTime == null){
-				await httpReq.setAutomatedHueDisableLights();
-				res.send(`Light automation is Disabled until ${automationDisabledUntilTime.toLocaleTimeString()}`);
+				var disabledUntil = await httpReq.setAutomatedHueDisableLights();
+				if(disabledUntil){
+					res.send(`Light automation is Disabled until ${disabledUntil.toLocaleTimeString()}`);
+				} else {
+					res.send(`Light automation is Disabled error`);
+				}
+
 			} else {
 				await httpReq.setAutomatedHueEnableLights();
 				res.send(`Light automation is Enabled`);
