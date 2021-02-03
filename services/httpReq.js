@@ -5,7 +5,7 @@ module.exports = function(logger) {
 	async function automationDisabledUntilTime() {
         try {
             const response = await got(options.automatedHueHomeUrl+'/sensorScheduleStatus');
-            logger.debug('sensorschedule status', response.body);
+            logger.debug('sensorschedule status', response);
             if (response){
                 response = new Date(response);
             }
