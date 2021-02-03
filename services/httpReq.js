@@ -6,6 +6,9 @@ module.exports = function(logger) {
         try {
             const response = await got(options.automatedHueHomeUrl+'/sensorScheduleStatus');
             logger.debug('sensorschedule status', response.body);
+            if (response){
+                response = new Date(response);
+            }
             return response;
         } catch (error) {
             logger.error(error.response.body);
