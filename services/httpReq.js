@@ -11,7 +11,7 @@ module.exports = function(logger) {
             }
             return response;
         } catch (error) {
-            logger.error(error.response.body);
+            logger.error(error);
         }
 	}
 
