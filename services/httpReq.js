@@ -8,7 +8,6 @@ module.exports = function(logger) {
             var response = await got(options.automatedHueHomeUrl+'/sensorScheduleStatus');
             if (response && response.body){
                 logger.debug('sensorschedule status', response.body);
-                logger.debug("test", new Date(""2021-02-03T17:00:05.321Z""));
                 disabledUntilDate = new Date(response.body);
                 logger.debug('disabled until date', disabledUntilDate);
             }
