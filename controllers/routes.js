@@ -99,7 +99,7 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 			logger.debug('emitting automated hue home');
 			var automationDisabledUntilTime = await httpReq.automationDisabledUntilTime();
 			logger.debug("automated hue home enabled in routes", automationDisabledUntilTime);
-			if(automationDisabledUntilTime == null){
+			if(automationDisabledUntilTime){
 				logger.debug("set to enabled");
 				io.sockets.emit('toggleAutomatedHueHome',`Light automation is Enabled`);
 			} else {
