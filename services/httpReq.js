@@ -19,6 +19,7 @@ module.exports = function(logger) {
 	}
 
     async function setAutomatedHueDisableLights() {
+        var date = null;
             try {
                 var response = await got.post(options.automatedHueHomeUrl+'/disableSchedulesAndSensors');
 
@@ -26,12 +27,14 @@ module.exports = function(logger) {
                     logger.debug('setAutomatedHueDisableLights status', response.body);
                     disabledUntilDate = new Date(response.body);
                     logger.debug('disabled until date', disabledUntilDate);
+                    dateRes = disabledUntilDate;
                 }
                 
                 logger.debug("setAutomatedHueDisableLights success");
             } catch (error) {
                 logger.error(error);
             }
+            return dateRes;
 	}
 
     async function setAutomatedHueEnableLights() {

@@ -74,9 +74,11 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 			var automationDisabledUntilTime = await httpReq.automationDisabledUntilTime();
 			if(automationDisabledUntilTime == null){
 				var disabledUntil = await httpReq.setAutomatedHueDisableLights();
-				res.send(`Light automation is Disabled until ${disabledUntil.toLocaleTimeString()}`);
-			
-
+				if(disabledUntil){
+					res.send(`Light automation is Disabled until ${disabledUntil.toLocaleTimeString()}`);
+				} else {
+					res.send(`Light automation is Disabled Error`);
+				}
 			} else {
 				await httpReq.setAutomatedHueEnableLights();
 				res.send(`Light automation is Enabled`);
