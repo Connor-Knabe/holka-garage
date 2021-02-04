@@ -20,9 +20,7 @@ module.exports = function(logger) {
 
     async function setAutomatedHueDisableLights() {
             try {
-                var response = await got.post(options.automatedHueHomeUrl+'/disableSchedulesAndSensors', {
-					responseType: 'json'
-				});
+                var response = await got.post(options.automatedHueHomeUrl+'/disableSchedulesAndSensors');
 
                 if (response && response.body){
                     logger.debug('setAutomatedHueDisableLights status', response.body);
