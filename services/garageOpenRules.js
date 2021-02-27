@@ -2,7 +2,7 @@ module.exports = function() {
 	function isFridayAndShouldOpen() {
 		var dayOfWeek = new Date().getDay();
 		var theTime = new Date();
-		return dayOfWeek == 5 && theTime.getHours() >= 11 && theTime.getHours() <= 21;
+		return dayOfWeek == 5 && theTime.getHours() >= 9 && theTime.getHours() <= 21;
 	}
 
 	function isTuesdayAndShouldOpen() {
