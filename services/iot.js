@@ -21,7 +21,7 @@ var motionSensorTimeoutOne = null,
 	tempGarageDisableStillOpenAlertTimeout = null,
 	temporaryDisableGarageStillOpenAlertTime = new Date(),
 	temporaryEnableGuestIsHomeTimeout = null,
-	temporaryEnableGuestIsHomeTime = new Date(),
+	temporaryEnableGuestIsHomeTime = null,
 	shouldAlertTimeoutOne = null,
 	shouldAlertTimeoutTwo = null,
 	garageTracking = null;
@@ -308,7 +308,12 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	//clean up these two functions 
 	function getTemporaryGuestIsHomeStatus(){
-		var status = homeAway.Status.temporaryEnableGuestIsHome ? `Guest Is Home Enabled until ${temporaryEnableGuestIsHomeTime.toLocaleTimeString()}` : `Guest Is Home Disabled`;
+
+		var guestHomeTime = "";
+		if(temporaryEnableGuestIsHomeTime){
+			guestHomeTime = `until ${temporaryEnableGuestIsHomeTime.toLocaleTimeString()}`;
+		}
+		var status = homeAway.Status.temporaryEnableGuestIsHome ? `Guest Is Home Enabled ${guestHomeTime}` : `Guest Is Home Disabled`;
 
 		return status
 	}
