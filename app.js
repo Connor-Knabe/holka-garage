@@ -49,7 +49,7 @@ const video = require('./services/video.js')(app, logger, io, hue, sockets);
 var messenger = require('./services/messenger.js')(logger, options.debugMode);
 
 
-const homeAway = require('./services/homeAway.js')(logger, login, messenger,messengerInfo, io)
+const homeAway = require('./services/homeAway.js')(logger, login, messenger, messengerInfo, io, options)
 var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron, homeAway);
 
 

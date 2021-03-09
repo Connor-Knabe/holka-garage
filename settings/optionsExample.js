@@ -32,3 +32,4 @@ module.exports.guestIsHomeEnableForHours = 5;
 module.exports.enableOutletSwitchOff = false;
 module.exports.automatedHueHome = false;
 module.exports.automatedHueHomeUrl = "http://localhost:3000"
+module.exports.defaultGuestIsHome = false;

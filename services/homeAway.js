@@ -1,13 +1,11 @@
-const { iftttGarageSetHomeUrl } = require("../settings/messengerInfoExample");
-
-module.exports = function(logger, login, messenger, messengerInfo, io) {
+module.exports = function(logger, login, messenger, messengerInfo, io, options) {
 
 	var Status = {
 		personOneAway: false,
 		personTwoAway: false,
 		personOneTime: new Date(),
 		personTwoTime: new Date(),
-		temporaryEnableGuestIsHome: false,
+		temporaryEnableGuestIsHome: options.defaultGuestIsHome,
 		isAway: ()=>{return Status.personOneAway && Status.personTwoAway},
 		isOnlyOnePersonHome: ()=>{
 			var personName = null;
