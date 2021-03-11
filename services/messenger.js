@@ -32,7 +32,6 @@ module.exports = function(logger, debugMode) {
 	function sendGenericIfttt(message) {
 		if (options.enableIfttt) {
 			messengerInfo.iftttRecipients.forEach((iftttRecipient) => {
-				// @ts-ignore
 				var url = messengerInfo.iftttGarageAlertUrl;
 				url += iftttRecipient.ApiKey;
 	
@@ -150,14 +149,12 @@ module.exports = function(logger, debugMode) {
 					} else {
 						setTimeout(() => {
 							if (message && message.sid) {
-								//@ts-ignore
 								client.messages(message.sid).media.each((media) => {
 									if (media && media.sid) {
 										console.log(`Deleting media for message.sid ${message.sid}`);
 										client
 											.messages(message.sid)
 											.media(media.sid)
-											//@ts-ignore
 											.remove()
 											.then(() => {
 												logger.info(`Media Sid ${media.sid}  deleted successfully. Message.sid ${message.sid}`);

@@ -1,7 +1,5 @@
-// @ts-ignore
 var express = require('express');
 var app = express();
-// @ts-ignore
 var http = require('http').Server(app);
 var https = require('https');
 
