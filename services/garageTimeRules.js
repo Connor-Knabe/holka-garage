@@ -22,10 +22,17 @@ module.exports = function() {
 		return (theTime.getHours() >= 11 && theTime.getHours() <= 13) || (theTime.getHours() >= 16 && theTime.getHours() <= 19);
 	}
 
+
+	function shouldAlertBasedOnTime() {
+		var theTime = new Date();
+		return (theTime.getHours() >= 22 && theTime.getHours() <= 3);
+	}
+
 	return {
 		isFridayAndShouldOpen: isFridayAndShouldOpen,
 		isTuesdayAndShouldOpen: isTuesdayAndShouldOpen,
 		isWeekendAndShouldOpen: isWeekendAndShouldOpen,
-		genericShouldOpenBasedOnTime: genericShouldOpenBasedOnTime
+		genericShouldOpenBasedOnTime: genericShouldOpenBasedOnTime,
+		shouldAlertBasedOnTime:shouldAlertBasedOnTime
 	};
 };

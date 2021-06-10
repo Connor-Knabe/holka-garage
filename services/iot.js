@@ -35,7 +35,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	var hasBeenOpened = garageIsOpen();
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const options = require('../settings/options.js');
-	const garageOpenRules = require('./garageOpenRules.js')();
+	const garageTimeRules = require('./garageTimeRules.js')();
 	const fs = require("fs");
 	garageTracking = require("../garageTracking.json");
 
@@ -50,6 +50,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			garageTracking.garageOpens++;
 			io.sockets.emit('garageOpenCount', getGarageOpenCount());
 			io.sockets.emit('springLifeRemaining', getSpringLifeRemaining());
+			shouldAlertHomeOwnersBasedOnTime('opened');
 
 			try { 
 				fs.writeFileSync( "garageTracking.json", JSON.stringify( garageTracking ), "utf8");
@@ -84,6 +85,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			}
 			
 		} else if (value == 0 && hasBeenOpened) {
+			shouldAlertHomeOwnersBasedOnTime('closed');
+
 			clearTimeout(tempGarageDisableStillOpenAlertTimeout);
 			temporaryDisableGarageStillOpenAlert = false;
 			io.sockets.emit('garageStatus', 'closed');
@@ -132,11 +135,35 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		});
 	}
 
+	function shouldAlertHomeOwnersBasedOnTime(status){
+		if(garageTimeRules.shouldAlertBasedOnTime()){
+			if(status=="opened"){
+				messenger.sendCallAlert();
+			}
+			video
+			.streamVideo()
+			.then(() => {
+				var garageAlertMsg = `ALERT! The garage has been ${status} during odd hours!`;
+				messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, sendPictureText, true);
+				video.stopStreaming();
+			})
+			.catch(() => {
+				var garageAlertMsg = `ALERT! The garage has been ${status} during odd hours`;
+				sendPictureText = false;
+				messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, sendPictureText, true);
+				video.stopStreaming();
+			});
+		}
+
+
+	}
+
 	function shouldAlertHomeOwners(status) {
 		logger.debug(`possibly alert home owners not home? expectedGarageOpen${expectedGarageOpen} | homeAway.Status.personOneAway && homeAway.Status.personTwoAway ${homeAway.Status.personOneAway} && ${homeAway.Status.personTwoAway}`);
 		if (!expectedGarageOpen) {
 			if (homeAway.Status.personOneAway && homeAway.Status.personTwoAway) {
 				var sendPictureText = true;
+				messenger.sendCallAlert();
 				video
 					.streamVideo()
 					.then(() => {
@@ -241,7 +268,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	function shouldOpenGarageBaesdOnRules(){
-		return garageOpenRules.isFridayAndShouldOpen() || garageOpenRules.isTuesdayAndShouldOpen() || garageOpenRules.genericShouldOpenBasedOnTime() || garageOpenRules.isWeekendAndShouldOpen();
+		return garageTimeRules.isFridayAndShouldOpen() || garageTimeRules.isTuesdayAndShouldOpen() || garageTimeRules.genericShouldOpenBasedOnTime() || garageTimeRules.isWeekendAndShouldOpen();
 	}
 
 	function openCloseGarageDoor() {
