@@ -25,7 +25,7 @@ module.exports = function() {
 
 	function shouldAlertBasedOnTime() {
 		var theTime = new Date();
-		return (theTime.getHours() >= 22 && theTime.getHours() <= 3);
+		return (theTime.getHours() >= 22 || theTime.getHours() <= 8);
 	}
 
 	return {
