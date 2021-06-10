@@ -137,6 +137,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	function shouldAlertHomeOwnersBasedOnTime(status){
 		if(garageTimeRules.shouldAlertBasedOnTime()){
+			logger.debug('Should alert homeowners based on odd time');
 			if(status=="opened"){
 				messenger.sendCallAlert();
 			}
