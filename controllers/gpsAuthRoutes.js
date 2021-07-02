@@ -49,7 +49,13 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 			var isPersonTwo = true;
 			
 			const personTwoAwayTime = homeAway.getTimeAway(homeAway.Status.personTwoTime)
+
 			if (!homeAway.isPersonAway(isPersonTwo) && personTwoAwayTime > 0) {
+				var msg = `Would open garage for person two but in testing, home time > 0`
+				messenger.sendGenericIfttt(msg);
+			} 
+
+			if (!homeAway.isPersonAway(isPersonTwo)) {
 				var msg = `person two already home not opening garage!`
 				messenger.sendGenericIfttt(msg);
 				logger.debug(msg);
@@ -62,6 +68,11 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 			const personOneAwayTime = homeAway.getTimeAway(homeAway.Status.personOneTime)
 
 			if (!homeAway.isPersonAway(isPersonTwo) && personOneAwayTime > 0) {
+				var msg = `Would open garage for person one but in testing home time> 0`
+				messenger.sendGenericIfttt(msg);
+			}
+
+			if (!homeAway.isPersonAway(isPersonTwo)) {
 				var msg = `person one already home not opening garage!`
 				messenger.sendGenericIfttt(msg);
 				logger.debug(msg);
