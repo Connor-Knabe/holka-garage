@@ -1,3 +1,4 @@
+v2.7.3-1.0.1 - fixing issue if sets to home before open garage attempt
 v2.6.8 - shows what time the light automation will resume
 v2.6.7 - shows the toggle for automated hue lights on site
 v2.6.6 - section on website that mentions if garage should open based on rules or not
