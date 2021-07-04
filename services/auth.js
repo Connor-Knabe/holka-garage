@@ -51,7 +51,7 @@ module.exports = function(logger, login, messengerInfo, options, messenger) {
 
 		if (shouldSendSecurityAlert) {
 			var btnPress = true;
-			messenger.send(true, messengerInfo.toNumbers, securityMsg, false, btnPress);
+			messenger.send(true, messengerInfo.alertNumbers, securityMsg, false, btnPress);
 			shouldSendSecurityAlert = false;
 		}
 	}
