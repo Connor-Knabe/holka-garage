@@ -7,6 +7,13 @@ module.exports.toNumbers = [
 		email: 'myemailaddress@gmail.com'
 	}
 ];
+module.exports.alertNumbers = [
+	{
+		name: 'Connor',
+		number: '314-555-0333',
+		email: 'myemailaddress@gmail.com'
+	}
+];
 
 //For gmail emails must enable less secure apps....
 //https://support.google.com/accounts/answer/6010255?hl=en

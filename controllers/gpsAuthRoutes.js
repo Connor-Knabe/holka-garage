@@ -114,7 +114,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 
 		if (shouldSendSecurityAlert) {
 			var btnPress = true;
-			messenger.send(true, messengerInfo.toNumbers, securityMsg, options.alertSendPictureText, btnPress);
+			messenger.send(true, messengerInfo.alertNumbers, securityMsg, options.alertSendPictureText, btnPress);
 			shouldSendSecurityAlert = false;
 		}
 	}
