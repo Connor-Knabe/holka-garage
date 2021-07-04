@@ -26,13 +26,12 @@ module.exports = function(logger, login, messengerInfo, options, messenger) {
 			next();
 		} else if (req.path.toLowerCase().includes('open')) {
 			var garageStatus = 'hack';
-			const minsToWaitBeforeNextSecurityAlert = 5;
 			if (req.body && req.body.garageSwitch == 'open') {
 				garageStatus = 'open';
 			} else if (req.body && req.body.garageSwitch == 'close') {
 				garageStatus = 'close';
 			}
-			possibleHackAlert(garageStatus, req, minsToWaitBeforeNextSecurityAlert);
+			possibleHackAlert(garageStatus, req, options.minsToWaitBeforeNextSecurityAlert);
 			res.status(401);
 			res.send('not auth');
 		} else {
@@ -52,7 +51,7 @@ module.exports = function(logger, login, messengerInfo, options, messenger) {
 
 		if (shouldSendSecurityAlert) {
 			var btnPress = true;
-			messenger.send(true, messengerInfo.toNumbers, securityMsg, options.alertSendPictureText, btnPress);
+			messenger.send(true, messengerInfo.toNumbers, securityMsg, false, btnPress);
 			shouldSendSecurityAlert = false;
 		}
 	}

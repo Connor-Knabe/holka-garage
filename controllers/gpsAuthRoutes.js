@@ -94,8 +94,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 			res.status(200);
 			res.send('OK');
 		} else {
-			const minsToWaitBeforeNextSecurityAlert = 5;
-			possibleHackAlert('openViaGPS', req, minsToWaitBeforeNextSecurityAlert);
+			possibleHackAlert('openViaGPS', req, options.minsToWaitBeforeNextSecurityAlert);
 
 			logger.info(`Failed attempt to open garage for person ${gpsPerson} via gps from ip: ${req.connection.remoteAddress} with body of ${JSON.stringify(req.body)}, Possible Hack?`);
 			res.status(401);
