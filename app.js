@@ -38,7 +38,7 @@ var httpsServer = https.createServer(
 	},
 	app
 );
-var io = require('socket.io')(httpsServer);
+var io = require('socket.io')(http);
 
 const hue = require('./services/hue.js')(logger);
 
@@ -55,13 +55,13 @@ const authService = require('./services/auth.js')(logger, login, messengerInfo, 
 
 app.use(helmet());
 app.use(cookieParser());
-
+/*
 app.use(function(req, res, next) {
 	if (!req.secure) {
 		return res.redirect([ 'https://', req.get('Host'), req.url ].join(''));
 	}
 	next();
-});
+});*/
 
 var hueEnergyUsageHealthOptions = {
 	target: 'http://localhost:1234/health',
