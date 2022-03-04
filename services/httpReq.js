@@ -11,10 +11,11 @@ module.exports = function(logger) {
                 logger.debug(response.body);
                 var dateToSet = response.body;
                 logger.debug('sensorschedule status', dateToSet);
-                disabledUntilDate = new Date(dateToSet);
+                disabledUntilDate = Date.parse(dateToSet);
                 logger.debug('disabled until date1', disabledUntilDate);
             }
         } catch (error) {
+            logger.debug("error parsing date",  error);
             logger.error(error);
         }
         return disabledUntilDate;
