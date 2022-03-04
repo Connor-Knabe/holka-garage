@@ -9,7 +9,7 @@ module.exports = function(logger) {
             if (response && response.body){
                 logger.debug('sensorschedule status', response.body);
                 disabledUntilDate = new Date(response.body);
-                logger.debug('disabled until date', disabledUntilDate);
+                logger.debug('disabled until date1', disabledUntilDate);
             }
         } catch (error) {
             logger.error(error);
@@ -19,14 +19,14 @@ module.exports = function(logger) {
 	}
 
     async function setAutomatedHueDisableLights() {
-        var date = null;
+        var dateRes = null;
             try {
                 var response = await got.post(options.automatedHueHomeUrl+'/disableSchedulesAndSensors');
 
                 if (response && response.body){
                     logger.debug('setAutomatedHueDisableLights status', response.body);
                     disabledUntilDate = new Date(response.body);
-                    logger.debug('disabled until date', disabledUntilDate);
+                    logger.debug('disabled until date2', disabledUntilDate);
                     dateRes = disabledUntilDate;
                 }
                 
