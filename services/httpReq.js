@@ -3,12 +3,13 @@ const options = require('../settings/options.js');
 
 module.exports = function(logger) {
 	async function automationDisabledUntilTime() {
-        var disabledUntilDate = null;
+        var disabledUntilDate = new Date();
         try {
             var response = await got(options.automatedHueHomeUrl+'/sensorScheduleStatus');
             if (response && response.body){
-                logger.debug('sensorschedule status', response.body);
-                disabledUntilDate = new Date(response.body);
+                var dateToSet = "2022-03-04T08:57:07.589Z";
+                logger.debug('sensorschedule status', dateToSet);
+                disabledUntilDate = new Date(dateToSet);
                 logger.debug('disabled until date1', disabledUntilDate);
             }
         } catch (error) {
@@ -19,7 +20,7 @@ module.exports = function(logger) {
 	}
 
     async function setAutomatedHueDisableLights() {
-        var dateRes = null;
+        var dateRes = new Date();
             try {
                 var response = await got.post(options.automatedHueHomeUrl+'/disableSchedulesAndSensors');
 
