@@ -1,4 +1,4 @@
-module.exports = function() {
+module.exports = function(options) {
 	function isFridayAndShouldOpen() {
 		var dayOfWeek = new Date().getDay();
 		var theTime = new Date();
@@ -25,6 +25,9 @@ module.exports = function() {
 
 	function shouldAlertBasedOnTime() {
 		var theTime = new Date();
+		if(!options.shouldAlertBasedOnOddHours){
+			return false;
+		}
 		return (theTime.getHours() >= 22 || theTime.getHours() <= 3);
 	}
 

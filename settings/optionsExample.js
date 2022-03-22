@@ -34,3 +34,4 @@ module.exports.automatedHueHome = false;
 module.exports.automatedHueHomeUrl = "http://localhost:3000"
 module.exports.defaultGuestIsHome = false;
 module.exports.minsToWaitBeforeNextSecurityAlert = 60;
+module.exports.shouldAlertBasedOnOddHours = true;

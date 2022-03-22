@@ -35,7 +35,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	var hasBeenOpened = garageIsOpen();
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const options = require('../settings/options.js');
-	const garageTimeRules = require('./garageTimeRules.js')();
+	const garageTimeRules = require('./garageTimeRules.js')(options);
 	const fs = require("fs");
 	garageTracking = require("../garageTracking.json");
 
