@@ -1,28 +1,32 @@
 {
-	"name": "holka-garage",
-	"version": "1.0.3",
-	"description": "IoT project running on a Raspberry Pi to open/close a garage door and to see if it's opened or closed.",
-	"main": "app.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"author": "Connor Knabe",
-	"license": "MIT",
-	"dependencies": {
-		"basic-auth-connect": "1.0.0",
-		"body-parser": "1.19.0",
-		"cookie-parser": "1.4.5",
-		"express": "4.17.1",
-		"express-session": "1.17.1",
-		"helmet": "^3.23.3",
-		"http-proxy-middleware": "0.21.0",
-		"log4js": "~6.3.0",
-		"node-hue-api": "4.0.10",
-		"onoff": "3.2.2",
-		"got": "11.8.0",
-		"serve-favicon": "2.5.0",
-		"socket.io": "3.0.0",
-		"twilio": "3.54.2",
-		"cron": "1.8.2"
-	}
+  "name": "holka-garage",
+  "version": "1.0.3",
+  "description": "IoT project running on a Raspberry Pi to open/close a garage door and to see if it's opened or closed.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "npm run snyk-protect",
+    "snyk-protect": "snyk-protect"
+  },
+  "author": "Connor Knabe",
+  "license": "MIT",
+  "dependencies": {
+    "basic-auth-connect": "1.0.0",
+    "body-parser": "1.19.0",
+    "cookie-parser": "1.4.5",
+    "express": "4.17.1",
+    "express-session": "1.17.1",
+    "helmet": "^3.23.3",
+    "http-proxy-middleware": "0.21.0",
+    "log4js": "~6.3.0",
+    "node-hue-api": "4.0.10",
+    "onoff": "3.2.2",
+    "got": "11.8.0",
+    "serve-favicon": "2.5.0",
+    "socket.io": "3.0.0",
+    "twilio": "3.54.2",
+    "cron": "1.8.2",
+    "@snyk/protect": "latest"
+  },
+  "snyk": true
 }
