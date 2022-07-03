@@ -5,6 +5,7 @@ module.exports = function(logger, debugMode) {
 
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const got = require('got');
+	
 	const options = require('../settings/options.js');
 	const client = twilio(messengerInfo.TWILIO_ACCOUNT_SID, messengerInfo.TWILIO_AUTH_TOKEN);
 	var minsOpened = 0;
