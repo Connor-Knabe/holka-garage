@@ -1,4 +1,16 @@
 module.exports = function(options) {
+
+
+	//create a function to save which times garage is being used
+	var garageTime = function(garage, time) {
+		var garageTime = {
+			garage: garage,
+			time: time
+		};
+		return garageTime;
+	}
+	
+
 	function isFridayAndShouldOpen() {
 		var dayOfWeek = new Date().getDay();
 		var theTime = new Date();
@@ -21,7 +33,6 @@ module.exports = function(options) {
 		var theTime = new Date();
 		return (theTime.getHours() >= 11 && theTime.getHours() <= 13) || (theTime.getHours() >= 16 && theTime.getHours() <= 19);
 	}
-
 
 	function shouldAlertBasedOnTime() {
 		var theTime = new Date();

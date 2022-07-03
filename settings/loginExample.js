@@ -15,7 +15,5 @@ module.exports.users = [
 
 module.exports.secret = '23094u2noiadsjfsdf';
 module.exports.sslPath = '/etc/letsencrypt/live/domain.com/';
-module.exports.acmeChallenge = 'al;sjdfas0idfjoasjdflksjdfokjasi0dfj0asdjf';
-module.exports.acmeChallengeKey = 'alksjdf0iasjdf0ijas0dfj0iasjdfaskldjflkajsdfja.asjdlfkjaklsdjflkjaslkdjf';
 module.exports.gpsPersonOneKey = 'laskdjf02j02j0jf02hf0h';
 module.exports.gpsPersonTwoKey = 'alksjdf02h9f2hu0hf02hf0';

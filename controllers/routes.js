@@ -144,21 +144,6 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		}
 	});
 
-	//Used to verify letsencrypt manually
-	app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey.split('.')[0], function(req, res) {
-		res.send(login.acmeChallengeKey);
-	});
-
-	//Used to verify letsencrypt manually
-	app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey2.split('.')[0], function(req, res) {
-		res.send(login.acmeChallengeKey2);
-	});
-
-	//Used to verify letsencrypt manually
-	app.get('/.well-known/acme-challenge/' + login.acmeChallengeKey3.split('.')[0], function(req, res) {
-		res.send(login.acmeChallengeKey3);
-	});
-
 	function isValidLogin(username, password) {
 		var user = null;
 		login.users.forEach((userLogin) => {

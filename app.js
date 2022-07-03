@@ -30,14 +30,15 @@ process.argv.forEach((val, index, array)=> {
 	}
 });
 
-var httpsServer = https.createServer(
-	{
-		secureOptions: constants.SSL_OP_NO_TLSv1 | constants.SSL_OP_NO_TLSv1_1,
-		key: fs.readFileSync(login.sslPath + 'privkey.pem'),
-		cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
-	},
-	app
-);
+// var httpsServer = https.createServer(
+// 	{
+// 		secureOptions: constants.SSL_OP_NO_TLSv1 | constants.SSL_OP_NO_TLSv1_1,
+// 		key: fs.readFileSync(login.sslPath + 'privkey.pem'),
+// 		cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
+// 	},
+// 	app
+// );
+
 var io = require('socket.io')(http);
 
 const hue = require('./services/hue.js')(logger);
