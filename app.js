@@ -86,7 +86,7 @@ app.use('/', express.static(path.join(__dirname, 'public')));
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 //settings
-var port = 80;
+var port = 2323;
 logger.level = 'debug';
 
 process.on('uncaughtException', (e) => {
