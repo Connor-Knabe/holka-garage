@@ -11,7 +11,7 @@ const favicon = require('serve-favicon');
 var path = require('path');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
-const proxy = require('http-proxy-middleware');
+// const proxy = require('http-proxy-middleware');
 const fs = require('fs');
 var log4js = require('log4js');
 var logger = log4js.getLogger();
@@ -64,21 +64,21 @@ app.use(function(req, res, next) {
 	next();
 });*/
 
-var hueEnergyUsageHealthOptions = {
-	target: 'http://localhost:1234/health',
-	changeOrigin: false,
-	pathRewrite: {
-		'^/proxy/hue-energy-usage/health': ''
-	}
-};
+// var hueEnergyUsageHealthOptions = {
+// 	target: 'http://localhost:1234/health',
+// 	changeOrigin: false,
+// 	pathRewrite: {
+// 		'^/proxy/hue-energy-usage/health': ''
+// 	}
+// };
 
-var nestEnergyUsageIftttOptions = {
-	target: 'http://localhost:1235/ifttt',
-	changeOrigin: false,
-	pathRewrite: {
-		'^/proxy/nest-energy-usage/ifttt': ''
-	}
-};
+// var nestEnergyUsageIftttOptions = {
+// 	target: 'http://localhost:1235/ifttt',
+// 	changeOrigin: false,
+// 	pathRewrite: {
+// 		'^/proxy/nest-energy-usage/ifttt': ''
+// 	}
+// };
 
 
 
@@ -132,6 +132,6 @@ if (options.debugMode) {
 
 require('./controllers/routes.js')(app, logger, io, video, authService, homeAway, bodyParser, iot, sockets);
 require('./controllers/gpsAuthRoutes.js')(app, logger, messenger, homeAway, bodyParser, iot);
-require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, video, authService, homeAway, proxy, bodyParser, iot);
+require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, video, authService, homeAway, bodyParser, iot);
 
 

@@ -6,7 +6,7 @@ var garageOpenStatus = null;
 var wasOpenedViaWebsiteTimeout = null;
 var wasClosedViaWebsiteTimeout = null;
 
-module.exports = function(app, logger, io, hue, messenger, video, authService, homeAway, proxy, bodyParser,iot) {
+module.exports = function(app, logger, io, hue, messenger, video, authService, homeAway, bodyParser,iot) {
 	var garageErrorStatus = null;
 	const httpReq = require('../services/httpReq.js')(logger);
 
@@ -200,26 +200,26 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 	});
 
 	//if using https://github.com/Connor-Knabe/hue-energy-usage
-	if (options.enableHueEnergyUsageReport) {
-		var hueEnergyUsageOptions = {
-			target: 'http://localhost:1234',
-			changeOrigin: false,
-			pathRewrite: {
-				'^/proxy/hue-energy-usage': ''
-			}
-		};
-		app.use('/proxy/hue-energy-usage', proxy(hueEnergyUsageOptions));
-	}
+	// if (options.enableHueEnergyUsageReport) {
+	// 	var hueEnergyUsageOptions = {
+	// 		target: 'http://localhost:1234',
+	// 		changeOrigin: false,
+	// 		pathRewrite: {
+	// 			'^/proxy/hue-energy-usage': ''
+	// 		}
+	// 	};
+	// 	app.use('/proxy/hue-energy-usage', proxy(hueEnergyUsageOptions));
+	// }
 
-	if (options.enableNestEnergyUsageReport) {
-		var nestEnergyUsageOptions = {
-			target: 'http://localhost:1235',
-			changeOrigin: false,
-			pathRewrite: {
-				'^/proxy/nest-energy-usage': ''
-			}
-		};
-		app.use('/proxy/nest-energy-usage', proxy(nestEnergyUsageOptions));
-	}
+	// if (options.enableNestEnergyUsageReport) {
+	// 	var nestEnergyUsageOptions = {
+	// 		target: 'http://localhost:1235',
+	// 		changeOrigin: false,
+	// 		pathRewrite: {
+	// 			'^/proxy/nest-energy-usage': ''
+	// 		}
+	// 	};
+	// 	app.use('/proxy/nest-energy-usage', proxy(nestEnergyUsageOptions));
+	// }
 	
 };
