@@ -24,7 +24,6 @@ module.exports.TWILIO_ACCOUNT_SID = 'accountSIDlkasjdf0jSIDFJ11DF';
 module.exports.photoTextTimeoutSeconds = 20;
 
 module.exports.iftttRecipients = [ { Name: 'Connor', ApiKey: 'apiKeylaksdjf09sdjf' } ];
-module.exports.iftttHomeAwayAccount = { ApiKey: 'lkajsdfj02ijf0', baseUrl: 'https://maker.ifttt.com/trigger/' };
 
 module.exports.iftttGarageOpenedUrl = 'https://maker.ifttt.com/trigger/garage_open_trigger/with/key/';
 module.exports.iftttGarageClosedUrl = 'https://maker.ifttt.com/trigger/garage_close_trigger/with/key/';
@@ -36,7 +35,6 @@ module.exports.iftttGarageSetHomeUrl = 'https://maker.ifttt.com/trigger/garage_h
 module.exports.iftttGarageSetAwayUrl = 'https://maker.ifttt.com/trigger/garage_away/alert/with/key/';
 
 module.exports.iftttGarageSetAway2Url = 'https://maker.ifttt.com/trigger/garage_away2/alert/with/key/';
-module.exports.iftttGarageOutletsOffUrl = 'https://maker.ifttt.com/trigger/outletsoff/alert/with/key/';
 
 module.exports.iftttValue1 = 'This will be displayed in the notification';
 
