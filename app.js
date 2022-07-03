@@ -122,13 +122,13 @@ if (options.debugMode) {
 	logger.debug('___________________________________');
 }
 
-if (options.enableNestEnergyUsageReport) {
-	app.use('/proxy/nest-energy-usage/ifttt', proxy(nestEnergyUsageIftttOptions));
-}
+// if (options.enableNestEnergyUsageReport) {
+// 	app.use('/proxy/nest-energy-usage/ifttt', proxy(nestEnergyUsageIftttOptions));
+// }
 
-if (options.enableHueEnergyUsageReport) {
-	app.use('/proxy/hue-energy-usage/health', proxy(hueEnergyUsageHealthOptions));
-}
+// if (options.enableHueEnergyUsageReport) {
+// 	app.use('/proxy/hue-energy-usage/health', proxy(hueEnergyUsageHealthOptions));
+// }
 
 require('./controllers/routes.js')(app, logger, io, video, authService, homeAway, bodyParser, iot, sockets);
 require('./controllers/gpsAuthRoutes.js')(app, logger, messenger, homeAway, bodyParser, iot);
