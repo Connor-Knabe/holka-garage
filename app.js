@@ -97,9 +97,9 @@ process.on('unhandledRejection', (reason, p) => {
 	logger.error('Unhandled rejection for Promise:', p, 'With a reason of:', reason);
 });
 
-httpsServer.listen(443, function() {
-	logger.info('listening on *:', 443);
-});
+// httpsServer.listen(443, function() {
+// 	logger.info('listening on *:', 443);
+// });
 
 http.listen(port, function() {
 	logger.info('listening on *:', port);
