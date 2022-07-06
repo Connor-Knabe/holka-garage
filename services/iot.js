@@ -252,7 +252,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	setTimeout(()=>{
 		shouldOpenGarageBaesdOnRules();
-
 	},5000);
 
 
@@ -272,7 +271,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	async function shouldOpenGarageBaesdOnRules(){
-		const shouldOpenGarage = garageTimeRules.newShouldOpenBasedOnDayTime(garageTracking.shouldOpenBasedOnTime,garageTracking.garageTimesToOpenLog);
+		const shouldOpenGarage = garageTimeRules.newShouldOpenBasedOnDayTime(garageTracking.garageTimesToOpen,garageTracking.garageTimesToOpenLog);
 
 		await writeToGarageTrackingFile();
 
