@@ -250,7 +250,11 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert, timeUntilAlert);
 	}
 
-	shouldOpenGarageBaesdOnRules();
+	setTimeout(()=>{
+		shouldOpenGarageBaesdOnRules();
+
+	},5000);
+
 
 	function toggleGarageDoor(gpsPerson, remoteAddress) {
 		if (shouldOpenGarageBaesdOnRules()) {
