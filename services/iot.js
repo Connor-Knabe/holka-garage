@@ -54,7 +54,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			
 			await writeToGarageTrackingFile();
 
-
 			hasBeenOpened = true;
 			garageLastOpenedTime = new Date();
 			io.sockets.emit('garageLastOpenedTime', garageLastOpenedTime);
@@ -268,7 +267,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		}
 	}
 
-	function shouldOpenGarageBaesdOnRules(){
+	async function shouldOpenGarageBaesdOnRules(){
 		const shouldOpenGarage = garageTimeRules.newShouldOpenBasedOnDayTime(garageTracking.shouldOpenBasedOnTime,garageTracking.garageTimesToOpenLog);
 
 		await writeToGarageTrackingFile();
