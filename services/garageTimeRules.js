@@ -42,9 +42,6 @@ function newShouldOpenBasedOnDayTime(shouldOpenBasedOnTime,garageTimesToOpenLog)
         if (garageTimesToOpen.hasOwnProperty(dayOfWeekNumberKey)) {
             if(currentDayNum == dayOfWeekNumberKey){
                 var day = garageTimesToOpen[dayOfWeekNumberKey];
-                var dayToLog = garageTimesToOpenLog[dayOfWeekNumberKey];
-                dayToLog.hourAndCount[theTime.getHours()] = dayToLog.hourAndCount[theTime.getHours()] == undefined ? 1 : dayToLog.hourAndCount[theTime.getHours()] += 1;
-
                 if(day.hoursToOpen != null){
                     day.hoursToOpen.forEach(function(hour){
                         if(hour==theTime.getHours()){
@@ -57,9 +54,26 @@ function newShouldOpenBasedOnDayTime(shouldOpenBasedOnTime,garageTimesToOpenLog)
         }
     }
 
+	var day = garageTimesToOpen["All"];
+	if(day.hoursToOpen != null){
+		day.hoursToOpen.forEach(function(hour){
+			if(hour==theTime.getHours()){
+				shouldOpenBasedOnTime = true;
+				return;
+			}   
+		});
+	}
+
+
+
+	var dayToLog = garageTimesToOpenLog[dayOfWeekNumberKey];
+	dayToLog.hourAndCount[theTime.getHours()] = dayToLog.hourAndCount[theTime.getHours()] == undefined ? 1 : dayToLog.hourAndCount[theTime.getHours()] += 1;
+
+	console.log('shouldOpenBasedOnTime',shouldOpenBasedOnTime);
     return shouldOpenBasedOnTime;
 }
 
+	function shouldOpenBasedOnDayTime(garageTimesToOpenLog){
 
 	return {
 		isFridayAndShouldOpen: isFridayAndShouldOpen,
