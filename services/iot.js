@@ -41,7 +41,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	app.set('takingVideo', false);
 
-	garageSensor.watch(function(err, value) {
+	garageSensor.watch(async function(err, value) {
 		if (err) {
 			logger.error('Error watching garage sensor: ', err);
 		}
