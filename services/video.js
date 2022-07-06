@@ -2,7 +2,6 @@ var fs = require('fs');
 var raspistillProc;
 var convertProc;
 var Gpio = require('onoff').Gpio;
-// var spawn = require('child_process').spawn;
 const { spawn } = require('node:child_process');
 
 var garageSensor = new Gpio(4, 'in', 'both');
