@@ -1,1 +1,24 @@
-{"springReplacedDate":"Dec 29 2020" ,"garageOpens":0}
+{
+    "springReplacedDate": "Dec 29 2020",
+    "garageOpens": 0,
+    "garageTimesToOpen": [
+    {"day": "Sunday", "hoursToOpen": [17]},
+    {"day": "Monday", "hoursToOpen": [17]},
+    {"day": "Tuesday", "hoursToOpen": null},
+    {"day": "Wednesday", "hoursToOpen": [17]},
+    {"day": "Thursday", "hoursToOpen": null},
+    {"day": "Friday", "hoursToOpen": [17]},
+    {"day": "Saturday", "hoursToOpen": [17]},
+    {"day": "All", "hoursToOpen": [17]}
+],"garageTimesToOpenLog" : [
+    {"day": "Sunday", "hourAndCount": {}},
+    {"day": "Monday", "hourAndCount": {}},
+    {"day": "Tuesday", "hourAndCount": {}},
+    {"day": "Wednesday", "hourAndCount": {}},
+    {"day": "Thursday", "hourAndCount": {}},
+    {"day": "Friday", "hourAndCount": {}},
+    {"day": "Saturday", "hourAndCount": {}},
+    {"day": "All", "hourAndCount":{}}
+]}
+
+

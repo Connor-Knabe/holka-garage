@@ -36,7 +36,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const options = require('../settings/options.js');
 	const garageTimeRules = require('./garageTimeRules.js')(options);
-	const fs = require("fs");
+	const fs = require("fs").promises;
 	garageTracking = require("../garageTracking.json");
 
 	app.set('takingVideo', false);
@@ -51,12 +51,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			io.sockets.emit('garageOpenCount', getGarageOpenCount());
 			io.sockets.emit('springLifeRemaining', getSpringLifeRemaining());
 			shouldAlertHomeOwnersBasedOnTime('opened');
-
-			try { 
-				fs.writeFileSync( "garageTracking.json", JSON.stringify( garageTracking ), "utf8");
-			} catch(err) { 
-				logger.error(`Error writing garageTracking file ${err}`); 
-			} 		
+			
+			await writeToGarageTrackingFile();
 
 
 			hasBeenOpened = true;
@@ -271,7 +267,12 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	function shouldOpenGarageBaesdOnRules(){
-		return garageTimeRules.isFridayAndShouldOpen() || garageTimeRules.isTuesdayAndShouldOpen() || garageTimeRules.genericShouldOpenBasedOnTime() || garageTimeRules.isWeekendAndShouldOpen();
+		const shouldOpenGarage = garageTimeRules.newShouldOpenBasedOnDayTime(garageTracking.shouldOpenBasedOnTime,garageTracking.garageTimesToOpenLog);
+
+		await writeToGarageTrackingFile();
+
+		return shouldOpenGarage;
+		// return garageTimeRules.isFridayAndShouldOpen() || garageTimeRules.isTuesdayAndShouldOpen() || garageTimeRules.genericShouldOpenBasedOnTime() || garageTimeRules.isWeekendAndShouldOpen();
 	}
 
 	function openCloseGarageDoor() {
@@ -403,6 +404,14 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		'America/Chicago'
 	);
 	job.start();
+
+	async function writeToGarageTrackingFile() {
+		try { 
+			await fs.writeFile( "garageTracking.json", JSON.stringify( garageTracking ), "utf8");
+		} catch(err) { 
+			logger.error(`Error writing garageTracking file ${err}`); 
+		} 	
+	}
 
 	return {
 		garageIsOpen: garageIsOpen,

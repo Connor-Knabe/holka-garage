@@ -1,16 +1,5 @@
 module.exports = function(options) {
 
-
-	//create a function to save which times garage is being used
-	var garageTime = function(garage, time) {
-		var garageTime = {
-			garage: garage,
-			time: time
-		};
-		return garageTime;
-	}
-	
-
 	function isFridayAndShouldOpen() {
 		var dayOfWeek = new Date().getDay();
 		var theTime = new Date();
@@ -42,11 +31,42 @@ module.exports = function(options) {
 		return (theTime.getHours() >= 22 || theTime.getHours() <= 3);
 	}
 
+
+
+
+function newShouldOpenBasedOnDayTime(shouldOpenBasedOnTime,garageTimesToOpenLog){
+    var currentDayNum = new Date().getDay();
+    var theTime = new Date();
+    var shouldOpenBasedOnTime = false;
+    for (var dayOfWeekNumberKey in garageTimesToOpen) {
+        if (garageTimesToOpen.hasOwnProperty(dayOfWeekNumberKey)) {
+            if(currentDayNum == dayOfWeekNumberKey){
+                var day = garageTimesToOpen[dayOfWeekNumberKey];
+                var dayToLog = garageTimesToOpenLog[dayOfWeekNumberKey];
+                dayToLog.hourAndCount[theTime.getHours()] = dayToLog.hourAndCount[theTime.getHours()] == undefined ? 1 : dayToLog.hourAndCount[theTime.getHours()] += 1;
+
+                if(day.hoursToOpen != null){
+                    day.hoursToOpen.forEach(function(hour){
+                        if(hour==theTime.getHours()){
+                            shouldOpenBasedOnTime = true;
+                            return;
+                        }   
+                    });
+                }
+            }
+        }
+    }
+
+    return shouldOpenBasedOnTime;
+}
+
+
 	return {
 		isFridayAndShouldOpen: isFridayAndShouldOpen,
 		isTuesdayAndShouldOpen: isTuesdayAndShouldOpen,
 		isWeekendAndShouldOpen: isWeekendAndShouldOpen,
 		genericShouldOpenBasedOnTime: genericShouldOpenBasedOnTime,
-		shouldAlertBasedOnTime:shouldAlertBasedOnTime
+		shouldAlertBasedOnTime:shouldAlertBasedOnTime,
+		newShouldOpenBasedOnDayTime:newShouldOpenBasedOnDayTime
 	};
 };

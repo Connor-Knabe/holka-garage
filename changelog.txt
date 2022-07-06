@@ -1,3 +1,4 @@
+v3.1 - tracking time of day garage opens
 v2.8.0 - adding ability to disable odd time open alert
 v2.7.3-1.0.1 - fixing issue if sets to home before open garage attempt
 v2.6.8 - shows what time the light automation will resume
