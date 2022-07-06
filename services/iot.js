@@ -251,6 +251,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert, timeUntilAlert);
 	}
 
+	shouldOpenGarageBaesdOnRules();
+
 	function toggleGarageDoor(gpsPerson, remoteAddress) {
 		if (shouldOpenGarageBaesdOnRules()) {
 			if (!garageIsOpen()) {
@@ -271,6 +273,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 		await writeToGarageTrackingFile();
 
+		//DEBUG
+		return false;
 		return shouldOpenGarage;
 		// return garageTimeRules.isFridayAndShouldOpen() || garageTimeRules.isTuesdayAndShouldOpen() || garageTimeRules.genericShouldOpenBasedOnTime() || garageTimeRules.isWeekendAndShouldOpen();
 	}
