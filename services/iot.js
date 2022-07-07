@@ -255,7 +255,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			if (!garageIsOpen()) {
 				logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${remoteAddress}`);
 				openCloseGarageDoor();
-			messenger.sendIftt(true, `Garage open via GPS for person ${gpsPerson}`);
+				messenger.sendIftt(true, `Garage open via GPS for person ${gpsPerson}`);
 			} else {
 				logger.info(`Attempted to open garage via gps person ${gpsPerson} from ip: ${remoteAddress} but garage was open`);
 			}
@@ -266,7 +266,12 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	async function shouldOpenGarageBaesdOnRules(){
-		const shouldOpenGarage = garageTimeRules.newShouldOpenBasedOnDayTime(garageTracking.garageTimesToOpen,garageTracking.garageTimesToOpenLog);
+		var shouldOpenGarage = false;
+		const shouldOpenGarageBasedOnDayTimeLog = garageTimeRules.shouldOpenCheckAndLog(garageTracking.garageTimesToOpenLog);
+		
+		const shouldOpenGarageBasedOnDayTime = garageTimeRules.shouldOpenCheck(garageTracking.garageTimesToOpen);
+		
+		shouldOpenGarage = shouldOpenGarageBasedOnDayTime || shouldOpenGarageBasedOnDayTimeLog;
 
 		await writeToGarageTrackingFile();
 

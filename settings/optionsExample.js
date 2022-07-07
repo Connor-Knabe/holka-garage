@@ -30,3 +30,4 @@ module.exports.defaultGuestIsHome = false;
 module.exports.minsToWaitBeforeNextSecurityAlert = 60;
 module.exports.shouldAlertBasedOnOddHours = true;
 module.exports.shouldAlertIfBothOwnersAwayAndOpen = true;
+module.exports.arrivalFrequencyCountToOpen = 10;

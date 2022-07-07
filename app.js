@@ -30,15 +30,6 @@ process.argv.forEach((val, index, array)=> {
 	}
 });
 
-// var httpsServer = https.createServer(
-// 	{
-// 		secureOptions: constants.SSL_OP_NO_TLSv1 | constants.SSL_OP_NO_TLSv1_1,
-// 		key: fs.readFileSync(login.sslPath + 'privkey.pem'),
-// 		cert: fs.readFileSync(login.sslPath + 'fullchain.pem')
-// 	},
-// 	app
-// );
-
 var io = require('socket.io')(http);
 
 const hue = require('./services/hue.js')(logger);
@@ -56,13 +47,7 @@ const authService = require('./services/auth.js')(logger, login, messengerInfo, 
 
 app.use(helmet());
 app.use(cookieParser());
-/*
-app.use(function(req, res, next) {
-	if (!req.secure) {
-		return res.redirect([ 'https://', req.get('Host'), req.url ].join(''));
-	}
-	next();
-});*/
+
 
 // var hueEnergyUsageHealthOptions = {
 // 	target: 'http://localhost:1234/health',
