@@ -252,10 +252,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		messenger.sendIfttGarageOpenedAlert(options.iftttSendGarageOpenAlert, timeUntilAlert);
 	}
 
-	function toggleGarageDoor(gpsPerson, remoteAddress) {
+	async function toggleGarageDoor(gpsPerson, remoteAddress) {
 
 		garageTimeRules.shouldLog(garageTracking.garageTimesToOpenLog);
-		
+
 		await writeToGarageTrackingFile();
 
 		if (shouldOpenGarageBaesdOnRules()) {
@@ -272,7 +272,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		}
 	}
 
-	async function shouldOpenGarageBaesdOnRules(){
+	function shouldOpenGarageBaesdOnRules(){
 		// var shouldOpenGarage = false;
 		logger.debug("shouldOpenGarageBaesdOnRules");
 		// const shouldOpenGarageBasedOnDayTimeLog = garageTimeRules.shouldOpenCheckAndLog(garageTracking.garageTimesToOpenLog);
