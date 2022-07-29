@@ -35,9 +35,11 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	var hasBeenOpened = garageIsOpen();
 	const messengerInfo = require('../settings/messengerInfo.js');
 	const options = require('../settings/options.js');
-	const garageTimeRules = require('./garageTimeRules.js')(options);
-	const fs = require("fs").promises;
 	garageTracking = require("../garageTracking.json");
+	const garageTimeRules = require('./garageTimeRules.js')(options,garageTracking);
+	logger.debug('t');
+	logger.debug(garageTracking);
+	const fs = require("fs").promises;
 
 	app.set('takingVideo', false);
 
