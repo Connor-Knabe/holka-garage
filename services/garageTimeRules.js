@@ -26,6 +26,7 @@ module.exports = function(options,garageTimesToOpenLog) {
 		var shouldOpenBasedOnTime = false;
 		var currentDayObj = returnCurrentDay(garageTimesToOpenLog);
 		if (currentDayObj) {
+			
 			logGarageOpenHours(currentDayObj);
 			shouldOpenBasedOnTime = shouldOpenBasedOnDayTime(garageTimesToOpen);
 		}
