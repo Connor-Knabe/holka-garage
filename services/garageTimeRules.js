@@ -22,7 +22,6 @@ module.exports = function(options) {
 		var shouldOpenBasedOnTime = false;
 		var currentDayObj = returnCurrentDay(garageTimesToOpenLog);
 		if (currentDayObj) {
-			console.log(currentDayObj);
 			logGarageOpenHours(currentDayObj);
 			shouldOpenBasedOnTime = shouldOpenBasedOnDayTime(garageTimesToOpen);
 		}
@@ -33,7 +32,6 @@ module.exports = function(options) {
 		var shouldOpenBasedOnTime = false;
 		var currentDayObj = returnCurrentDay(garageTimesToOpenLog);
 		if (currentDayObj) {
-			console.log(currentDayObj);
 			shouldOpenBasedOnTime = shouldOpenBasedOnDayTime(garageTimesToOpen);
 		}
 		return shouldOpenBasedOnTime;
@@ -44,7 +42,6 @@ module.exports = function(options) {
 		var shouldOpenBasedOnTime = false;
 		var currentDayObj = returnCurrentDay(garageTimesToOpenLog);
 		if (currentDayObj) {
-			console.log(currentDayObj);
 			logGarageOpenHours(currentDayObj);
 			const shouldOpenCurrentDay = shouldOpenBasedOnDayObject(currentDayObj);
 			const shouldOpenGenericTimes = shouldOpenBasedOnDayObject(garageTimesToOpenLog[7]);
@@ -61,7 +58,6 @@ module.exports = function(options) {
 		var theTime = new Date();
 		var shouldOpenBasedOnTime = false;
 		if (currentDayObj.hourAndCount != null) {
-			console.log(currentDayObj);
 			for (var hour in currentDayObj.hourAndCount) {
 				if (currentDayObj.hourAndCount.hasOwnProperty(hour)) {
 					const count = currentDayObj.hourAndCount[hour];

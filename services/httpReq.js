@@ -46,7 +46,6 @@ module.exports = function(logger) {
                 const {body} = await got.post(options.automatedHueHomeUrl+'/enableSchedulesAndSensors', {
 					responseType: 'json'
 				});
-                console.log("setAutomatedHueEnableLights success");
             } catch (error) {
                 logger.error(error);
             }

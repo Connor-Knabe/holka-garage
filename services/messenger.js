@@ -70,7 +70,6 @@ module.exports = function(logger, debugMode) {
 					},
 					responseType: 'text'
 				});
-				console.log(body);
 			} catch (err){
 				logger.error('error making requestIfttt', err);
 			}
@@ -152,7 +151,7 @@ module.exports = function(logger, debugMode) {
 							if (message && message.sid) {
 								client.messages(message.sid).media.each((media) => {
 									if (media && media.sid) {
-										console.log(`Deleting media for message.sid ${message.sid}`);
+										(`Deleting media for message.sid ${message.sid}`);
 										client
 											.messages(message.sid)
 											.media(media.sid)
