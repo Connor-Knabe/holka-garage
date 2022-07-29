@@ -15,6 +15,8 @@ var cookieParser = require('cookie-parser');
 const fs = require('fs');
 var log4js = require('log4js');
 var logger = log4js.getLogger();
+logger.level = 'debug';
+
 
 //settings
 const login = require('./settings/login.js');
@@ -53,7 +55,6 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 //settings
 var port = 2323;
-logger.level = 'debug';
 
 process.on('uncaughtException', (e) => {
 	logger.error('Exception thrown', e);
