@@ -21,17 +21,25 @@ module.exports = function(options,garageTimesToOpenLog) {
 		return;
 	}
 
-
-	function shouldOpenCheckAndLog(garageTimesToOpen){
-		var shouldOpenBasedOnTime = false;
+	function shouldLog(garageTimesToOpen){
 		var currentDayObj = returnCurrentDay(garageTimesToOpenLog);
 		if (currentDayObj) {
-			
 			logGarageOpenHours(currentDayObj);
-			shouldOpenBasedOnTime = shouldOpenBasedOnDayTime(garageTimesToOpen);
 		}
-		return shouldOpenBasedOnTime;
+
 	}
+
+	// function shouldOpenCheckAndLog(garageTimesToOpen){
+
+	// 	//dont log
+	// 	var shouldOpenBasedOnTime = false;
+	// 	var currentDayObj = returnCurrentDay(garageTimesToOpenLog);
+	// 	if (currentDayObj) {
+	// 		logGarageOpenHours(currentDayObj);
+	// 		shouldOpenBasedOnTime = shouldOpenBasedOnDayTime(garageTimesToOpen);
+	// 	}
+	// 	return shouldOpenBasedOnTime;
+	// }
 
 	function shouldOpenCheck(garageTimesToOpen){
 		var shouldOpenBasedOnTime = false;
@@ -91,6 +99,7 @@ module.exports = function(options,garageTimesToOpenLog) {
 	return {
 		shouldAlertBasedOnTime:shouldAlertBasedOnTime,
 		shouldOpenCheck:shouldOpenCheck,
-		shouldOpenCheckAndLog,shouldOpenCheckAndLog
+		// shouldOpenCheckAndLog,shouldOpenCheckAndLog,
+		shouldLog:shouldLog
 	}
 };

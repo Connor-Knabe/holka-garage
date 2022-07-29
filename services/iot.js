@@ -253,6 +253,11 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	function toggleGarageDoor(gpsPerson, remoteAddress) {
+
+		garageTimeRules.shouldLog(garageTracking.garageTimesToOpenLog);
+		
+		await writeToGarageTrackingFile();
+
 		if (shouldOpenGarageBaesdOnRules()) {
 			if (!garageIsOpen()) {
 				logger.info(`Opening garage via gps person ${gpsPerson} from ip: ${remoteAddress}`);
@@ -268,17 +273,14 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	}
 
 	async function shouldOpenGarageBaesdOnRules(){
-		var shouldOpenGarage = false;
+		// var shouldOpenGarage = false;
 		logger.debug("shouldOpenGarageBaesdOnRules");
-		const shouldOpenGarageBasedOnDayTimeLog = garageTimeRules.shouldOpenCheckAndLog(garageTracking.garageTimesToOpenLog);
-		
+		// const shouldOpenGarageBasedOnDayTimeLog = garageTimeRules.shouldOpenCheckAndLog(garageTracking.garageTimesToOpenLog);
+
 		const shouldOpenGarageBasedOnDayTime = garageTimeRules.shouldOpenCheck(garageTracking.garageTimesToOpen);
 		
-		shouldOpenGarage = shouldOpenGarageBasedOnDayTime || shouldOpenGarageBasedOnDayTimeLog;
-
-		await writeToGarageTrackingFile();
-
-		return shouldOpenGarage;
+		// shouldOpenGarage = shouldOpenGarageBasedOnDayTime || shouldOpenGarageBasedOnDayTimeLog;
+		return shouldOpenGarageBasedOnDayTime;
 	}
 
 	function openCloseGarageDoor() {
