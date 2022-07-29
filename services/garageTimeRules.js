@@ -13,6 +13,7 @@ module.exports = function(options,garageTimesToOpenLog) {
 
 	function logGarageOpenHours(dayToLog) {
 		var theTime = new Date();
+		console.log(dayToLog);
 		dayToLog.hourAndCount[theTime.getHours()] = dayToLog.hourAndCount[theTime.getHours()] == undefined ? 1 : dayToLog.hourAndCount[theTime.getHours()] += 1;
 		//log time to "All"
 		dayToLog = garageTimesToOpenLog[7];
