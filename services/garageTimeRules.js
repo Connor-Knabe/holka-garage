@@ -7,6 +7,9 @@ module.exports = function(options,garageTimesToOpenLog) {
 		return (theTime.getHours() >= 22 || theTime.getHours() <= 3);
 	}
 
+	logger.debug('garageTimesToOpenLog',garageTimesToOpenLog);
+	logger.debug('garageTimesToOpenLog[7]',garageTimesToOpenLog[7]);
+
 
 	function logGarageOpenHours(dayToLog) {
 		var theTime = new Date();
