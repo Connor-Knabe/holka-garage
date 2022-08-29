@@ -1,13 +1,21 @@
 var fs = require('fs');
 var raspistillProc;
 var convertProc;
-var Gpio = require('onoff').Gpio;
+
+const options = require('../settings/options.js');
+
+
+var garageSensor = null;
+if(!options.localDebug){
+	var Gpio = require('onoff').Gpio;
+	garageSensor = new Gpio(4, 'in', 'both');
+} 
+
+
 const { spawn } = require('node:child_process');
 
-var garageSensor = new Gpio(4, 'in', 'both');
 var pictureCounter = 0;
 var needsToConvert = true;
-const options = require('../settings/options.js');
 var garageOpenStatus = null;
 
 module.exports = (app, logger, io, hue, sockets) => {
@@ -31,8 +39,13 @@ module.exports = (app, logger, io, hue, sockets) => {
 			app.set('cameraOn', true);
 		}
 	}
+
 	function garageIsOpen() {
-		var isOpen = garageSensor.readSync() == 1 ? true : false;
+		var isOpen = false;
+		
+		if(!options.localDebug){
+			isOpen = garageSensor.readSync() == 1 ? true : false;
+		}
 		return isOpen;
 	}
 
@@ -126,10 +139,21 @@ module.exports = (app, logger, io, hue, sockets) => {
 		return;
 	}
 
-	return {
-		streamVideo: streamVideo,
-		stopStreaming: stopStreaming,
-		updateGarageStatus: updateGarageStatus,
-		startStreaming: startStreaming
-	};
+	if(options.localDebug){
+		return {
+			streamVideo: ()=>{return null},
+			stopStreaming: ()=>{return null},
+			updateGarageStatus: ()=>{return null},
+			startStreaming: ()=>{return null}
+		};
+	} else {
+		return {
+			streamVideo: streamVideo,
+			stopStreaming: stopStreaming,
+			updateGarageStatus: updateGarageStatus,
+			startStreaming: startStreaming
+		};
+	}
+
+
 };

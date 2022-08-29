@@ -7,7 +7,6 @@ const rebootTime = new Date();
 module.exports = function(app, logger, io, video, authService, homeAway, bodyParser, iot, sockets) {
 	const hue = require('../services/hue.js')(logger);
 	var login = require('../settings/login.js');
-	const httpReq = require('../services/httpReq.js')(logger);
 
 	io.on('connection', async function(socket) {
 		sockets[socket.id] = socket;
@@ -92,21 +91,9 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		}
 
 		socket.on('start-stream', function() {
-			video.startStreaming(io);
+			video?.startStreaming(io);
 		});
 
-		if(options.automatedHueHome){
-			logger.debug('emitting automated hue home');
-			var automationDisabledUntilTime = await httpReq.automationDisabledUntilTime();
-			logger.debug("automated hue home enabled in routes", automationDisabledUntilTime);
-			if(!automationDisabledUntilTime){
-				logger.debug("set to enabled");
-				io.sockets.emit('toggleAutomatedHueHome',`Light automation is Enabled`);
-			} else {
-				logger.debug("set to disabled");
-				io.sockets.emit('toggleAutomatedHueHome',`Light automation is Disabled until ${automationDisabledUntilTime.toLocaleTimeString()}`);
-			}
-		}
 	});
 
 	app.get('/', function(req, res) {

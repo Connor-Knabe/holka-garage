@@ -8,8 +8,6 @@ var wasClosedViaWebsiteTimeout = null;
 
 module.exports = function(app, logger, io, hue, messenger, video, authService, homeAway, bodyParser,iot) {
 	var garageErrorStatus = null;
-	const httpReq = require('../services/httpReq.js')(logger);
-
 	//requires basic auth for twilio mms
 	app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
 	app.get('/pictures', function(req, res) {
@@ -34,7 +32,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 	app.post('/video', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		io.sockets.emit('garageOpenStatus', 'Recording video');
 		video
-			.streamVideo()
+			?.streamVideo()
 			.then(() => {
 				var msg = 'Sending video via website';
 				var btnPress = true;
@@ -69,22 +67,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 	});
 
 
-	if (options.automatedHueHome) {
-		app.post('/toggleAutomatedHueHome', bodyParser.urlencoded({ extended: false }), async function(req, res) {
-			var automationDisabledUntilTime = await httpReq.automationDisabledUntilTime();
-			if(automationDisabledUntilTime == null){
-				var disabledUntil = await httpReq.setAutomatedHueDisableLights();
-				if(disabledUntil){
-					res.send(`Light automation is Disabled until ${disabledUntil.toLocaleTimeString()}`);
-				} else {
-					res.send(`Light automation is Disabled Error`);
-				}
-			} else {
-				await httpReq.setAutomatedHueEnableLights();
-				res.send(`Light automation is Enabled`);
-			}
-		});
-	}
+
 
 	app.post('/lights/:brightness', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		io.sockets.emit('garageLightStatus', 'Changing light brightness');
@@ -112,7 +95,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				iot.Status.wasOpenedViaWebsite = true; 
 				iot.openCloseGarageDoor();
 				garageOpenStatus = 'Opening...';
-				video.updateGarageStatus(garageOpenStatus);
+				video?.updateGarageStatus(garageOpenStatus);
 				io.sockets.emit('garageOpenStatus', garageOpenStatus);
 				var msg = `${garageOpenStatus} garage via button for ${user.name}`;
 				homeAway.Status.whoOpenedGarageLast = user.name;
@@ -123,13 +106,13 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				}, 40*1000);
 				var btnPress = true;
 				video
-					.streamVideo()
+					?.streamVideo()
 					.then(() => {
 						messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
 					})
 					.catch(() => {
 						logger.debug('failed to stream video when garage was opening');
-						video.stopStreaming();
+						video?.stopStreaming();
 						messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
 					});
 
@@ -145,7 +128,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				iot.Status.wasClosedViaWebsite = true; 
 				iot.openCloseGarageDoor();
 				garageOpenStatus = 'Closing...';
-				video.updateGarageStatus(garageOpenStatus);
+				video?.updateGarageStatus(garageOpenStatus);
 				io.sockets.emit('garageOpenStatus', garageOpenStatus);
 				var msg = `${garageOpenStatus} garage via button for ${user.name}`;
 				homeAway.Status.whoClosedGarageLast = user.name;
@@ -156,19 +139,19 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 				}, 40*1000);
 				var btnPress = true;
 				video
-					.streamVideo()
+					?.streamVideo()
 					.then(() => {
 						messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
 					})
 					.catch(() => {
 						logger.debug('failed to stream video when garage was closing');
-						video.stopStreaming();
+						video?.stopStreaming();
 						messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.openViaButtonAlertSendPictureText, btnPress);
 					});
 				io.sockets.emit('garageErrorStatus', null);
 			} else {
 				logger.debug('err');
-				video.updateGarageStatus(null);
+				video?.updateGarageStatus(null);
 				io.sockets.emit('garageOpenStatus', null);
 				io.sockets.emit('garageErrorStatus', 'Garage is already closed!!');
 			}
@@ -198,28 +181,5 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 		}
 	});
-
-	//if using https://github.com/Connor-Knabe/hue-energy-usage
-	// if (options.enableHueEnergyUsageReport) {
-	// 	var hueEnergyUsageOptions = {
-	// 		target: 'http://localhost:1234',
-	// 		changeOrigin: false,
-	// 		pathRewrite: {
-	// 			'^/proxy/hue-energy-usage': ''
-	// 		}
-	// 	};
-	// 	app.use('/proxy/hue-energy-usage', proxy(hueEnergyUsageOptions));
-	// }
-
-	// if (options.enableNestEnergyUsageReport) {
-	// 	var nestEnergyUsageOptions = {
-	// 		target: 'http://localhost:1235',
-	// 		changeOrigin: false,
-	// 		pathRewrite: {
-	// 			'^/proxy/nest-energy-usage': ''
-	// 		}
-	// 	};
-	// 	app.use('/proxy/nest-energy-usage', proxy(nestEnergyUsageOptions));
-	// }
 	
 };

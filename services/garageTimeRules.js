@@ -13,7 +13,8 @@ module.exports = function(options,garageTimesToOpenLog) {
 
 	function logGarageOpenHours(dayToLog) {
 		var theTime = new Date();
-		console.log(dayToLog);
+		console.log('daytolog',dayToLog);
+
 		dayToLog.hourAndCount[theTime.getHours()] = dayToLog.hourAndCount[theTime.getHours()] == undefined ? 1 : dayToLog.hourAndCount[theTime.getHours()] += 1;
 		//log time to "All"
 		dayToLog = garageTimesToOpenLog[7];
@@ -21,25 +22,15 @@ module.exports = function(options,garageTimesToOpenLog) {
 		return;
 	}
 
-	function shouldLog(garageTimesToOpen){
+	function shouldOpenCheckAndLog(garageTimesToOpen){
+		var shouldOpenBasedOnTime = false;
 		var currentDayObj = returnCurrentDay(garageTimesToOpenLog);
 		if (currentDayObj) {
 			logGarageOpenHours(currentDayObj);
+			shouldOpenBasedOnTime = shouldOpenBasedOnDayTime(garageTimesToOpen);
 		}
-
+		return shouldOpenBasedOnTime;
 	}
-
-	// function shouldOpenCheckAndLog(garageTimesToOpen){
-
-	// 	//dont log
-	// 	var shouldOpenBasedOnTime = false;
-	// 	var currentDayObj = returnCurrentDay(garageTimesToOpenLog);
-	// 	if (currentDayObj) {
-	// 		logGarageOpenHours(currentDayObj);
-	// 		shouldOpenBasedOnTime = shouldOpenBasedOnDayTime(garageTimesToOpen);
-	// 	}
-	// 	return shouldOpenBasedOnTime;
-	// }
 
 	function shouldOpenCheck(garageTimesToOpen){
 		var shouldOpenBasedOnTime = false;
@@ -55,7 +46,6 @@ module.exports = function(options,garageTimesToOpenLog) {
 		var shouldOpenBasedOnTime = false;
 		var currentDayObj = returnCurrentDay(garageTimesToOpenLog);
 		if (currentDayObj) {
-			logGarageOpenHours(currentDayObj);
 			const shouldOpenCurrentDay = shouldOpenBasedOnDayObject(currentDayObj);
 			const shouldOpenGenericTimes = shouldOpenBasedOnDayObject(garageTimesToOpenLog[7]);
 			shouldOpenBasedOnTime = shouldOpenCurrentDay || shouldOpenGenericTimes;
@@ -99,7 +89,6 @@ module.exports = function(options,garageTimesToOpenLog) {
 	return {
 		shouldAlertBasedOnTime:shouldAlertBasedOnTime,
 		shouldOpenCheck:shouldOpenCheck,
-		// shouldOpenCheckAndLog,shouldOpenCheckAndLog,
-		shouldLog:shouldLog
+		shouldOpenCheckAndLog,shouldOpenCheckAndLog
 	}
 };

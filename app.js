@@ -32,19 +32,18 @@ process.argv.forEach((val, index, array)=> {
 	}
 });
 
+if(options.localDebug){
+	options.debugMode = true;
+	options.enableHue = false;
+}
+
 var io = require('socket.io')(http);
-
 const hue = require('./services/hue.js')(logger);
-
-
 const video = require('./services/video.js')(app, logger, io, hue, sockets);
 var messenger = require('./services/messenger.js')(logger, options.debugMode);
 
-
 const homeAway = require('./services/homeAway.js')(logger, login, messenger, messengerInfo, io, options)
 var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron, homeAway);
-
-
 const authService = require('./services/auth.js')(logger, login, messengerInfo, options, messenger);
 
 app.use(helmet());
@@ -64,9 +63,6 @@ process.on('unhandledRejection', (reason, p) => {
 	logger.error('Unhandled rejection for Promise:', p, 'With a reason of:', reason);
 });
 
-// httpsServer.listen(443, function() {
-// 	logger.info('listening on *:', 443);
-// });
 
 http.listen(port, function() {
 	logger.info('listening on *:', port);

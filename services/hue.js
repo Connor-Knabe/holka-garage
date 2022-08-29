@@ -1,18 +1,21 @@
 
 var options = require('../settings/options.js');
 
-var v3 = require('node-hue-api').v3, 
+
+if(!options.localDebug){
+	var v3 = require('node-hue-api').v3, 
 	host = options.hueBridgeIp,
 	username = options.hueUser,
 	lightsOffTimeout = null,
 	lightsOffTimedTimeout = null,
 	GroupLightState = v3.model.lightStates.GroupLightState;
-	
 
-var api = null;
-(async function() {
-	api = await v3.api.createLocal(host).connect(username);
-})();
+	var api = null;
+	(async function() {
+		api = await v3.api.createLocal(host).connect(username);
+	})();
+}
+
 
 
 module.exports = function(logger) {
@@ -55,16 +58,6 @@ module.exports = function(logger) {
 
 	function lightsOff() {
 		api.groups.setGroupState(8, new GroupLightState().off()).then(() => {}).catch(() => {});
-	}
-
-
-	//refactor into separate app
-	function temporarilyDisableLRMotionSensor(){
-
-	}
-
-	function temporarilyDisableSchedule(){
-
 	}
 
 	return {
