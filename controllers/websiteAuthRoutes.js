@@ -71,19 +71,8 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 
 	app.post('/lights/:brightness', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		io.sockets.emit('garageLightStatus', 'Changing light brightness');
-		hue
-			.lightsOn(req.params.brightness)
-			.then(() => {
-				setTimeout(() => {
-					io.sockets.emit('garageLightStatus', 'Light brightness changed, wait for image to update');
-					setTimeout(() => {
-						io.sockets.emit('garageLightStatus', null);
-					}, 3 * 1000);
-				}, 2 * 1000);
-			})
-			.catch((e) => {
-				logger.error('Error setting light brightness:', e);
-			});
+		hue.lightsOn();
+		
 		res.send(`Set to brightness ${req.params.brightness}`);
 	});
 

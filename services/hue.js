@@ -23,7 +23,7 @@ module.exports = function(logger,messenger) {
 
 	function garageLightsOnTimed(brightness) {
 		if (options.enableHue) {
-			lightsOn(brightness).then(() => {}).catch(() => {});
+			lightsOn();
 			logger.debug('Lights on for ' + options.garageLightTimeoutMins + ' mins');
 			clearTimeout(lightsOffTimeout);
 			lightsOffTimeout = setTimeout(function() {
@@ -41,7 +41,7 @@ module.exports = function(logger,messenger) {
 		}
 	}
 
-	function lightsOn(brightness) {
+	function lightsOn() {
 		messenger.requestIfttt(messengerInfo.garageLightsOnUrl, messengerInfo.iftttRecipients[0].ApiKey, "", "");
 	}
 
