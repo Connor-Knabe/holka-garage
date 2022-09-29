@@ -179,6 +179,7 @@ module.exports = function(logger, debugMode) {
 		sendIftt: sendIftt,
 		sendIfttGarageOpenedAlert: sendIfttGarageOpenedAlert,
 		sendGenericIfttt: sendGenericIfttt,
-		sendCallAlert: sendCallAlert
+		sendCallAlert: sendCallAlert,
+		requestIfttt:requestIfttt
 	};
 };

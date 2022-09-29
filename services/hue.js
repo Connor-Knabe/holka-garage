@@ -1,5 +1,7 @@
 
 var options = require('../settings/options.js');
+const messenger = require('../settings/messengerInfo.js');
+
 
 
 if(!options.localDebug){
@@ -17,8 +19,7 @@ if(!options.localDebug){
 }
 
 
-
-module.exports = function(logger) {
+module.exports = function(logger,messenger) {
 
 	function garageLightsOnTimed(brightness) {
 		if (options.enableHue) {
@@ -41,23 +42,11 @@ module.exports = function(logger) {
 	}
 
 	function lightsOn(brightness) {
-		if (options.enableHue) {
-			return new Promise((resolve, reject) => {
-				api.groups.setGroupState(8, new GroupLightState().on().brightness(brightness))
-					.then(() => {
-						logger.info('turned on lights successfully');
-						resolve();
-					})
-					.catch((e) => {
-						logger.error(`Error setting light brightness ${e}`);
-						reject();
-					});
-			});
-		}
+		messenger.requestIfttt(options.garageLightsOnUrl, messengerInfo.iftttRecipients[0].ApiKey, "", "");
 	}
 
 	function lightsOff() {
-		api.groups.setGroupState(8, new GroupLightState().off()).then(() => {}).catch(() => {});
+		messenger.requestIfttt(options.garageLightsOnUrl, messengerInfo.iftttRecipients[0].ApiKey, "", "");
 	}
 
 	return {

@@ -38,9 +38,9 @@ if(options.localDebug){
 }
 
 var io = require('socket.io')(http);
-const hue = require('./services/hue.js')(logger);
-const video = require('./services/video.js')(app, logger, io, hue, sockets);
 var messenger = require('./services/messenger.js')(logger, options.debugMode);
+const hue = require('./services/hue.js')(logger,messenger);
+const video = require('./services/video.js')(app, logger, io, hue, sockets);
 
 const homeAway = require('./services/homeAway.js')(logger, login, messenger, messengerInfo, io, options)
 var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron, homeAway);

@@ -41,3 +41,6 @@ module.exports.iftttValue1 = 'This will be displayed in the notification';
 module.exports.twilioPictureUser = 'make this a random string like -> alksjdfiajsd0fjsd';
 module.exports.twilioPicturePass = 'make this a random string like -> ksldjf0j2jf0';
 module.exports.serverPictureUrl = '/pictures';
+
+module.exports.garageLightsOnUrl="https://maker.ifttt.com/trigger/garage_lights_on/json/with/key/";
+module.exports.garageLightsOffUrl="https://maker.ifttt.com/trigger/garage_lights_off/json/with/key/";

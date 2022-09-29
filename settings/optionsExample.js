@@ -32,3 +32,5 @@ module.exports.shouldAlertBasedOnOddHours = true;
 module.exports.shouldAlertIfBothOwnersAwayAndOpen = true;
 module.exports.arrivalFrequencyCountToOpen = 10;
 module.exports.localDebug= false;
+module.exports.garageLightsOnUrl="https://maker.ifttt.com/trigger/lights_on/json/with/key/";
+module.exports.garageLightsOffUrl="https://maker.ifttt.com/trigger/lights_off/json/with/key/";
