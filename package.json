@@ -16,7 +16,6 @@
 		"express-session": "1.17.3",
 		"helmet": "5.1.0",
 		"log4js": "6.5.2",
-		"node-hue-api": "4.0.10",
 		"onoff": "6.0.3",
 		"got": "^11",
 		"serve-favicon": "2.5.0",

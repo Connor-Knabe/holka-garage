@@ -5,17 +5,17 @@ const messengerInfo = require('../settings/messengerInfo.js');
 
 
 if(!options.localDebug){
-	var v3 = require('node-hue-api').v3, 
+	// var v3 = require('node-hue-api').v3, 
 	host = options.hueBridgeIp,
 	username = options.hueUser,
 	lightsOffTimeout = null,
 	lightsOffTimedTimeout = null,
-	GroupLightState = v3.model.lightStates.GroupLightState;
+	// GroupLightState = v3.model.lightStates.GroupLightState;
 
-	var api = null;
-	(async function() {
-		api = await v3.api.createLocal(host).connect(username);
-	})();
+	// var api = null;
+	// (async function() {
+	// 	api = await v3.api.createLocal(host).connect(username);
+	// })();
 }
 
 
