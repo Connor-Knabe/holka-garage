@@ -1,6 +1,6 @@
 
 var options = require('../settings/options.js');
-const messenger = require('../settings/messengerInfo.js');
+const messengerInfo = require('../settings/messengerInfo.js');
 
 
 
