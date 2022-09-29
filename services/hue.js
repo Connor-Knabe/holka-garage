@@ -42,11 +42,11 @@ module.exports = function(logger,messenger) {
 	}
 
 	function lightsOn(brightness) {
-		messenger.requestIfttt(options.garageLightsOnUrl, messengerInfo.iftttRecipients[0].ApiKey, "", "");
+		messenger.requestIfttt(messengerInfo.garageLightsOnUrl, messengerInfo.iftttRecipients[0].ApiKey, "", "");
 	}
 
 	function lightsOff() {
-		messenger.requestIfttt(options.garageLightsOnUrl, messengerInfo.iftttRecipients[0].ApiKey, "", "");
+		messenger.requestIfttt(messengerInfo.garageLightsOnUrl, messengerInfo.iftttRecipients[0].ApiKey, "", "");
 	}
 
 	return {

@@ -1,3 +1,4 @@
+v3.3 - using ifttt to turn on/off garage lights
 v3.2b - now logs properly when garage attempted to open
 v3.1 - tracking time of day garage opens
 v2.8.0 - adding ability to disable odd time open alert
