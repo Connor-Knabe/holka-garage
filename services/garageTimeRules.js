@@ -1,4 +1,4 @@
-module.exports = function(options,garageTimesToOpenLog) {
+module.exports = function(options,garageTimesToOpenLog,logger) {
 	function shouldAlertBasedOnTime() {
 		var theTime = new Date();
 		if(!options.shouldAlertBasedOnOddHours){
