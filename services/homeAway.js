@@ -62,7 +62,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		whoOpenedGarageLast: "unknown..",
 		whoClosedGarageLast: "unknown.."
 	};
-	function setPersonAway(req, res, isPersonTwo) {
+	function setPersonAway(isPersonTwo) {
         var personName = isPersonTwo ? login.users[1].name : login.users[0].name;
 
 		if (isPersonTwo) {
@@ -89,7 +89,6 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		}
 
 		messenger.sendGenericIfttt(`${personName} Set to Away`);
-		res.send('Ok');
 	}
 
 	function getMinsAway(startDate){

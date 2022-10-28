@@ -155,9 +155,11 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 			homeAway.setPersonOneHome();
 		} else {
 			const isPersonTwo = false;
-			homeAway.setPersonAway(req, res, isPersonTwo);
+			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 		}
+		res.send('Ok');
+
 	});
 
 	app.post('/togglePersonTwoHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
@@ -166,9 +168,10 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 			homeAway.setPersonTwoHome();
 		} else {
 			const isPersonTwo = true;
-			homeAway.setPersonAway(req, res, isPersonTwo);
+			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 		}
+		res.send('Ok');
 	});
 	
 };
