@@ -21,6 +21,13 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 	//routes below this line check for logged in user
 	app.use(authService.authChecker);
 
+	app.get('/status', function(req, res) {
+		var garageOpenClosed = iot.garageIsOpen() ? "Open": "Closed";
+		var personOneAway = homeAway.isPersonAway(true) ? "Away": "Home";
+		var personTwoAway = homeAway.isPersonAway(false) ? "Away": "Home";
+		res.send(`Garage is ${garageOpenClosed}: Person One ${personOneAway} Person Two ${personTwoAway})
+	});
+
 	app.get('/stream/image_stream.jpg', function(req, res) {
 		fs.readFile('./stream/image_stream.jpg', function(err, data) {
 			if (err) logger.error('failed to read image stream', err); // Fail if the file can't be read.
@@ -76,9 +83,11 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		res.send(`Set to brightness ${req.params.brightness}`);
 	});
 
+
+
+
 	app.post('/openOrCloseGarage', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var user = authService.auth(req);
-
 		if (req.body && req.body.garageSwitch == 'open') {
 			if (!iot.garageIsOpen()) {
 				iot.Status.wasOpenedViaWebsite = true; 
