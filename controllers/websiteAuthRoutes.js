@@ -162,25 +162,26 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		var personTwo = false;
 		if (homeAway.isPersonAway(personTwo)) {
 			homeAway.setPersonOneHome();
+			res.send('Person One Now Home');
 		} else {
 			const isPersonTwo = false;
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
+			res.send('Person One Now Away');
 		}
-		res.send('Ok');
-
 	});
 
 	app.post('/togglePersonTwoHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var personTwo = true;
 		if (homeAway.isPersonAway(personTwo)){
 			homeAway.setPersonTwoHome();
+			res.send('Person Two Now Home');
 		} else {
 			const isPersonTwo = true;
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
+			res.send('Person Two Now Away');
 		}
-		res.send('Ok');
 	});
 	
 };
