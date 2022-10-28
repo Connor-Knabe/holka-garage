@@ -25,7 +25,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		var garageOpenClosed = iot.garageIsOpen() ? "Open": "Closed";
 		var personOneAway = homeAway.isPersonAway(true) ? "Away": "Home";
 		var personTwoAway = homeAway.isPersonAway(false) ? "Away": "Home";
-		res.send(`Garage is ${garageOpenClosed}:\nPerson One ${personOneAway}:\nPerson Two ${personTwoAway}`);
+		res.send(`Garage is:${garageOpenClosed}|Person 1:${personOneAway}|Person 2: ${personTwoAway}`);
 	});
 
 	app.get('/stream/image_stream.jpg', function(req, res) {
