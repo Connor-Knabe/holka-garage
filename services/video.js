@@ -32,7 +32,7 @@ module.exports = (app, logger, io, hue, sockets) => {
 	}
 
 	function startCamera() {
-		hue.garageLightsOnTimed(100);
+		hue.garageLightsOnTimed();
 		if (!app.get('cameraOn')) {
 			var args = [ '-w', '800', '-h', '600', '-vf', '-hf', '-o', './stream/image_stream.jpg', '-t', '999999999', '-tl', '1000', '-ex', 'night' ];
 			raspistillProc = spawn('raspistill', args);

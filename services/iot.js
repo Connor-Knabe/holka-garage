@@ -70,7 +70,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 				var msg = 'Garage door opened';
 	
 				if (options.enableLightsOnGarageOpen) {
-					hue.garageLightsOnTimed(25);
+					hue.garageLightsOnTimed();
 				}
 				logger.debug(`garage open {Status.wasOpenedViaWebsite} ${Status.wasOpenedViaWebsite}`);
 	
@@ -131,7 +131,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 				motionSensorTimeoutOne = setTimeout(function() {
 					hasTurnedLightsOn = true;
 				}, 5 * 1000);
-				hue.garageLightsOnTimed(100);
+				hue.garageLightsOnTimed();
 			} else if (value == 0 && hasTurnedLightsOn) {
 				clearTimeout(motionSensorTimeoutTwo);
 				motionSensorTimeoutTwo = setTimeout(function() {

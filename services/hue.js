@@ -2,8 +2,6 @@
 var options = require('../settings/options.js');
 const messengerInfo = require('../settings/messengerInfo.js');
 
-
-
 if(!options.localDebug){
 	// var v3 = require('node-hue-api').v3, 
 	var host = options.hueBridgeIp,
@@ -21,7 +19,7 @@ if(!options.localDebug){
 
 module.exports = function(logger,messenger) {
 
-	function garageLightsOnTimed(brightness) {
+	function garageLightsOnTimed() {
 		if (options.enableHue) {
 			lightsOn();
 			logger.debug('Lights on for ' + options.garageLightTimeoutMins + ' mins');

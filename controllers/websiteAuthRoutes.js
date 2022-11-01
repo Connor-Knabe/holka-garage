@@ -23,8 +23,8 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 
 	app.get('/status', function(req, res) {
 		var garageOpenClosed = iot.garageIsOpen() ? "Open": "Closed";
-		var personOneAway = homeAway.isPersonAway(true) ? "Away": "Home";
-		var personTwoAway = homeAway.isPersonAway(false) ? "Away": "Home";
+		var personOneAway = homeAway.isPersonAway(false) ? "Away": "Home";
+		var personTwoAway = homeAway.isPersonAway(true) ? "Away": "Home";
 		res.send(`${garageOpenClosed}|1:${personOneAway}|2: ${personTwoAway}`);
 	});
 
