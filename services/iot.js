@@ -284,7 +284,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	function shouldOpenGarageBaesdOnRules(){
 		// var shouldOpenGarage = false;
-		logger.debug("shouldOpenGarageBaesdOnRules");
 		const shouldOpenGarageBasedOnDayTimeLog = garageTimeRules.shouldOpenCheckAndLog(garageTracking.garageTimesToOpenLog);
 		const shouldOpenGarageBasedOnDayTime = garageTimeRules.shouldOpenCheck(garageTracking.garageTimesToOpen);
 		
