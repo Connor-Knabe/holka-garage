@@ -48,13 +48,6 @@ module.exports = function(options,garageTimesToOpenLog,logger) {
 		if (currentDayObj) {
 			const shouldOpenCurrentDay = shouldOpenBasedOnDayObject(currentDayObj);
 			const shouldOpenGenericTimes = shouldOpenBasedOnDayObject(garageTimesToOpenLog[7]);
-
-			logger.debug('currentday',currentDayObj);
-			logger.debug('all days',garageTimesToOpenLog[7]);
-
-			logger.debug('shouldOpenCurrentDay',shouldOpenCurrentDay);
-			logger.debug('shouldOpenGenericTimes',shouldOpenGenericTimes);
-
 			shouldOpenBasedOnTime = shouldOpenCurrentDay || shouldOpenGenericTimes;
 		} else {
 			logger.error("couldn't find current day!");

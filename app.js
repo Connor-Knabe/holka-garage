@@ -39,6 +39,9 @@ if(options.localDebug){
 
 var io = require('socket.io')(http);
 var messenger = require('./services/messenger.js')(logger, options.debugMode);
+messenger.send(true, messengerInfo.toNumbers, 'The garage software has rebooted.  Garage open alerts disabled until you leave home!', false, false);
+
+
 const hue = require('./services/hue.js')(logger,messenger);
 const video = require('./services/video.js')(app, logger, io, hue, sockets);
 
