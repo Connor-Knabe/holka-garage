@@ -75,17 +75,6 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 
 
 
-
-	app.post('/lights/:brightness', bodyParser.urlencoded({ extended: false }), function(req, res) {
-		io.sockets.emit('garageLightStatus', 'Changing light brightness');
-		hue.lightsOn();
-		
-		res.send(`Set to brightness ${req.params.brightness}`);
-	});
-
-
-
-
 	app.post('/openOrCloseGarage', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var user = authService.auth(req);
 		if (req.body && req.body.garageSwitch == 'open') {

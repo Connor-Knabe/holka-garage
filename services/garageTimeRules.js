@@ -7,13 +7,8 @@ module.exports = function(options,garageTimesToOpenLog,logger) {
 		return (theTime.getHours() >= 22 || theTime.getHours() <= 3);
 	}
 
-	console.log('garageTimesToOpenLog',garageTimesToOpenLog);
-	console.log('garageTimesToOpenLog[7]',garageTimesToOpenLog[7]);
-
-
 	function logGarageOpenHours(dayToLog) {
 		var theTime = new Date();
-		console.log('daytolog',dayToLog);
 
 		dayToLog.hourAndCount[theTime.getHours()] = dayToLog.hourAndCount[theTime.getHours()] == undefined ? 1 : dayToLog.hourAndCount[theTime.getHours()] += 1;
 		//log time to "All"
