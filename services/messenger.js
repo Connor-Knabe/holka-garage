@@ -9,7 +9,7 @@ module.exports = function(logger, debugMode) {
 	const options = require('../settings/options.js');
 	const client = twilio(messengerInfo.TWILIO_ACCOUNT_SID, messengerInfo.TWILIO_AUTH_TOKEN);
 	var minsOpened = 0;
-
+	logger.debug("messenger init");
 	send(true, messengerInfo.toNumbers, 'The garage software has rebooted.  Garage open alerts disabled until you leave home!', false, false);
 
 	function sendIftt(garageOpened, message, url) {
