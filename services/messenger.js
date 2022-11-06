@@ -77,6 +77,7 @@ module.exports = function(logger, debugMode) {
 	}
 
 	function send(shouldSend = true, numbers, msgContent, sendPicture = false, btnPress = false) {
+		logger.debug('send', shouldSend);
 		if (!shouldSend) {
 			return;
 		}
