@@ -77,7 +77,7 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		var shouldOpenGarageBaesdOnRules = iot.shouldOpenGarageBaesdOnRules() ? "Yes" : "No";
 		io.sockets.emit('shouldOpenGarageBaesdOnRules', shouldOpenGarageBaesdOnRules);
 		var garageGPSOpenTime = garageTimeRules.nextOpenBasedOnDayTime();
-		garageGPSOpenTime = `${new Date('2022-11-08T14:00:00.917Z').toLocaleTimeString()} on ${new Date('2022-11-08T14:00:00.917Z').toLocaleDateString()}`
+		garageGPSOpenTime = `${new Date(garageGPSOpenTime).toLocaleTimeString()} on ${new Date(garageGPSOpenTime).toLocaleDateString()}`
 		io.sockets.emit('garageGPSOpenTime', garageGPSOpenTime);
 
 		io.sockets.emit('springLifeRemaining', iot.getSpringLifeRemaining());
