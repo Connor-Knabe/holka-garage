@@ -52,7 +52,7 @@ var garageTracking = require("./garageTracking.json");
 const garageTimeRules = require('./services/garageTimeRules.js')(options,garageTracking.garageTimesToOpenLog,garageTracking.garageTimesToOpen,logger);
 
 const homeAway = require('./services/homeAway.js')(logger, login, messenger, messengerInfo, io, options)
-var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron, homeAway,garageTimeRules);
+var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron, homeAway,garageTimeRules,garageTracking);
 const authService = require('./services/auth.js')(logger, login, messengerInfo, options, messenger);
 
 app.use(helmet());
