@@ -62,33 +62,25 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 			} else {
 				io.sockets.emit('personOneAway', 'home');
 			}
-
 			io.sockets.emit('whoOpenedGarageLast', homeAway.Status.whoOpenedGarageLast);
 			io.sockets.emit('whoClosedGarageLast', homeAway.Status.whoClosedGarageLast);
-			io.sockets.emit('garageOpenCount', iot.getGarageOpenCount())
-			io.sockets.emit('springLifeRemaining', iot.getSpringLifeRemaining());
 		}
 
 		const timeSinceReboot = homeAway.getTimeAway(rebootTime);
 
 		io.sockets.emit('rebootTime', timeSinceReboot);
-
 		io.sockets.emit('garageTimer', `${options.minsToWaitAfterLeavingHouseForGPSOpen} mins`);
-
 		io.sockets.emit('stillOpenAlert', `${options.garageStillOpenAlertDisableForHours} hours`);
-
 		io.sockets.emit('guestIsHome', `${options.guestIsHomeEnableForHours} hours`);
-
-
 		io.sockets.emit('garageLastOpenedTime', iot.getGarageLastOpenedTime());
 		io.sockets.emit('garageLastClosedTime', iot.getGarageLastClosedTime());
-		
 		var shouldOpenGarageBaesdOnRules = iot.shouldOpenGarageBaesdOnRules() ? "Yes" : "No";
 		io.sockets.emit('shouldOpenGarageBaesdOnRules', shouldOpenGarageBaesdOnRules);
-
 		var whenGarageWillOpenNext = garageTimeRules.nextOpenBasedOnDayTime();
 		logger.debug(`whenGarageWillOpenNext${whenGarageWillOpenNext}`);
-		io.sockets.emit('whenGarageWillOpenNext', whenGarageWillOpenNext);
+		io.sockets.emit('whenGarageWillOpenNext', shouldOpenGarageBaesdOnRules);
+		io.sockets.emit('springLifeRemaining', iot.getSpringLifeRemaining());
+		io.sockets.emit('garageOpenCount', iot.getGarageOpenCount())
 
 		if (app.get('takingVideo')) {
 			io.sockets.emit('garageOpenStatus', 'Recording video');
