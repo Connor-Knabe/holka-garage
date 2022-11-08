@@ -40,12 +40,6 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 	}
 
 
-	//for debugging
-	(function () {
-		var nextOpen = nextOpenBasedOnDayTime();
-		console.log(nextOpen);
-	})();
-
 	function nextOpenBasedOnDayTime(){
 		var date = new Date();
 		var hourCounter = 1;
