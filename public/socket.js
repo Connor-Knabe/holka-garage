@@ -271,14 +271,17 @@ socket.on('springLifeRemaining', function (status) {
 });
 
 socket.on('shouldOpenGarageBaesdOnRules', function (status) {
+    console.log("shouldOpenGarageBaesdOnRules");
     if (status) {
         $("#shouldOpenGarageBaesdOnRules").text(status);
+        $("#garageGPSOpenTime").text(status);
     } else {
         $("#shouldOpenGarageBaesdOnRules").text("Unknown!");
     }
 });      
 
 socket.on('garageGPSOpenTime', function (status) {
+    console.log("garageGPSOpenTime");
     if (status) {
         $("#garageGPSOpenTime").text(status);
     } else {
