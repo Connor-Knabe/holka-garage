@@ -274,7 +274,6 @@ socket.on('shouldOpenGarageBaesdOnRules', function (status) {
     console.log("shouldOpenGarageBaesdOnRules");
     if (status) {
         $("#shouldOpenGarageBaesdOnRules").text(status);
-        $("#garageGPSOpenTime").text(status);
     } else {
         $("#shouldOpenGarageBaesdOnRules").text("Unknown!");
     }
