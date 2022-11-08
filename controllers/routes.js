@@ -4,7 +4,7 @@ var personOneTime = new Date();
 var personTwoTime = new Date();
 const rebootTime = new Date();
 
-module.exports = function(app, logger, io, video, authService, homeAway, bodyParser, iot, sockets,garageTimeRules) {
+module.exports = function(app, logger, io, video, authService, homeAway, bodyParser, iot, sockets, garageTimeRules) {
 	const hue = require('../services/hue.js')(logger);
 	var login = require('../settings/login.js');
 
@@ -87,10 +87,8 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		io.sockets.emit('shouldOpenGarageBaesdOnRules', shouldOpenGarageBaesdOnRules);
 
 		var whenGarageWillOpenNext = garageTimeRules.nextOpenBasedOnDayTime();
+		logger.debug(`whenGarageWillOpenNext${whenGarageWillOpenNext}`);
 		io.sockets.emit('whenGarageWillOpenNext', whenGarageWillOpenNext);
-
-
-		
 
 		if (app.get('takingVideo')) {
 			io.sockets.emit('garageOpenStatus', 'Recording video');

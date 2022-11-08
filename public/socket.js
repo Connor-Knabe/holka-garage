@@ -285,8 +285,6 @@ socket.on('whenGarageWillOpenNext', function (status) {
         $("#whenGarageWillOpenNext").text("Unknown!");
     }
 });     
-whenWIll
-
 
 
 socket.on('garageLastClosedTime', function (status) {
