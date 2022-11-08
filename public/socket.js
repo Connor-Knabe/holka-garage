@@ -278,11 +278,11 @@ socket.on('shouldOpenGarageBaesdOnRules', function (status) {
     }
 });      
 
-socket.on('whenGarageWillOpenNext', function (status) {
+socket.on('garageGPSOpenTime', function (status) {
     if (status) {
-        $("#whenGarageWillOpenNext").text(status);
+        $("#garageGPSOpenTime").text(status);
     } else {
-        $("#whenGarageWillOpenNext").text("Unknown!");
+        $("#garageGPSOpenTime").text("Unknown!");
     }
 });     
 
