@@ -47,9 +47,12 @@ setTimeout(()=>{
 
 const hue = require('./services/hue.js')(logger,messenger);
 const video = require('./services/video.js')(app, logger, io, hue, sockets);
+var garageTracking = require("./garageTracking.json");
+
+const garageTimeRules = require('./services/garageTimeRules.js')(options,garageTracking.garageTimesToOpenLog,garageTracking.garageTimesToOpen,logger);
 
 const homeAway = require('./services/homeAway.js')(logger, login, messenger, messengerInfo, io, options)
-var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron, homeAway);
+var iot = require('./services/iot.js')(app, options.debugMode, io, logger, video, messenger, hue, cron, homeAway,garageTimeRules);
 const authService = require('./services/auth.js')(logger, login, messengerInfo, options, messenger);
 
 app.use(helmet());
@@ -91,6 +94,6 @@ if (options.debugMode) {
 	logger.debug('___________________________________');
 }
 
-require('./controllers/routes.js')(app, logger, io, video, authService, homeAway, bodyParser, iot, sockets);
+require('./controllers/routes.js')(app, logger, io, video, authService, homeAway, bodyParser, iot, sockets,garageTimeRules);
 require('./controllers/gpsAuthRoutes.js')(app, logger, messenger, homeAway, bodyParser, iot);
 require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, video, authService, homeAway, bodyParser, iot);

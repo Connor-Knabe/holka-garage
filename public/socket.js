@@ -278,6 +278,17 @@ socket.on('shouldOpenGarageBaesdOnRules', function (status) {
     }
 });      
 
+socket.on('whenGarageWillOpenNext', function (status) {
+    if (status) {
+        $("#whenGarageWillOpenNext").text(status);
+    } else {
+        $("#whenGarageWillOpenNext").text("Unknown!");
+    }
+});     
+whenWIll
+
+
+
 socket.on('garageLastClosedTime', function (status) {
     if (status) {
         $("#garageLastClosedTime").text(new Date(status).toLocaleString());

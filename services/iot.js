@@ -35,7 +35,7 @@ var motionSensorTimeoutOne = null,
 	shouldAlertTimeoutTwo = null,
 	garageTracking = null;
 
-module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron, homeAway) {
+module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron, homeAway,garageTimeRules,garageTracking) {
 	var Status = {
 		wasOpenedViaWebsite: false,
 		wasClosedViaWebsite: false
@@ -43,9 +43,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	var hasBeenOpened = garageIsOpen();
 	const messengerInfo = require('../settings/messengerInfo.js');
-	garageTracking = require("../garageTracking.json");
-	const garageTimeRules = require('./garageTimeRules.js')(options,garageTracking.garageTimesToOpenLog,garageTracking.garageTimesToOpen,logger);
-	logger.info(garageTracking);
+
 	const fs = require("fs").promises;
 
 	app.set('takingVideo', false);

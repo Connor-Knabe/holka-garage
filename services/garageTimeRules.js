@@ -39,46 +39,44 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 
 	}
 
+
+	//for debugging
 	(function () {
-		console.log('here');
 		var nextOpen = nextOpenBasedOnDayTime();
 		console.log(nextOpen);
 	})();
 
 	function nextOpenBasedOnDayTime(){
-		console.log('checking');
 		var date = new Date();
 		var hourCounter = 1;
 		var dayCounter = 1;
 		var shouldLoop = true;
+		date.setMinutes(0);
+		date.setSeconds(0);
 		while (shouldLoop){
-			console.log("WHILE", date.toLocaleDateString());
 			var shouldOpen = shouldOpenBasedOnDayTime(garageTimesToOpenLog,date) || shouldOpenBasedOnDayTime(garageTimesToOpen,date);
-
 			if (shouldOpen){
 				console.log("FOUND MATCH",date);
 				shouldLoop = false;
 				//if match get day/time that it matched
 			} else {
-				console.log(`NO MATCH ${date.toLocaleDateString()} ${date.toLocaleTimeString()} Day counter: ${dayCounter} HourCounter${hourCounter}`);
-				
 				var currentDate = new Date();
-				if(dayCounter >= 7){
-					console.log("failed to match", date);
+				if(dayCounter > 7){
+					logger.error("Failed to find next garage open time");
 					shouldLoop = false;
 				} else if(hourCounter>=23){
 					hourCounter = 1;
 					date.setDate(currentDate.getDate() + dayCounter++)
-					console.log('MORE THAN 24 hours!', dayCounter);
-				} else if (dayCounter > 1) {
-					date.setHours(currentDate.getHours() + hourCounter++);
 				} else {
-					console.log("HIT ELSE?");
+					if(dayCounter>1){
+						date.setHours(hourCounter++);
+					} else {
+						date.setHours(currentDate.getHours() + hourCounter++);
+					}
 				}
 			}
 		}
 		return date;
-
 	}
 
 
@@ -106,6 +104,8 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 
 	function shouldOpenBasedOnDayObject(currentDayObj,theTime){
 		var shouldOpenBasedOnTime = false;
+		var shouldOpenBasedOnFixedTime = false;
+
 		if (currentDayObj.hourAndCount != null) {
 			for (var hour in currentDayObj.hourAndCount) {
 				if (currentDayObj.hourAndCount.hasOwnProperty(hour)) {
@@ -116,7 +116,17 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 				}
 			}
 		}
-		return shouldOpenBasedOnTime;
+		if (currentDayObj.hoursToOpen != null){
+			currentDayObj.hoursToOpen.forEach(hour => {
+				if (hour == theTime.getHours()) {
+					shouldOpenBasedOnFixedTime = true;
+				}
+			});
+		}
+
+		var shouldOpen = shouldOpenBasedOnTime || shouldOpenBasedOnFixedTime;
+
+		return shouldOpen;
 	}
 
 	function returnCurrentDay(garageTimesToOpen) {
@@ -135,6 +145,7 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 	return {
 		shouldAlertBasedOnTime:shouldAlertBasedOnTime,
 		shouldOpenCheck:shouldOpenCheck,
-		shouldOpenCheckAndLog,shouldOpenCheckAndLog
+		shouldOpenCheckAndLog:shouldOpenCheckAndLog,
+		nextOpenBasedOnDayTime:nextOpenBasedOnDayTime
 	}
 };
