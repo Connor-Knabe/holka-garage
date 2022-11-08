@@ -271,7 +271,6 @@ socket.on('springLifeRemaining', function (status) {
 });
 
 socket.on('shouldOpenGarageBaesdOnRules', function (status) {
-    console.log("shouldOpenGarageBaesdOnRules");
     if (status) {
         $("#shouldOpenGarageBaesdOnRules").text(status);
     } else {
@@ -280,7 +279,6 @@ socket.on('shouldOpenGarageBaesdOnRules', function (status) {
 });      
 
 socket.on('garageGPSOpenTime', function (status) {
-    console.log("garageGPSOpenTime");
     if (status) {
         $("#garageGPSOpenTime").text(status);
     } else {
