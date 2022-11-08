@@ -22,11 +22,16 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 	app.use(authService.authChecker);
 
 	app.get('/status', function(req, res) {
+		const garageStatus = getGarageStatus();
+		res.send(garageStatus);
+	});
+
+	function getGarageStatus(){
 		var garageOpenClosed = iot.garageIsOpen() ? "Opn": "Clsd";
 		var personOneAway = homeAway.isPersonAway(false) ? "Awy": "Hme";
 		var personTwoAway = homeAway.isPersonAway(true) ? "Awy": "Hme";
-		res.send(`${garageOpenClosed}|1${personOneAway}|2${personTwoAway}`);
-	});
+		return `${garageOpenClosed}|1${personOneAway}|2${personTwoAway}`;
+	}
 
 	app.get('/stream/image_stream.jpg', function(req, res) {
 		fs.readFile('./stream/image_stream.jpg', function(err, data) {
@@ -149,27 +154,31 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 
 	app.post('/togglePersonOneHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var personTwo = false;
+		const garageStatus = getGarageStatus();
 		if (homeAway.isPersonAway(personTwo)) {
 			homeAway.setPersonOneHome();
-			res.send('Person One Now Home');
+			res.send(garageStatus);
 		} else {
 			const isPersonTwo = false;
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
-			res.send('Person One Now Away');
+			res.send(garageStatus);
 		}
 	});
 
 	app.post('/togglePersonTwoHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var personTwo = true;
+		const garageStatus = getGarageStatus();
+
 		if (homeAway.isPersonAway(personTwo)){
 			homeAway.setPersonTwoHome();
-			res.send('Person Two Now Home');
+			res.send(garageStatus);
 		} else {
 			const isPersonTwo = true;
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
-			res.send('Person Two Now Away');
+			res.send(garageStatus);
+
 		}
 	});
 	
