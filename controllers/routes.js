@@ -79,7 +79,7 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		var whenGarageWillOpenNext = garageTimeRules.nextOpenBasedOnDayTime();
 		logger.debug(`whenGarageWillOpenNext${whenGarageWillOpenNext}`);
 
-		io.sockets.emit('garageGPSOpenTime', shouldOpenGarageBaesdOnRules);
+		io.sockets.emit('garageGPSOpenTime', whenGarageWillOpenNext);
 
 		io.sockets.emit('springLifeRemaining', iot.getSpringLifeRemaining());
 		io.sockets.emit('garageOpenCount', iot.getGarageOpenCount())
