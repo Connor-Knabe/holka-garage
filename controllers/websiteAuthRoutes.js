@@ -31,13 +31,13 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		const time = new Date(garageGPSOpenTime).toLocaleTimeString(undefined,{ hour12: false}).slice(0, -3)
 		const date = new Date(garageGPSOpenTime).toLocaleDateString({month: 'numeric', day: 'numeric'});
 		garageGPSOpenTime = `${time}||${date}`
-		var shouldOpenGarageBaesdOnRules = iot.shouldOpenGarageBaesdOnRules() ? "Yes" : "No";
+		var shouldOpenGarageBaesdOnRules = iot.shouldOpenGarageBaesdOnRules() ? "Y" : garageGPSOpenTime;
 
 		var garageOpenClosed = iot.garageIsOpen() ? "Opn": "Cld";
 		var personOneAway = homeAway.isPersonAway(false) ? "Awy": "Hme";
 		var personTwoAway = homeAway.isPersonAway(true) ? "Awy": "Hme";
 		
-		return `${garageOpenClosed}|1${personOneAway}|2${personTwoAway}|${shouldOpenGarageBaesdOnRules}|${garageGPSOpenTime}`;
+		return `${garageOpenClosed}|1${personOneAway}|2${personTwoAway}|${shouldOpenGarageBaesdOnRules}`;
 	}
 
 	app.get('/stream/image_stream.jpg', function(req, res) {
