@@ -30,7 +30,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		var garageGPSOpenTime = garageTimeRules.nextOpenBasedOnDayTime();
 		const time = new Date(garageGPSOpenTime).toLocaleTimeString(undefined,{ hour12: false}).slice(0, -3)
 		const date = new Date(garageGPSOpenTime).toLocaleDateString({month: 'numeric', day: 'numeric'});
-		garageGPSOpenTime = `${time} on ${date}`
+		garageGPSOpenTime = `${time}||${date}`
 		var shouldOpenGarageBaesdOnRules = iot.shouldOpenGarageBaesdOnRules() ? "Yes" : "No";
 
 		var garageOpenClosed = iot.garageIsOpen() ? "Opn": "Cld";
