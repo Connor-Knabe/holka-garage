@@ -161,14 +161,15 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 
 	app.post('/togglePersonOneHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var personTwo = false;
-		const garageStatus = getGarageStatus();
 		if (homeAway.isPersonAway(personTwo)) {
 			homeAway.setPersonOneHome();
+			const garageStatus = getGarageStatus();
 			res.send(garageStatus);
 		} else {
 			const isPersonTwo = false;
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
+			const garageStatus = getGarageStatus();
 			res.send(garageStatus);
 		}
 	});
