@@ -41,7 +41,7 @@ var io = require('socket.io')(http);
 var messenger = require('./services/messenger.js')(logger, options.debugMode);
 
 setTimeout(()=>{
-	messenger.send(true, messengerInfo.toNumbers, 'The garage software has rebooted.  Garage open alerts disabled until you leave home!', false, false);
+	messenger.send(true, messengerInfo.alertNumbers, 'The garage software has rebooted.  Garage open alerts disabled until you leave home!', false, false);
 },10*1000);
 
 
