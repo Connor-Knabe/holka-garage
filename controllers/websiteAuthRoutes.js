@@ -31,10 +31,8 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		const time = new Date(garageGPSOpenTime).toLocaleTimeString(undefined,{ hour12: false}).slice(0, -3)
 		const date = new Date(garageGPSOpenTime).toLocaleDateString({month: 'numeric', day: 'numeric'});
 		garageGPSOpenTime = `${time} on ${date}}`
-		console.log(today.toLocaleDateString(undefined,options),'th'); // 9/17/2016
 		var shouldOpenGarageBaesdOnRules = iot.shouldOpenGarageBaesdOnRules() ? "Yes" : "No";
 
-			
 		var garageOpenClosed = iot.garageIsOpen() ? "Opn": "Cld";
 		var personOneAway = homeAway.isPersonAway(false) ? "Awy": "Hme";
 		var personTwoAway = homeAway.isPersonAway(true) ? "Awy": "Hme";
