@@ -96,4 +96,4 @@ if (options.debugMode) {
 
 require('./controllers/routes.js')(app, logger, io, video, authService, homeAway, bodyParser, iot, sockets, garageTimeRules);
 require('./controllers/gpsAuthRoutes.js')(app, logger, messenger, homeAway, bodyParser, iot);
-require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, video, authService, homeAway, bodyParser, iot);
+require('./controllers/websiteAuthRoutes.js')(app, logger, io, hue, messenger, video, authService, homeAway, bodyParser, iot,garageTimeRules);

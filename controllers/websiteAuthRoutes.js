@@ -6,7 +6,7 @@ var garageOpenStatus = null;
 var wasOpenedViaWebsiteTimeout = null;
 var wasClosedViaWebsiteTimeout = null;
 
-module.exports = function(app, logger, io, hue, messenger, video, authService, homeAway, bodyParser,iot) {
+module.exports = function(app, logger, io, hue, messenger, video, authService, homeAway, bodyParser,iot,garageTimeRules) {
 	var garageErrorStatus = null;
 	//requires basic auth for twilio mms
 	app.use('/pictures', basicAuth(messengerInfo.twilioPictureUser, messengerInfo.twilioPicturePass));
@@ -27,10 +27,19 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 	});
 
 	function getGarageStatus(){
-		var garageOpenClosed = iot.garageIsOpen() ? "Opn": "Clsd";
+		var garageGPSOpenTime = garageTimeRules.nextOpenBasedOnDayTime();
+		const time = new Date(garageGPSOpenTime).toLocaleTimeString()(undefined,{ hour12: false}).slice(0, -3)
+		const date = new Date(garageGPSOpenTime).toLocaleDateString({month: 'numeric', day: 'numeric'});
+		garageGPSOpenTime = `${time} on ${date}}`
+		console.log(today.toLocaleDateString(undefined,options),'th'); // 9/17/2016
+		var shouldOpenGarageBaesdOnRules = iot.shouldOpenGarageBaesdOnRules() ? "Yes" : "No";
+
+			
+		var garageOpenClosed = iot.garageIsOpen() ? "Opn": "Cld";
 		var personOneAway = homeAway.isPersonAway(false) ? "Awy": "Hme";
 		var personTwoAway = homeAway.isPersonAway(true) ? "Awy": "Hme";
-		return `${garageOpenClosed}|1${personOneAway}|2${personTwoAway}`;
+		
+		return `${garageOpenClosed}|1${personOneAway}|2${personTwoAway}|${shouldOpenGarageBaesdOnRules}|${garageGPSOpenTime}`;
 	}
 
 	app.get('/stream/image_stream.jpg', function(req, res) {
