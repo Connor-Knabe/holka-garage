@@ -50,7 +50,6 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 		while (shouldLoop){
 			var shouldOpen = shouldOpenBasedOnDayTime(garageTimesToOpenLog,date) || shouldOpenBasedOnDayTime(garageTimesToOpen,date);
 			if (shouldOpen){
-				console.log("FOUND MATCH",date);
 				shouldLoop = false;
 				//if match get day/time that it matched
 			} else {
