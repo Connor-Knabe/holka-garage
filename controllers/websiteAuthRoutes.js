@@ -22,23 +22,9 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 	app.use(authService.authChecker);
 
 	app.get('/status', function(req, res) {
-		const garageStatus = getGarageStatus();
+		const garageStatus = iot.getGarageStatus();
 		res.send(garageStatus);
 	});
-
-	function getGarageStatus(){
-		var garageGPSOpenTime = garageTimeRules.nextOpenBasedOnDayTime();
-		const time = new Date(garageGPSOpenTime).toLocaleTimeString(undefined,{ hour12: false}).slice(0, -3)
-		const date = new Date(garageGPSOpenTime).toLocaleDateString({month: 'numeric', day: 'numeric'});
-		garageGPSOpenTime = `${time}||${date}`
-		var shouldOpenGarageBaesdOnRules = iot.shouldOpenGarageBaesdOnRules() ? "Y" : garageGPSOpenTime;
-
-		var garageOpenClosed = iot.garageIsOpen() ? "Opn": "Cld";
-		var personOneAway = homeAway.isPersonAway(false) ? "Awy": "Hme";
-		var personTwoAway = homeAway.isPersonAway(true) ? "Awy": "Hme";
-		
-		return `${garageOpenClosed}|1${personOneAway}|2${personTwoAway}|${shouldOpenGarageBaesdOnRules}`;
-	}
 
 	app.get('/stream/image_stream.jpg', function(req, res) {
 		fs.readFile('./stream/image_stream.jpg', function(err, data) {
@@ -163,30 +149,30 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		var personTwo = false;
 		if (homeAway.isPersonAway(personTwo)) {
 			homeAway.setPersonOneHome();
-			const garageStatus = getGarageStatus();
+			const garageStatus = iot.getGarageStatus();
 			res.send(garageStatus);
 		} else {
 			const isPersonTwo = false;
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
-			const garageStatus = getGarageStatus();
+			const garageStatus = iot.getGarageStatus();
 			res.send(garageStatus);
 		}
 	});
 
 	app.post('/togglePersonTwoHomeAway', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		var personTwo = true;
-		const garageStatus = getGarageStatus();
 
 		if (homeAway.isPersonAway(personTwo)){
 			homeAway.setPersonTwoHome();
+			const garageStatus = iot.getGarageStatus();
 			res.send(garageStatus);
 		} else {
 			const isPersonTwo = true;
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
+			const garageStatus = iot.getGarageStatus();
 			res.send(garageStatus);
-
 		}
 	});
 	

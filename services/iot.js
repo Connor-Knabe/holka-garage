@@ -32,8 +32,7 @@ var motionSensorTimeoutOne = null,
 	temporaryEnableGuestIsHomeTimeout = null,
 	temporaryEnableGuestIsHomeTime = null,
 	shouldAlertTimeoutOne = null,
-	shouldAlertTimeoutTwo = null,
-	garageTracking = null;
+	shouldAlertTimeoutTwo = null;
 
 module.exports = function(app, debugMode, io, logger, video, messenger, hue, cron, homeAway,garageTimeRules,garageTracking) {
 	var Status = {
@@ -430,6 +429,20 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		} 	
 	}
 
+	function getGarageStatus(){
+		var garageGPSOpenTime = garageTimeRules.nextOpenBasedOnDayTime();
+		const time = new Date(garageGPSOpenTime).toLocaleTimeString(undefined,{ hour12: false}).slice(0, -3)
+		const date = new Date(garageGPSOpenTime).toLocaleDateString({month: 'numeric', day: 'numeric'});
+		garageGPSOpenTime = `${time}||${date}`
+		var shouldOpenGarageBaesdOnRules = shouldOpenGarageBaesdOnRules() ? "Y" : garageGPSOpenTime;
+
+		var garageOpenClosed = garageIsOpen() ? "Opn": "Cld";
+		var personOneAway = homeAway.isPersonAway(false) ? "Awy": "Hme";
+		var personTwoAway = homeAway.isPersonAway(true) ? "Awy": "Hme";
+		
+		return `${garageOpenClosed}|1${personOneAway}|2${personTwoAway}|${shouldOpenGarageBaesdOnRules}`;
+	}
+
 	return {
 		garageIsOpen: garageIsOpen,
 		toggleGarageDoor: toggleGarageDoor,
@@ -445,6 +458,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		Status:Status,
 		getGarageOpenCount:getGarageOpenCount,
 		getSpringLifeRemaining:getSpringLifeRemaining,
-		shouldOpenGarageBaesdOnRules:shouldOpenGarageBaesdOnRules
+		shouldOpenGarageBaesdOnRules:shouldOpenGarageBaesdOnRules,
+		getGarageStatus:getGarageStatus
 	};
 };
