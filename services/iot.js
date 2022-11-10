@@ -434,13 +434,13 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		const time = new Date(garageGPSOpenTime).toLocaleTimeString(undefined,{ hour12: false}).slice(0, -3)
 		const date = new Date(garageGPSOpenTime).toLocaleDateString({month: 'numeric', day: 'numeric'});
 		garageGPSOpenTime = `${time}||${date}`
-		var shouldOpenGarageBaesdOnRules = shouldOpenGarageBaesdOnRules() ? "Y" : garageGPSOpenTime;
+		const shouldOpen = shouldOpenGarageBaesdOnRules() ? "Y" : garageGPSOpenTime;
 
 		var garageOpenClosed = garageIsOpen() ? "Opn": "Cld";
 		var personOneAway = homeAway.isPersonAway(false) ? "Awy": "Hme";
 		var personTwoAway = homeAway.isPersonAway(true) ? "Awy": "Hme";
 		
-		return `${garageOpenClosed}|1${personOneAway}|2${personTwoAway}|${shouldOpenGarageBaesdOnRules}`;
+		return `${garageOpenClosed}|1${personOneAway}|2${personTwoAway}|${shouldOpen}`;
 	}
 
 	return {
