@@ -431,9 +431,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	function getGarageStatus(){
 		var garageGPSOpenTime = garageTimeRules.nextOpenBasedOnDayTime();
-		const time = new Date(garageGPSOpenTime).toLocaleTimeString(undefined,{ hour12: false}).slice(0, -3)
-		const date = new Date(garageGPSOpenTime).toLocaleDateString({month: 'numeric', day: 'numeric'});
-		garageGPSOpenTime = `${time}||${date}`
+		const time = new Date(garageGPSOpenTime).toLocaleTimeString('en-US',{ hour12: true, hour: 'numeric'});
+		const date = new Date(garageGPSOpenTime).toLocaleDateString(undefined,{month: 'numeric', day: 'numeric'});
+		garageGPSOpenTime = `${time} ${date}`
 		const shouldOpen = shouldOpenGarageBaesdOnRules() ? "Y" : garageGPSOpenTime;
 
 		var garageOpenClosed = garageIsOpen() ? "Opn": "Cld";
