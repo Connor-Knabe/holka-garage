@@ -436,9 +436,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		garageGPSOpenTime = `${time} ${date}`
 		const shouldOpen = shouldOpenGarageBaesdOnRules() ? "Y" : garageGPSOpenTime;
 
-		var garageOpenClosed = garageIsOpen() ? "Opn": "Cld";
-		var personOneAway = homeAway.isPersonAway(false) ? "Awy": "Hme";
-		var personTwoAway = homeAway.isPersonAway(true) ? "Awy": "Hme";
+		var garageOpenClosed = garageIsOpen() ? "O": "C";
+		var personOneAway = homeAway.isPersonAway(false) ? "A": "H";
+		var personTwoAway = homeAway.isPersonAway(true) ? "A": "H";
 		
 		return `${garageOpenClosed}|1${personOneAway}|2${personTwoAway}|${shouldOpen}`;
 	}
