@@ -80,9 +80,9 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		var garageGPSOpenTime = garageTimeRules.nextOpenBasedOnDayTime();
 
 		if (iot.shouldOpenGarageBaesdOnRules()){
-			garageGPSOpenTime = `Next auto open via GPS: ${new Date(garageGPSOpenTime).toLocaleTimeString()} on ${new Date(garageGPSOpenTime).toLocaleDateString()}`
-		} else {
 			garageGPSOpenTime = null;
+		} else {
+			garageGPSOpenTime = `Next auto open via GPS: ${new Date(garageGPSOpenTime).toLocaleTimeString()} on ${new Date(garageGPSOpenTime).toLocaleDateString()}`
 		}
 		io.sockets.emit('garageGPSOpenTime', garageGPSOpenTime);
 
