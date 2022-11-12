@@ -40,7 +40,12 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 	}
 
 	(function () {
-		logger.debug('nextOpenBasedOnDayTime()',nextOpenBasedOnDayTime());
+		logger.debug('nextOpenBasedOnDayTime()',new Date(`${nextOpenBasedOnDayTime()}`));
+		var garageGPSOpenTime = nextOpenBasedOnDayTime();
+		const time = new Date(garageGPSOpenTime).toLocaleTimeString('en-US',{ hour12: true, hour: 'numeric'});
+		const date = new Date(garageGPSOpenTime).toLocaleDateString(undefined,{month: 'numeric', day: 'numeric'});
+		garageGPSOpenTime = `${time} ${date}`
+		logger.debug("nextOpenBasedOnDayTime",garageGPSOpenTime);
 	})();
 	function nextOpenBasedOnDayTime(){
 		var date = new Date();
@@ -51,11 +56,10 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 		date.setSeconds(0);
 		while (shouldLoop){
 			var shouldOpen = shouldOpenBasedOnDayTime(garageTimesToOpenLog,date) || shouldOpenBasedOnDayTime(garageTimesToOpen,date);
-			logger.debug(`shouldOpenBasedOnDayTime(garageTimesToOpenLog,date)${shouldOpenBasedOnDayTime(garageTimesToOpenLog,date)}`);
-			logger.debug(`shouldOpenBasedOnDayTime(garageTimesToOpen,date)${shouldOpenBasedOnDayTime(garageTimesToOpen,date)}`);
-
 			if (shouldOpen){
 				shouldLoop = false;
+				logger.debug(`shouldOpenBasedOnDayTime(garageTimesToOpenLog,date)${shouldOpenBasedOnDayTime(garageTimesToOpenLog,date)}`);
+				logger.debug(`shouldOpenBasedOnDayTime(garageTimesToOpen,date)${shouldOpenBasedOnDayTime(garageTimesToOpen,date)}`);
 				//if match get day/time that it matched
 			} else {
 				var currentDate = new Date();
