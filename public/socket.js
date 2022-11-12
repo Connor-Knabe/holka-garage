@@ -282,7 +282,7 @@ socket.on('garageGPSOpenTime', function (status) {
     if (status) {
         $("#garageGPSOpenTime").text(status);
     } else {
-        $(".garageGPSOpenTime").hide();
+        $("#garageGPSOpenTime").hide();
     }
 });     
 
