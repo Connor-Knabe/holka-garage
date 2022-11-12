@@ -69,6 +69,7 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 				}
 			}
 		}
+		logger.debug("nextOpenBasedOnDayTime",date);
 		return date;
 	}
 
