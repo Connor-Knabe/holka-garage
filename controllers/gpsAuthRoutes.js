@@ -122,7 +122,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
 		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
-			homeAway.setPersonAway(req, res, isPersonTwo);
+			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 			const garageStatus = iot.getGarageStatus();
 			res.send(garageStatus);
@@ -140,7 +140,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
 
 		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
-			homeAway.setPersonAway(req, res, isPersonTwo);
+			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 			const garageStatus = iot.getGarageStatus();
 			res.send(garageStatus);
