@@ -115,6 +115,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 			shouldSendSecurityAlert = false;
 		}
 	}
+	
 
 	app.post('/personOneAway', bodyParser.text(), function(req, res) {
 		//away from home turn alert on

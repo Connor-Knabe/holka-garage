@@ -1,3 +1,8 @@
+Date.prototype.addHours = function(h) {
+	this.setTime(this.getTime() + (h*60*60*1000));
+	return this;
+}
+
 module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger) {
 	function shouldAlertBasedOnTime() {
 		var theTime = new Date();
@@ -40,41 +45,38 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 	}
 
 	(function () {
-		logger.debug('nextOpenBasedOnDayTime()',new Date(`${nextOpenBasedOnDayTime()}`));
 		var garageGPSOpenTime = nextOpenBasedOnDayTime();
 		const time = new Date(garageGPSOpenTime).toLocaleTimeString('en-US',{ hour12: true, hour: 'numeric'});
 		const date = new Date(garageGPSOpenTime).toLocaleDateString(undefined,{month: 'numeric', day: 'numeric'});
 		garageGPSOpenTime = `${time} ${date}`
-		logger.debug("nextOpenBasedOnDayTime",garageGPSOpenTime);
 	})();
 	function nextOpenBasedOnDayTime(){
 		var date = new Date();
 		var hourCounter = 1;
-		var dayCounter = 1;
+		var dayCounter = 0;
 		var shouldLoop = true;
 		date.setMinutes(0);
 		date.setSeconds(0);
+
+		
 		while (shouldLoop){
 			var shouldOpen = shouldOpenBasedOnDayTime(garageTimesToOpenLog,date) || shouldOpenBasedOnDayTime(garageTimesToOpen,date);
 			if (shouldOpen){
 				shouldLoop = false;
-				logger.debug(`shouldOpenBasedOnDayTime(garageTimesToOpenLog,date)${shouldOpenBasedOnDayTime(garageTimesToOpenLog,date)}`);
-				logger.debug(`shouldOpenBasedOnDayTime(garageTimesToOpen,date)${shouldOpenBasedOnDayTime(garageTimesToOpen,date)}`);
 				//if match get day/time that it matched
 			} else {
 				var currentDate = new Date();
-				if(dayCounter > 7){
+				let differenceBetweenDates = date.getTime() - currentDate.getTime();
+				let days = Math.ceil(differenceBetweenDates / (1000 * 3600 * 24));
+				if(days > 7){
 					logger.error("Failed to find next garage open time");
 					shouldLoop = false;
-				} else if(hourCounter>=23){
+				} else if(date.getHours()>=23){
 					hourCounter = 1;
-					date.setDate(currentDate.getDate() + dayCounter++)
+					date.setDate(date.getDate() + 1);
+					date.setHours(0);
 				} else {
-					if(dayCounter>1){
-						date.setHours(hourCounter++);
-					} else {
-						date.setHours(currentDate.getHours() + hourCounter++);
-					}
+					date.addHours(hourCounter);
 				}
 			}
 		}
@@ -82,12 +84,6 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 		return date;
 	}
 
-
-	function addDays(date, days) {
-		var result = new Date(date);
-		result.setDate(result.getDate() + days);
-		return result;
-	  }
 
 
 	function shouldOpenBasedOnDayTime(garageTimesToOpenLog,theTime) {
