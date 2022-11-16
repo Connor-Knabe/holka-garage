@@ -53,12 +53,10 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 	function nextOpenBasedOnDayTime(){
 		var date = new Date();
 		var hourCounter = 1;
-		var dayCounter = 0;
 		var shouldLoop = true;
 		date.setMinutes(0);
 		date.setSeconds(0);
 
-		
 		while (shouldLoop){
 			var shouldOpen = shouldOpenBasedOnDayTime(garageTimesToOpenLog,date) || shouldOpenBasedOnDayTime(garageTimesToOpen,date);
 			if (shouldOpen){
@@ -84,8 +82,6 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 		return date;
 	}
 
-
-
 	function shouldOpenBasedOnDayTime(garageTimesToOpenLog,theTime) {
 		var shouldOpenBasedOnTime = false;
 		var currentDayObj = returnCurrentDay(garageTimesToOpenLog);
@@ -99,7 +95,6 @@ module.exports = function(options,garageTimesToOpenLog,garageTimesToOpen,logger)
 
 		return shouldOpenBasedOnTime;
 	}
-
 
 	function shouldOpenBasedOnDayObject(currentDayObj,theTime){
 		var shouldOpenBasedOnTime = false;

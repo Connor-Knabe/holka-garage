@@ -431,9 +431,10 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	function getGarageStatus(){
 		var garageGPSOpenTime = garageTimeRules.nextOpenBasedOnDayTime();
+		
 		const time = new Date(garageGPSOpenTime).toLocaleTimeString('en-US',{ hour12: true, hour: 'numeric'});
 		const date = new Date(garageGPSOpenTime).toLocaleDateString(undefined,{month: 'numeric', day: 'numeric'});
-		garageGPSOpenTime = `${time} ${date}`
+		garageGPSOpenTime = isToday(garageGPSOpenTime) ? `${time}` : `${time} ${date}`;
 		logger.debug("garageGPSOpenTime",garageGPSOpenTime);
 
 		const shouldOpen = shouldOpenGarageBaesdOnRules() ? "Y" : garageGPSOpenTime;
@@ -444,6 +445,13 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		
 		return `${garageOpenClosed}|1${personOneAway}|2${personTwoAway}|${shouldOpen}`;
 	}
+
+	function isToday(someDate) {
+		const today = new Date()
+		return someDate.getDate() == today.getDate() &&
+		  someDate.getMonth() == today.getMonth() &&
+		  someDate.getFullYear() == today.getFullYear()
+	  }
 
 	return {
 		garageIsOpen: garageIsOpen,
