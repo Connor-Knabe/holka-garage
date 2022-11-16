@@ -77,7 +77,7 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		io.sockets.emit('garageLastClosedTime', iot.getGarageLastClosedTime());
 		var shouldOpenGarageBaesdOnRules = iot.shouldOpenGarageBaesdOnRules() ? "Yes" : "No";
 		io.sockets.emit('shouldOpenGarageBaesdOnRules', shouldOpenGarageBaesdOnRules);
-		var garageGPSOpenTime = garageTimeRules.getGarageStatus();
+		var garageGPSOpenTime = iot.getGarageStatus();
 
 		if (iot.shouldOpenGarageBaesdOnRules()){
 			garageGPSOpenTime = null;
