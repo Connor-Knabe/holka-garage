@@ -77,13 +77,23 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		io.sockets.emit('garageLastClosedTime', iot.getGarageLastClosedTime());
 		var shouldOpenGarageBaesdOnRules = iot.shouldOpenGarageBaesdOnRules() ? "Yes" : "No";
 		io.sockets.emit('shouldOpenGarageBaesdOnRules', shouldOpenGarageBaesdOnRules);
-		var garageGPSOpenTime = iot.getGarageStatus();
+		var garageGPSOpenTime = garageTimeRules.nextOpenBasedOnDayTime();
 
 		if (iot.shouldOpenGarageBaesdOnRules()){
 			garageGPSOpenTime = null;
 		} else {
-			garageGPSOpenTime = `Next auto open via GPS: ${garageGPSOpenTime}`
+			var dateTimeStr = ``;
+			dateTimeStr = isToday(garageGPSOpenTime) ? `${new Date(garageGPSOpenTime).toLocaleTimeString()}` : `${new Date(garageGPSOpenTime).toLocaleTimeString()} on ${new Date(garageGPSOpenTime).toLocaleDateString()}`;
+			garageGPSOpenTime = `Next auto open via GPS: ${dateTimeStr}`;
 		}
+
+		function isToday(someDate) {
+			const today = new Date()
+			return someDate.getDate() == today.getDate() &&
+			  someDate.getMonth() == today.getMonth() &&
+			  someDate.getFullYear() == today.getFullYear()
+		}
+
 		io.sockets.emit('garageGPSOpenTime', garageGPSOpenTime);
 
 		io.sockets.emit('springLifeRemaining', iot.getSpringLifeRemaining());

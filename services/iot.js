@@ -451,7 +451,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		return someDate.getDate() == today.getDate() &&
 		  someDate.getMonth() == today.getMonth() &&
 		  someDate.getFullYear() == today.getFullYear()
-	  }
+	}
 
 	return {
 		garageIsOpen: garageIsOpen,
