@@ -45,7 +45,7 @@ module.exports = function(logger,messenger) {
 
 	function lightsOff() {
 		//fix bug
-		messenger.requestIfttt(messengerInfo.garageLightsOnUrl, messengerInfo.iftttRecipients[0].ApiKey, "", "");
+		messenger.requestIfttt(messengerInfo.garageLightsOffUrl, messengerInfo.iftttRecipients[0].ApiKey, "", "");
 	}
 
 	return {
