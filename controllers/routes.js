@@ -1,11 +1,10 @@
-const messenger = require('../services/messenger.js');
 var options = require('../settings/options.js');
 
 var personOneTime = new Date();
 var personTwoTime = new Date();
 const rebootTime = new Date();
 
-module.exports = function(app, logger, io, video, authService, homeAway, bodyParser, iot, sockets, garageTimeRules) {
+module.exports = function(app, logger, io, video, authService, homeAway, bodyParser, iot, sockets, garageTimeRules,messenger) {
 	const hue = require('../services/hue.js')(logger, messenger);
 	var login = require('../settings/login.js');
 
@@ -15,7 +14,6 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 
 		socket.on('disconnect', function() {
 			delete sockets[socket.id];
-			
 			hue.garageLightsOffTimed();
 			video.stopStreaming();
 		});
