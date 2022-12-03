@@ -41,7 +41,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 			.then(() => {
 				var msg = 'Sending video via website';
 				var btnPress = true;
-				messenger.send(true, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
+				messenger.send(true, messengerInfo.alertNumbers, msg, options.alertSendPictureText, btnPress);
 				io.sockets.emit('garageOpenStatus', 'Video sent');
 			})
 			.catch(() => {
