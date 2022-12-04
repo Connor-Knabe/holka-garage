@@ -219,3 +219,8 @@ margin-right: 150px;*/
 .btn {
 	display: none;
 }
+
+.contained{
+	text-align: center;
+	display: inline;
+}
