@@ -114,9 +114,9 @@ socket.on('personOneName', function (status) {
     if (status) {
 	    var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
         if(isSafari){
-            $("#personOneName").text(" "+status);
+            $("#personOneName").text("."+status);
         } else {
-
+            $("#personOneName").text(status);
         }
         $("#personOneName").show();
     } else {
