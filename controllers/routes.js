@@ -54,7 +54,7 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 			personOneTime = homeAway.getPersonTime(personTwo)
 			const timeAway = homeAway.getTimeAway(personOneTime);
 			io.sockets.emit('personOneTime', `${timeAway}`);
-			io.sockets.emit('personOneName', `${login.users[0].name}: `);
+			io.sockets.emit('personOneName', `${login.users[0].name}:    `);
 			var personTwo = false;
 			if (homeAway.isPersonAway(personTwo)) {
 				io.sockets.emit('personOneAway', `away`);
