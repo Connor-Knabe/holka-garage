@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	
 	$('#progress').hide();
 	$('#stream').hide();
 	$('#open').click(function(e) {
