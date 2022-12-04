@@ -111,9 +111,9 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		if (hours >= 24) {
 			var days = Math.floor(hours / 24);
 			hours = hours - days * 24;
-			timeAway = `for ${days} day(s) ${hours} hrs`;
+			timeAway = ` for ${days} day(s) ${hours} hrs`;
 		} else {
-			timeAway = hours >= 2 ? `for ${hours} hours` : ` for ${minsBetweenDates} mins`;
+			timeAway = hours >= 2 ? ` for ${hours} hours` : ` for ${minsBetweenDates} mins`;
 		}
 
 		return timeAway;
