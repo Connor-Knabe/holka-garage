@@ -25,8 +25,8 @@
 </head>
 
 <body class="container">
-    <h1 class="text-center smallText">Silver Leaf Garage
-        <br />
+    <h1 class="text-center smallText">
+        <!-- <br /> -->
         <button type="button" disabled class="btn btn-info" id="open">Open Garage</button>
 
         <button type="button" disabled class="btn btn-info" id="close">Close Garage</button>
@@ -97,27 +97,24 @@
 
 		<br>
         <button type="button" class="btn btn-info" id="toggleGarageStillOpenAlert">Still Open Alert Enabled</button>
-        <br> 
+        <br>
+        Still open alert timeout: <div class="garageStatus" id="stillOpenAlert" style="color:purple"></div>
 
-        <h1 class="text-center">
-        GPS auto open is: <div class="garageStatus" id="garageGPSStatus" style="color:green"></div>
-        <!-- GPS auto open is: <button type="button" class="btn btn-info" id="gps"></button></div> -->
-        </h1>
-        <button type="button" class="btn btn-info" id="gps">Toggle GPS Open</button>
-        <br><br>
+        <br>
+        <div class="btn btn-info inline" id="gps"></div>
+        <br>
+        Will open via GPS based on rules: <div class="garageStatus" id="shouldOpenGarageBaesdOnRules">N/a</div>
+        <br>
         <button type="button" class="btn btn-info" id="toggleGuestIsHome">Guest Is Home Disabled</button>
-        <br><br>
-
+        <br>
+        Home guest temporary enable: <div class="garageStatus" id="guestIsHome" style="color:purple"></div>
+        <br>
 
         <div class="largeText" id="garageLightStatus" style="color:green"></div>
         <br>
         System has been online: <div class="garageStatus" id="rebootTime"></div>
         <br>
         Open after away for: <div class="garageStatus" id="garageTimer" style="color:purple"></div>
-        <br>
-        Still open alert timeout: <div class="garageStatus" id="stillOpenAlert" style="color:purple"></div>
-        <br>
-        Home guest temporary enable: <div class="garageStatus" id="guestIsHome" style="color:purple"></div>
         <br>
         Last opened: <div class="garageStatus" id="garageLastOpenedTime">N/a</div>
         <br>
@@ -132,8 +129,6 @@
         Garage opens: <div class="garageStatus" id="garageOpenCount">N/a</div>
         <br>
         Spring life remaining: <div class="garageStatus" id="springLifeRemaining">N/a</div>
-        <br>
-        Will open via GPS based on rules: <div class="garageStatus" id="shouldOpenGarageBaesdOnRules">N/a</div>
         <br>
         <div class="garageStatus" id="garageGPSOpenTime">N/a</div>
         <br><br>

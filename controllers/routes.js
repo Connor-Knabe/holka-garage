@@ -25,9 +25,9 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		}
 
 		if (options.garageGpsEnabledMain) {
-			io.sockets.emit('garageGPSStatus', 'enabled');
+			io.sockets.emit('gps', 'GPS auto open is enabled');
 		} else {
-			io.sockets.emit('garageGPSStatus', 'disabled');
+			io.sockets.emit('gps', 'GPS auto open is disabled');
 		}
 
 		io.sockets.emit('toggleGarageStillOpenAlert', iot.getTemporaryDisableGarageStillOpenAlertStatus());

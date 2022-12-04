@@ -66,8 +66,8 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		} else {
 			options.garageGpsEnabledMain = true;
 		}
-		var garageGPSStatus = options.garageGpsEnabledMain ? 'enabled' : 'disabled';
-		io.sockets.emit('garageGPSStatus', garageGPSStatus);
+		var garageGPSStatus = options.garageGpsEnabledMain ? 'GPS auto open is enabled' : 'GPS auto open is disabled';
+		io.sockets.emit('gps', garageGPSStatus);
 		res.send('Ok');
 	});
 

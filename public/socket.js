@@ -51,15 +51,12 @@ socket.on('toggleAutomatedHueHome', function (status) {
 });
 
 
-socket.on('garageGPSStatus', function (status) {
+socket.on('gps', function (status) {
     if (status) {
-        $("#garageGPSStatus").text(status);
-        $("#garageGPSStatus").show();
-        $("#gps").removeAttr("disabled");
-
-    } else {
-        $("#garageGPSStatus").hide();
-    }
+        $("#gps").text(status);
+        // $("#gps").show();
+        // $("#gps").removeAttr("disabled");
+    } 
 });
 
 socket.on('garageStatus', function (status) {
