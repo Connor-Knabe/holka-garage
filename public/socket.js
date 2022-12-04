@@ -82,10 +82,10 @@ socket.on('garageStatus', function (status) {
 socket.on('personOneAway', function (status) {
     if (status) {
         if(status=='home'){
-            $("#personOneAway").css("color", "green");
+            // $("#personOneAway").css("color", "green");
             $("#personOneTime").css("color", "green");
         } else {
-            $("#personOneAway").css("color", "purple");
+            // $("#personOneAway").css("color", "purple");
             $("#personOneTime").css("color", "purple");
         }
 
@@ -100,10 +100,10 @@ socket.on('personOneAway', function (status) {
 socket.on('personTwoAway', function (status) {
     if (status) {
         if(status=='home'){
-            $("#personTwoAway").css("color", "green");
+            // $("#personTwoAway").css("color", "green");
             $("#personTwoTime").css("color", "green");
         } else {
-            $("#personTwoAway").css("color", "purple");
+            // $("#personTwoAway").css("color", "purple");
             $("#personTwoTime").css("color", "purple");
         }
 
