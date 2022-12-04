@@ -112,12 +112,13 @@ socket.on('personTwoAway', function (status) {
 
 socket.on('personOneName', function (status) {
     if (status) {
-	    var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        if(isSafari){
+        if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
             $("#personOneName").text("."+status);
         } else {
             $("#personOneName").text(status);
         }
+
+    
         $("#personOneName").show();
     } else {
         $("#personOneName").hide();
