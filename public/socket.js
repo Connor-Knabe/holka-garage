@@ -113,7 +113,7 @@ socket.on('personTwoAway', function (status) {
 socket.on('personOneName', function (status) {
     if (status) {
         if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
-            $("#personOneName").text("."+status);
+            $("#personOneName").text(" "+status);
         } else {
             $("#personOneName").text(status);
         }
