@@ -104,16 +104,15 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 	
 	function getTimeAway(startDate) {
 		var minsBetweenDates = getMinsAway(startDate);
-	
 		var timeAway;
 		var hours = Math.floor(minsBetweenDates / 60);
 
 		if (hours >= 24) {
 			var days = Math.floor(hours / 24);
 			hours = hours - days * 24;
-			timeAway = ` for ${days} day(s) ${hours} hrs`;
+			timeAway = ` ${days}d(s)${hours}h`;
 		} else {
-			timeAway = hours >= 2 ? ` for ${hours} hours` : ` for ${minsBetweenDates} mins`;
+			timeAway = hours >= 2 ? ` ${hours}h` : ` ${minsBetweenDates}m`;
 		}
 
 		return timeAway;
