@@ -144,7 +144,7 @@ function getTimeAway(startDate){
         var diff = curDate.getTime() - startDate.getTime();
         minsBetweenDates = Math.floor(diff / 60000);
     }
-    var timeAway = hours >= 2 ? ` ${hours}h` : ` ${minsBetweenDates}m`;
+    var timeAway = minsBetweenDates >= 91 ? ` ${hours}h` : ` ${minsBetweenDates}m`;
     if (hours >= 24) {
         var days = Math.floor(hours / 24);
         hours = hours - days * 24;
