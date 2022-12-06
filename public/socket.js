@@ -116,21 +116,18 @@ socket.on('personOneName', function (status) {
         // }
         $("#personOneName").text(status);
         $("#personOneName").show();
-
-        $("#personTwoName").text(status);
-        $("#personTwoName").show();
     } else {
         $("#personOneName").hide();
     }
 });
 
 socket.on('personTwoName', function (status) {
-    // if (status) {
-    //     $("#personTwoName").text(status);
-    //     $("#personTwoName").show();
-    // } else {
-    //     $("#personTwoName").hide();
-    // }
+    if (status) {
+        $("#personTwoName").text(status);
+        $("#personTwoName").show();
+    } else {
+        $("#personTwoName").hide();
+    }
 });
 
 socket.on('personOneTime', function (status) {
