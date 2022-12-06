@@ -131,8 +131,6 @@ socket.on('personTwoName', function (status) {
 });
 function getTimeAway(startDate){
     startDate = new Date(startDate);
-    const curDate = new Date("December 10, 2022");
-
     var minsBetweenDates = 0;
     if (startDate && curDate) {
         var diff = curDate.getTime() - startDate.getTime();
@@ -157,26 +155,8 @@ function getTimeAway(startDate){
 
 socket.on('personOneTime', function (startDate) {
     if (startDate) {
-        // startDate = new Date(startDate);
-        // var hours = Math.floor(minsBetweenDates / 60);
-		// var minsBetweenDates = 0;
-		// const curDate = new Date();
-		// if (startDate && curDate) {
-		// 	var diff = curDate.getTime() - startDate.getTime();
-		// 	minsBetweenDates = Math.floor(diff / 60000);
-		// }
-
-        // var timeAway = hours >= 2 ? ` ${hours}h` : ` ${minsBetweenDates}m`;
         $(".lineBreak").hide();
-
-		// if (hours >= 24) {
-		// 	var days = Math.floor(hours / 24);
-		// 	hours = hours - days * 24;
-		// 	timeAway = ` ${days}d(s)${hours}h`;
-        //     $(".lineBreak").show();
-		// }
         const timeAway = getTimeAway(startDate);
-        // console.log("timeAway",hours);
         $("#personOneTime").text(timeAway);
         $("#personOneTime").show();
     } else {
