@@ -131,6 +131,8 @@ socket.on('personTwoName', function (status) {
 });
 function getTimeAway(startDate){
     startDate = new Date(startDate);
+    const curDate = new Date();
+
     var minsBetweenDates = 0;
     if (startDate && curDate) {
         var diff = curDate.getTime() - startDate.getTime();
