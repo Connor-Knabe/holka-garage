@@ -145,12 +145,23 @@ function getTimeAway(startDate){
         minsBetweenDates = Math.floor(diff / 60000);
     }
     var timeAway = minsBetweenDates >= 91 ? ` ${hours}h` : ` ${minsBetweenDates}m`;
+
+    if (minsBetweenDates >= 91){
+        timeAway = ` ${hours}h`;
+    } else if(minsBetweenDates >= 10){
+        ` ${minsBetweenDates}m`
+    } else {
+        ` 0${minsBetweenDates}m`
+    }
     if (hours >= 24) {
         var days = Math.floor(hours / 24);
         hours = hours - days * 24;
         timeAway = ` ${days}d(s)${hours}h`;
-        $(".lineBreak").show();
+        // $(".lineBreak").show();
+    } else if(hours >= 10){
+        timeAway = ` 0${hours}h`;
     }
+
     return timeAway;
 }
 
