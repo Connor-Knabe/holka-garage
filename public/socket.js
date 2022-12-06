@@ -160,7 +160,7 @@ function getTimeAway(startDate){
         // $(".lineBreak").show();
     } else if(hours >= 10){
         timeAway = ` ${hours}h`;
-    } else {
+    } else if(hours >=2) {
         timeAway = ` 0${hours}h`;
     }
 
