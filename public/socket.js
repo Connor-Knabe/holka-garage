@@ -157,7 +157,7 @@ function getTimeAway(startDate){
 
 socket.on('personOneTime', function (startDate) {
     if (startDate) {
-        $(".lineBreak").hide();
+        // $(".lineBreak").hide();
         const timeAway = getTimeAway(startDate);
         $("#personOneTime").text(timeAway);
         $("#personOneTime").show();

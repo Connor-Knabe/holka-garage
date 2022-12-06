@@ -124,7 +124,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		Status.personOneAway = false;
 		Status.personOneTime = new Date();
 		io.sockets.emit('personOneAway', 'home');
-		io.sockets.emit('personOneTime', `${getTimeAway(Status.personOneTime)}`);
+		io.sockets.emit('personOneTime', `${Status.personOneTime}`);
 		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 		messenger.sendGenericIfttt(`${login.users[0].name} Set to Home`);
 	}
