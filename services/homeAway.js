@@ -68,14 +68,12 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		if (isPersonTwo) {
 			Status.personTwoAway = true;
 			Status.personTwoTime = new Date();
-			const timeAway = getTimeAway(Status.personTwoTime);
-			io.sockets.emit('personTwoTime', `${timeAway}`);
+			io.sockets.emit('personTwoTime', `${Status.personTwoTime}`);
 			io.sockets.emit('personTwoAway', 'away');
 		} else {
 			Status.personOneAway = true;
 			Status.personOneTime = new Date();
-			const timeAway = getTimeAway(Status.personOneTime);
-			io.sockets.emit('personOneTime', `${timeAway}`);
+			io.sockets.emit('personOneTime', `${Status.personOneTime}`);
 			io.sockets.emit('personOneAway', 'away');
 		}
 
