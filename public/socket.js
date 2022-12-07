@@ -137,8 +137,7 @@ socket.on('personTwoName', function (status) {
 });
 function getTimeAway(startDate){
     startDate = new Date(startDate);
-    const curDate = new Date("December 8, 2022");
-    // const curDate = new Date();
+    const curDate = new Date();
 
     var minsBetweenDates = 0;
     if (startDate && curDate) {
