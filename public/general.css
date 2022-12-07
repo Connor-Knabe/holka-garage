@@ -161,7 +161,7 @@
 #stream {
 	margin: 0px auto;
 	display: block;
-	margin-top: 20px;
+	margin-top: 0px;
 	max-height: 100%;
 	max-width: 100%;
 }
