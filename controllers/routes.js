@@ -39,8 +39,8 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		if (options.garageGpsEnabledPersonTwo) {
 			var personTwo = true;
 			personTwoTime = homeAway.getPersonTime(personTwo)
-			io.sockets.emit('personTwoTime', `${personTwoTime}`);
-			io.sockets.emit('personTwoName', `${login.users[1].name}: `);
+			io.sockets.emit('personTwoTime',`${personTwoTime}`);
+			io.sockets.emit('personTwoName',`${login.users[1].name}: `);
 			if (homeAway.isPersonAway(personTwo)) {
 				io.sockets.emit('personTwoAway', `away`);
 			} else {

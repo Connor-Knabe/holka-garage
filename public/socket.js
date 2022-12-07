@@ -80,8 +80,10 @@ socket.on('personOneAway', function (status) {
     if (status) {
         if(status=='home'){
             $("#personOneTime").css("color", "green");
+            $("#personOneAway").css("background-color", "green");
         } else {
             $("#personOneTime").css("color", "red");
+            $("#personOneAway").css("background-color", "red");
         }
 
         $("#personOneAway").text(status);
@@ -96,8 +98,12 @@ socket.on('personTwoAway', function (status) {
     if (status) {
         if(status=='home'){
             $("#personTwoTime").css("color", "green");
+            $("#personTwoAway").css("background-color", "green");
+
         } else {
             $("#personTwoTime").css("color", "red");
+            $("#personTwoAway").css("background-color", "red");
+
         }
 
         $("#personTwoAway").text(status);
@@ -131,7 +137,8 @@ socket.on('personTwoName', function (status) {
 });
 function getTimeAway(startDate){
     startDate = new Date(startDate);
-    const curDate = new Date();
+    const curDate = new Date("December 8, 2022");
+    // const curDate = new Date();
 
     var minsBetweenDates = 0;
     if (startDate && curDate) {
@@ -156,7 +163,7 @@ function getTimeAway(startDate){
     if (hours >= 24) {
         var days = Math.floor(hours / 24);
         hours = hours - days * 24;
-        timeAway = ` ${days}d(s)${hours}h`;
+        timeAway = ` ${days}d${hours}h`;
         // $(".lineBreak").show();
     } else if(hours >= 10){
         timeAway = ` ${hours}h`;
