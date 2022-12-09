@@ -68,14 +68,12 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		if (isPersonTwo) {
 			Status.personTwoAway = true;
 			Status.personTwoTime = new Date();
-			const timeAway = getTimeAway(Status.personTwoTime);
-			io.sockets.emit('personTwoTime', `${timeAway}`);
+			io.sockets.emit('personTwoTime', `${Status.personTwoTime}`);
 			io.sockets.emit('personTwoAway', 'away');
 		} else {
 			Status.personOneAway = true;
 			Status.personOneTime = new Date();
-			const timeAway = getTimeAway(Status.personOneTime);
-			io.sockets.emit('personOneTime', `${timeAway}`);
+			io.sockets.emit('personOneTime', `${Status.personOneTime}`);
 			io.sockets.emit('personOneAway', 'away');
 		}
 
@@ -111,9 +109,9 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		if (hours >= 24) {
 			var days = Math.floor(hours / 24);
 			hours = hours - days * 24;
-			timeAway = `for ${days} day(s) ${hours} hrs`;
+			timeAway = ` for ${days} day(s) ${hours} hrs`;
 		} else {
-			timeAway = hours >= 2 ? `for ${hours} hours` : `for ${minsBetweenDates} mins`;
+			timeAway = hours >= 2 ? ` for ${hours} hours` : ` for ${minsBetweenDates} mins`;
 		}
 
 		return timeAway;
@@ -124,8 +122,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		Status.personOneAway = false;
 		Status.personOneTime = new Date();
 		io.sockets.emit('personOneAway', 'home');
-		const timeAway = getTimeAway(Status.personOneTime);
-		io.sockets.emit('personOneTime', `${timeAway}`);
+		io.sockets.emit('personOneTime', `${Status.personOneTime}`);
 		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 		messenger.sendGenericIfttt(`${login.users[0].name} Set to Home`);
 	}
@@ -134,8 +131,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		Status.personTwoAway = false;
 		Status.personTwoTime = new Date();
 		io.sockets.emit('personTwoAway', 'home');
-		const timeAway = getTimeAway(Status.personOneTime);
-		io.sockets.emit('personTwoTime', `${timeAway}`);
+		io.sockets.emit('personTwoTime', `${Status.personOneTime}`);
 		messenger.sendIftt(null, 'set home', messengerInfo.iftttGarageSetHomeUrl);
 		messenger.sendGenericIfttt(`${login.users[1].name} Set to Home`);
     }

@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	
 	$('#progress').hide();
 	$('#stream').hide();
 	$('#open').click(function(e) {
@@ -94,7 +95,7 @@ $(document).ready(function() {
 	
 	$('#gps').click(function(e) {
 		e.preventDefault();
-		$('#gps').attr('disabled', 'disabled');
+		// $('#gps').attr('disabled', 'disabled');
 		$.ajax({
 			type: 'POST',
 			url: '/gpsToggle',

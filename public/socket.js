@@ -51,15 +51,12 @@ socket.on('toggleAutomatedHueHome', function (status) {
 });
 
 
-socket.on('garageGPSStatus', function (status) {
+socket.on('gps', function (status) {
     if (status) {
-        $("#garageGPSStatus").text(status);
-        $("#garageGPSStatus").show();
-        $("#gps").removeAttr("disabled");
-
-    } else {
-        $("#garageGPSStatus").hide();
-    }
+        $("#gps").text(status);
+        // $("#gps").show();
+        // $("#gps").removeAttr("disabled");
+    } 
 });
 
 socket.on('garageStatus', function (status) {
@@ -82,11 +79,11 @@ socket.on('garageStatus', function (status) {
 socket.on('personOneAway', function (status) {
     if (status) {
         if(status=='home'){
-            $("#personOneAway").css("color", "green");
             $("#personOneTime").css("color", "green");
+            $("#personOneAway").css("background-color", "green");
         } else {
-            $("#personOneAway").css("color", "purple");
-            $("#personOneTime").css("color", "purple");
+            $("#personOneTime").css("color", "red");
+            $("#personOneAway").css("background-color", "red");
         }
 
         $("#personOneAway").text(status);
@@ -100,11 +97,13 @@ socket.on('personOneAway', function (status) {
 socket.on('personTwoAway', function (status) {
     if (status) {
         if(status=='home'){
-            $("#personTwoAway").css("color", "green");
             $("#personTwoTime").css("color", "green");
+            $("#personTwoAway").css("background-color", "green");
+
         } else {
-            $("#personTwoAway").css("color", "purple");
-            $("#personTwoTime").css("color", "purple");
+            $("#personTwoTime").css("color", "red");
+            $("#personTwoAway").css("background-color", "red");
+
         }
 
         $("#personTwoAway").text(status);
@@ -116,6 +115,11 @@ socket.on('personTwoAway', function (status) {
 
 socket.on('personOneName', function (status) {
     if (status) {
+        // if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1) {
+        //     $("#personOneName").text("."+status);
+        // } else {
+        //     $("#personOneName").text(status);
+        // }
         $("#personOneName").text(status);
         $("#personOneName").show();
     } else {
@@ -131,33 +135,56 @@ socket.on('personTwoName', function (status) {
         $("#personTwoName").hide();
     }
 });
+function getTimeAway(startDate){
+    startDate = new Date(startDate);
+    const curDate = new Date();
 
-socket.on('personOneTime', function (status) {
-    if (status) {
-        $("#personOneTime").text(status);
+    var minsBetweenDates = 0;
+    if (startDate && curDate) {
+        var diff = curDate.getTime() - startDate.getTime();
+        minsBetweenDates = Math.floor(diff / 60000);
+    }
+    var hours = Math.floor(minsBetweenDates / 60);
+
+    if (startDate && curDate) {
+        var diff = curDate.getTime() - startDate.getTime();
+        minsBetweenDates = Math.floor(diff / 60000);
+    }
+    var timeAway = minsBetweenDates >= 91 ? `${hours}h` : `${minsBetweenDates}m`;
+
+    if (hours >= 24) {
+        var days = Math.floor(hours / 24);
+        hours = hours - days * 24;
+        timeAway = `${days}d${hours}h`;
+    }
+
+    return timeAway;
+}
+
+
+socket.on('personOneTime', function (startDate) {
+    if (startDate) {
+        // $(".lineBreak").hide();
+        const timeAway = getTimeAway(startDate);
+        $("#personOneTime").text(timeAway);
         $("#personOneTime").show();
     } else {
         $("#personOneTime").hide();
     }
+
 });
 
-socket.on('personTwoTime', function (status) {
-    if (status) {
-        $("#personTwoTime").text(status);
+socket.on('personTwoTime', function (startDate) {
+    if (startDate) {
+        const timeAway = getTimeAway(startDate);
+        $("#personTwoTime").text(timeAway);
         $("#personTwoTime").show();
     } else {
         $("#personTwoTime").hide();
     }
 });
 
-socket.on('personTwoTime', function (status) {
-    if (status) {
-        $("#personTwoTime").text(status);
-        $("#personTwoTime").show();
-    } else {
-        $("#personTwoTime").hide();
-    }
-});        
+ 
 
 socket.on('garageTimer', function (status) {
     if (status) {

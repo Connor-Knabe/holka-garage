@@ -41,7 +41,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 			.then(() => {
 				var msg = 'Sending video via website';
 				var btnPress = true;
-				messenger.send(options.alertButtonPressTexts, messengerInfo.toNumbers, msg, options.alertSendPictureText, btnPress);
+				messenger.send(true, messengerInfo.alertNumbers, msg, options.alertSendPictureText, btnPress);
 				io.sockets.emit('garageOpenStatus', 'Video sent');
 			})
 			.catch(() => {
@@ -66,8 +66,8 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		} else {
 			options.garageGpsEnabledMain = true;
 		}
-		var garageGPSStatus = options.garageGpsEnabledMain ? 'enabled' : 'disabled';
-		io.sockets.emit('garageGPSStatus', garageGPSStatus);
+		var garageGPSStatus = options.garageGpsEnabledMain ? 'GPS auto open is enabled' : 'GPS auto open is disabled';
+		io.sockets.emit('gps', garageGPSStatus);
 		res.send('Ok');
 	});
 

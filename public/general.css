@@ -161,7 +161,7 @@
 #stream {
 	margin: 0px auto;
 	display: block;
-	margin-top: 20px;
+	margin-top: 0px;
 	max-height: 100%;
 	max-width: 100%;
 }
@@ -207,3 +207,15 @@ margin-right: 150px;*/
 .smallText {
 	font-size: 30px;
 }
+
+#personOneTime {
+	display: inline;
+}
+
+#personTwoTime {
+	display: inline;
+}
+
+/* .btn {
+	display: none;
+} */
