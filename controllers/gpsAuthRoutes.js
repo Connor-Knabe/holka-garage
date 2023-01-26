@@ -23,7 +23,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		}
 	});
 
-	app.post('/openViaGpsTwo', bodyParser.text(), function(req, res) {
+	app.post('/openViaGpsTwo', bodyParser.json(), function(req, res) {
 		if (options.garageGpsEnabledPersonTwo) {
 			logger.debug('openViaGpsTwo attempting to open');
 			var isSecondPerson = true;
@@ -69,8 +69,8 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		}
 
 		logger.debug(`open garage via gps ${gpsPerson}`);
-		logger.debug("req.body", req.body);
-		if (req.body && typeof req.body == "string" && req.body.includes(gpsOpenKey)) {
+		if (req.body && req.body.Key && req.body.Key.includes(gpsKey)) {
+		// if (req.body && typeof req.body == "string" && req.body.includes(gpsOpenKey)) {
 			if (options.garageGpsEnabledMain) {
 				iot.garageDoorOpenHandler(two, gpsPerson, req.connection.remoteAddress);
 			} else {
@@ -110,8 +110,8 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		const isPersonTwo = false;
 		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
-		logger.debug('req.body', req.body.Key);
-		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
+		// logger.debug('req.body', req.body.Key);
+		if (req.body && req.body.Key && req.body.Key.includes(gpsKey)) {
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 			const garageStatus = iot.getGarageStatus();
