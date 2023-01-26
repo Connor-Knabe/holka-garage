@@ -110,6 +110,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		const isPersonTwo = false;
 		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
+		logger.debug('req.body', req.body);
 		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
