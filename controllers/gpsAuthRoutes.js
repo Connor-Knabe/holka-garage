@@ -122,7 +122,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		}
 	});
 
-	app.post('/personTwoAway', bodyParser.text(), function(req, res) {
+	app.post('/personTwoAway', bodyParser.json(), function(req, res) {
 		//away from home turn alert on
 		const isPersonTwo = true;
 		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
