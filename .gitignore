@@ -16,3 +16,4 @@ core
 garageTracking.json
 garageTimes.js
 garageTimes*
+.DS_Store

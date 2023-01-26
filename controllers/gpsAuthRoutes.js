@@ -69,7 +69,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		}
 
 		logger.debug(`open garage via gps ${gpsPerson}`);
-
+		logger.debug("req.body", req.body);
 		if (req.body && typeof req.body == "string" && req.body.includes(gpsOpenKey)) {
 			if (options.garageGpsEnabledMain) {
 				iot.garageDoorOpenHandler(two, gpsPerson, req.connection.remoteAddress);
