@@ -9,7 +9,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 
 	var login = require('../settings/login.js');
 
-	app.post('/openViaGps', bodyParser.text(), function(req, res) {
+	app.post('/openViaGps', bodyParser.json(), function(req, res) {
 		if (options.garageGpsEnabledPersonOne) {
 			logger.debug('openViaGpsOne attempting to open');
 			var isSecondPerson = false;
@@ -105,7 +105,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 	}
 	
 
-	app.post('/personOneAway', bodyParser.text(), function(req, res) {
+	app.post('/personOneAway', bodyParser.json(), function(req, res) {
 		//away from home turn alert on
 		const isPersonTwo = false;
 		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
