@@ -70,7 +70,6 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 
 		logger.debug(`open garage via gps ${gpsPerson}`);
 		if (req.body && req.body.Key && req.body.Key.includes(gpsKey)) {
-		// if (req.body && typeof req.body == "string" && req.body.includes(gpsOpenKey)) {
 			if (options.garageGpsEnabledMain) {
 				iot.garageDoorOpenHandler(two, gpsPerson, req.connection.remoteAddress);
 			} else {
@@ -129,7 +128,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 		var gpsKey = isPersonTwo ? login.gpsPersonTwoKey : login.gpsPersonOneKey;
 		var personText = isPersonTwo ? 'personTwo' : 'personOne';
 
-		if (req.body && typeof req.body == "string" && req.body.includes(gpsKey)) {
+		if (req.body && req.body.Key && req.body.Key.includes(gpsKey)) {
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 			const garageStatus = iot.getGarageStatus();
