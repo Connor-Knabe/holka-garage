@@ -1,8 +1,8 @@
 module.exports = function(logger, login, messenger, messengerInfo, io, options) {
 
 	var Status = {
-		personOneAway: false,
-		personTwoAway: false,
+		personOneAway: true,
+		personTwoAway: true,
 		personOneTime: new Date(),
 		personTwoTime: new Date(),
 		temporaryEnableGuestIsHome: options.defaultGuestIsHome,
