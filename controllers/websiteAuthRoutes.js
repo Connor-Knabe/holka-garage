@@ -26,6 +26,10 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		res.send(garageStatus);
 	});
 
+	app.post('/status', function(req, res) {
+		const garageStatus = iot.getGarageStatus();
+		res.send(garageStatus);
+	});
 	app.get('/stream/image_stream.jpg', function(req, res) {
 		fs.readFile('./stream/image_stream.jpg', function(err, data) {
 			if (err) logger.error('failed to read image stream', err); // Fail if the file can't be read.
