@@ -28,7 +28,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 
 	app.post('/status', function(req, res) {
 		const garageStatus = iot.getGarageStatus();
-		res.json({'status':garageStatus});
+		res.json({'Value1':garageStatus});
 	});
 	app.get('/stream/image_stream.jpg', function(req, res) {
 		fs.readFile('./stream/image_stream.jpg', function(err, data) {

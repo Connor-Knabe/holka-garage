@@ -167,7 +167,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	function shouldAlertHomeOwners(status) {
 		logger.debug(`possibly alert home owners not home? expectedGarageOpen${expectedGarageOpen} | homeAway.Status.personOneAway && homeAway.Status.personTwoAway ${homeAway.Status.personOneAway} && ${homeAway.Status.personTwoAway}`);
 		if (!expectedGarageOpen) {
-			if (homeAway.Status.personOneAway && homeAway.Status.personTwoAway && options.shouldAlertIfBothOwnersAwayAndOpen) {
+			let garageIsOpen = garageIsOpen();
+			if (homeAway.Status.personOneAway && homeAway.Status.personTwoAway && options.shouldAlertIfBothOwnersAwayAndOpen && garageIsOpen) {
 				var sendPictureText = true;
 				messenger.sendCallAlert();
 				video
@@ -293,7 +294,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		clearTimeout(manualGarageOpenTimeout);
 		manualGarageOpenTimeout = setTimeout(() => {
 			expectedGarageOpen = false;
-		}, 60 * 1000);
+		}, 30 * 1000);
 
 		if (!debugMode && !options.localDebug) {
 			logger.debug('Opening/closing door now');
