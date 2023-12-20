@@ -21,6 +21,6 @@
 		"onoff": "^6.0.3",
 		"serve-favicon": "^2.5.0",
 		"socket.io": "^4.5.4",
-		"twilio": "^3.84.0"
+		"twilio": "^4.20.0"
 	}
 }
