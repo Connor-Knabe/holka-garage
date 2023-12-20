@@ -167,7 +167,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 	function shouldAlertHomeOwners(status) {
 		logger.debug(`possibly alert home owners not home? expectedGarageOpen${expectedGarageOpen} | homeAway.Status.personOneAway && homeAway.Status.personTwoAway ${homeAway.Status.personOneAway} && ${homeAway.Status.personTwoAway}`);
 		if (!expectedGarageOpen) {
-			var garageIsCurrentlyOpen = garageIsCurrentlyOpen();
+			var garageIsCurrentlyOpen = garageIsOpen();
 			if (homeAway.Status.personOneAway && homeAway.Status.personTwoAway && options.shouldAlertIfBothOwnersAwayAndOpen && garageIsCurrentlyOpen) {
 				var sendPictureText = true;
 				messenger.sendCallAlert();
