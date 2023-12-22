@@ -407,7 +407,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		return getTemporaryDisableGarageStillOpenAlertStatus();
 	}
 
-	//cron
+	//cron DISABLED
 	var job = new cron(
 		'5 * * * *',
 		function() {
@@ -420,7 +420,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		true,
 		'America/Chicago'
 	);
-	job.start();
+	// job.start();
 
 	async function writeToGarageTrackingFile() {
 		try { 
