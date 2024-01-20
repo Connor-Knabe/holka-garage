@@ -359,7 +359,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 		var guestHomeTime = "";
 		if(temporaryEnableGuestIsHomeTime){
-			guestHomeTime = `until ${temporaryEnableGuestIsHomeTime.toLocaleTimeString()}`;
+			guestHomeTime = `until ${temporaryEnableGuestIsHomeTime.toLocaleString()}`;
 		}
 		var status = homeAway.Status.temporaryEnableGuestIsHome ? `Guest Is Home Enabled ${guestHomeTime}` : `Guest Is Home Disabled`;
 
