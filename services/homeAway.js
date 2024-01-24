@@ -121,6 +121,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
     //need to refactor these into one function 
 	function setPersonOneHome() {
 		Status.temporaryEnableGuestIsHomeTillSomeoneHome = false;
+		iot.shouldTurnOffWhenBothSetAway();
 		Status.personOneAway = false;
 		Status.personOneTime = new Date();
 		io.sockets.emit('personOneAway', 'home');
@@ -131,6 +132,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 
 	function setPersonTwoHome() {
 		Status.temporaryEnableGuestIsHomeTillSomeoneHome = false;
+		iot.shouldTurnOffWhenBothSetAway();
 		Status.personTwoAway = false;
 		Status.personTwoTime = new Date();
 		io.sockets.emit('personTwoAway', 'home');
