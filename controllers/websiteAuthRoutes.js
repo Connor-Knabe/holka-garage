@@ -64,6 +64,10 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		res.send(iot.toggleTemporaryEnableGuestIsHome());
 	});
 
+	app.post('/toggleGuestIsHomeTillSomeoneHome', bodyParser.urlencoded({ extended: false }), function(req, res) {
+		res.send(iot.toggleTemporaryEnableGuestIsHomeTillSomeoneHome());
+	});
+
 	app.post('/gpsToggle', bodyParser.urlencoded({ extended: false }), function(req, res) {
 		if (options.garageGpsEnabledMain) {
 			options.garageGpsEnabledMain = false;

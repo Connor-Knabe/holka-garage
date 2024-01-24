@@ -227,6 +227,14 @@ socket.on('toggleGuestIsHome', function (status) {
     }
 });
 
+socket.on('toggleGuestIsHomeTillSomeoneHome', function (status) {
+    if (status) {
+        $("#toggleGuestIsHomeTillSomeoneHome").text(status);
+        $("#toggleGuestIsHomeTillSomeoneHome").show();
+    }
+});
+
+
 
 socket.on('garageStatus', function (status) {
     if (status) {

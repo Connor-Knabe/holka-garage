@@ -82,6 +82,18 @@ $(document).ready(function() {
 		});
 	});
 	
+	$('#toggleGuestIsHomeTillSomeoneHome').click(function(e) {
+		e.preventDefault();
+		$.ajax({
+			type: 'POST',
+			url: '/toggleGuestIsHomeTillSomeoneHome',
+			success: function(result) {
+				$('#toggleGuestIsHomeTillSomeoneHome').text(result);
+			}
+		});
+	});
+	
+
 	$('#toggleAutomatedHueHome').click(function(e) {
 		e.preventDefault();
 		$.ajax({

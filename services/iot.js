@@ -362,7 +362,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 			const time = temporaryEnableGuestIsHomeTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 			const date = temporaryEnableGuestIsHomeTime.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit' });
-
 			
 			guestHomeTime = `until ${date} ${time}`;
 		}
@@ -371,6 +370,15 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		return status
 	}
 
+	function getTemporaryGuestIsHomeTillSomeoneHomeStatus(){
+
+	
+		var status = homeAway.Status.temporaryEnableGuestIsHomeTillSomeoneHome ? `Guest Is Home Till Someone Home Enabled ${guestHomeTime}` : `Guest Is Home Till Someone Home Disabled`;
+
+		return status
+	}
+
+	
 	function toggleTemporaryEnableGuestIsHome(){
 		if(homeAway.Status.temporaryEnableGuestIsHome){
 			homeAway.Status.temporaryEnableGuestIsHome = false;
@@ -387,6 +395,21 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 		return getTemporaryGuestIsHomeStatus();
 	}
+
+	function toggleTemporaryEnableGuestIsHomeTillSomeoneHome(){
+		if(homeAway.Status.temporaryEnableGuestIsHomeTillSomeoneHome){
+			homeAway.Status.temporaryEnableGuestIsHomeTillSomeoneHome = false;
+			messenger.sendGenericIfttt(`Guest is NOT home shutting off lights when home owners are away`);
+		} else {
+			homeAway.Status.temporaryEnableGuestIsHomeTillSomeoneHome = true;
+			messenger.sendGenericIfttt(`Guest is home until someone arrives home NOT shutting off lights when home owners are away`);
+		}
+
+		return getTemporaryGuestIsHomeStatus();
+	}
+
+
+	
 
 	function getTemporaryDisableGarageStillOpenAlertStatus(){
 		var status = temporaryDisableGarageStillOpenAlert ? `Still Open Alert Disabled until ${temporaryDisableGarageStillOpenAlertTime.toLocaleTimeString()}` : 'Still Open Alert Enabled';
@@ -469,7 +492,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		toggleTemporaryDisableGarageStillOpenAlert:toggleTemporaryDisableGarageStillOpenAlert,
 		getTemporaryDisableGarageStillOpenAlertStatus:getTemporaryDisableGarageStillOpenAlertStatus,
 		toggleTemporaryEnableGuestIsHome:toggleTemporaryEnableGuestIsHome,
+		toggleTemporaryEnableGuestIsHomeTillSomeoneHome:toggleTemporaryEnableGuestIsHomeTillSomeoneHome,
 		getTemporaryGuestIsHomeStatus:getTemporaryGuestIsHomeStatus,
+		getTemporaryGuestIsHomeTillSomeoneHomeStatus:getTemporaryGuestIsHomeTillSomeoneHomeStatus,
 		Status:Status,
 		getGarageOpenCount:getGarageOpenCount,
 		getSpringLifeRemaining:getSpringLifeRemaining,

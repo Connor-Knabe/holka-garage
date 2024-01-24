@@ -6,11 +6,12 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		personOneTime: new Date(),
 		personTwoTime: new Date(),
 		temporaryEnableGuestIsHome: options.defaultGuestIsHome,
+		temporaryEnableGuestIsHomeTillSomeoneHome: false,
 		isAway: ()=>{return Status.personOneAway && Status.personTwoAway},
 		isOnlyOnePersonHome: ()=>{
 			var personName = null;
 				
-			if(Status.temporaryEnableGuestIsHome){
+			if(Status.temporaryEnableGuestIsHome || Status.temporaryEnableGuestIsHomeTillSomeoneHome){
 				personName = "Guest?";
 			} else if(Status.personOneAway && !Status.personTwoAway){
 				personName = login.users[1].name
@@ -78,7 +79,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		}
 
 		if (Status.isAway()) {
-			if(Status.temporaryEnableGuestIsHome){
+			if(Status.temporaryEnableGuestIsHome || Status.temporaryEnableGuestIsHomeTillSomeoneHome){
 				messenger.sendGenericIfttt(`Home NOT going to sleep as guest is home`);
 			} else {
 				messenger.sendGenericIfttt(`Home going to sleep as both home owners are away`);
