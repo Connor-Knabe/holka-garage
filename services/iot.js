@@ -372,7 +372,6 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 
 	function getTemporaryGuestIsHomeTillSomeoneHomeStatus(){
 
-	
 		var status = homeAway.Status.temporaryEnableGuestIsHomeTillSomeoneHome ? `Guest Is Home Till Someone Home Enabled ${guestHomeTime}` : `Guest Is Home Till Someone Home Disabled`;
 
 		return status
@@ -405,7 +404,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			messenger.sendGenericIfttt(`Guest is home until someone arrives home NOT shutting off lights when home owners are away`);
 		}
 
-		return getTemporaryGuestIsHomeStatus();
+		return getTemporaryGuestIsHomeTillSomeoneHomeStatus();
 	}
 
 
