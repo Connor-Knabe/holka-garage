@@ -164,6 +164,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 			const garageStatus = iot.getGarageStatus();
+			iot.shouldTurnOffWhenBothSetAway();
 			res.send(garageStatus);
 		}
 	});
@@ -180,6 +181,7 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 			const garageStatus = iot.getGarageStatus();
+			iot.shouldTurnOffWhenBothSetAway();
 			res.send(garageStatus);
 		}
 	});
