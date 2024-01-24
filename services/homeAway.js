@@ -147,6 +147,10 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		return two ? Status.personTwoTime : Status.personOneTime
 	}
 
+	function isGuestHome(){
+		return Status.temporaryEnableGuestIsHome || Status.temporaryEnableGuestIsHomeTillSomeoneHome;
+	}
+
 	return {
         setPersonAway: setPersonAway,
         isPersonAway: isPersonAway,
@@ -155,6 +159,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		getTimeAway:getTimeAway,
 		getPersonTime:getPersonTime,
 		Status:Status,
-		getMinsAway:getMinsAway
+		getMinsAway:getMinsAway,
+		isGuestHome:isGuestHome
 	};
 };
