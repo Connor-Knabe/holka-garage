@@ -296,7 +296,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			shouldTurnOffWhenBothSetAway = false;
 		}
 
-		return shouldTurnOffWhenBothSetAway;
+		shouldTurnOffWhenBothSetAway ? "Yes" : "No";
+		io.sockets.emit('shouldTurnOffWhenBothSetAway', shouldTurnOffWhenBothSetAway);
+
 	}
 
 	
@@ -404,9 +406,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			},options.guestIsHomeEnableForHours*60*60*1000)
 		}
 
-		const shouldTurnOffWhenBothSetAway = this.shouldTurnOffWhenBothSetAway() ? "Yes" : "No";
-		io.sockets.emit('shouldTurnOffWhenBothSetAway', shouldTurnOffWhenBothSetAway);
+		this.shouldTurnOffWhenBothSetAway();
 
+	
 		return getTemporaryGuestIsHomeStatus();
 	}
 
