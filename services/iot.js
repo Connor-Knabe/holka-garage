@@ -289,6 +289,18 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		return shouldOpenGarage;
 	}
 
+	
+	function shouldTurnOffWhenBothSetAway(){
+		var shouldTurnOffWhenBothSetAway = true;
+		if(homeAway.Status.temporaryEnableGuestIsHome || homeAway.Status.temporaryEnableGuestIsHomeTillSomeoneHome){
+			shouldTurnOffWhenBothSetAway = false;
+		}
+
+		return shouldTurnOffWhenBothSetAway;
+	}
+
+	
+
 	function openCloseGarageDoor() {
 		expectedGarageOpen = true;
 		clearTimeout(manualGarageOpenTimeout);
@@ -392,6 +404,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			},options.guestIsHomeEnableForHours*60*60*1000)
 		}
 
+		const shouldTurnOffWhenBothSetAway = iot.shouldTurnOffWhenBothSetAway() ? "Yes" : "No";
+		io.sockets.emit('shouldTurnOffWhenBothSetAway', shouldTurnOffWhenBothSetAway);
+
 		return getTemporaryGuestIsHomeStatus();
 	}
 
@@ -403,6 +418,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			homeAway.Status.temporaryEnableGuestIsHomeTillSomeoneHome = true;
 			messenger.sendGenericIfttt(`Guest is home until someone arrives home NOT shutting off lights when home owners are away`);
 		}
+
+		const shouldTurnOffWhenBothSetAway = iot.shouldTurnOffWhenBothSetAway() ? "Yes" : "No";
+		io.sockets.emit('shouldTurnOffWhenBothSetAway', shouldTurnOffWhenBothSetAway);
 
 		return getTemporaryGuestIsHomeTillSomeoneHomeStatus();
 	}
@@ -498,6 +516,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		getGarageOpenCount:getGarageOpenCount,
 		getSpringLifeRemaining:getSpringLifeRemaining,
 		shouldOpenGarageBaesdOnRules:shouldOpenGarageBaesdOnRules,
+		shouldTurnOffWhenBothSetAway:shouldTurnOffWhenBothSetAway,
 		getGarageStatus:getGarageStatus
 	};
 };

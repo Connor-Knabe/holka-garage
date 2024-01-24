@@ -312,6 +312,15 @@ socket.on('shouldOpenGarageBaesdOnRules', function (status) {
     }
 });      
 
+socket.on('shouldTurnOffWhenBothSetAway', function (status) {
+    if (status) {
+        $("#shouldTurnOffWhenBothSetAway").text(status);
+    } else {
+        $("#shouldTurnOffWhenBothSetAway").text("Unknown!");
+    }
+});    
+
+
 socket.on('garageGPSOpenTime', function (status) {
     if (status) {
         $("#garageGPSOpenTime").text(status);
