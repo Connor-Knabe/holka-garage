@@ -158,13 +158,13 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		if (homeAway.isPersonAway(personTwo)) {
 			homeAway.setPersonOneHome();
 			const garageStatus = iot.getGarageStatus();
+			iot.shouldTurnOffWhenBothSetAway();
 			res.send(garageStatus);
 		} else {
 			const isPersonTwo = false;
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 			const garageStatus = iot.getGarageStatus();
-			iot.shouldTurnOffWhenBothSetAway();
 			res.send(garageStatus);
 		}
 	});
@@ -175,13 +175,13 @@ module.exports = function(app, logger, io, hue, messenger, video, authService, h
 		if (homeAway.isPersonAway(personTwo)){
 			homeAway.setPersonTwoHome();
 			const garageStatus = iot.getGarageStatus();
+			iot.shouldTurnOffWhenBothSetAway();
 			res.send(garageStatus);
 		} else {
 			const isPersonTwo = true;
 			homeAway.setPersonAway(isPersonTwo);
 			iot.activateGarageGpsOpenAwayTimer(isPersonTwo);
 			const garageStatus = iot.getGarageStatus();
-			iot.shouldTurnOffWhenBothSetAway();
 			res.send(garageStatus);
 		}
 	});
