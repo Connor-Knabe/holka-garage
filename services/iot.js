@@ -295,9 +295,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		if(homeAway.Status.temporaryEnableGuestIsHome || homeAway.Status.temporaryEnableGuestIsHomeTillSomeoneHome){
 			shouldTurnOffWhenBothSetAway = false;
 		}
-
-		shouldTurnOffWhenBothSetAway ? "Yes" : "No";
-		io.sockets.emit('shouldTurnOffWhenBothSetAway', shouldTurnOffWhenBothSetAway);
+		const shouldTurnOffWhenBothSetAwayText  = shouldTurnOffWhenBothSetAway ? "Yes" : "No";
+		io.sockets.emit('shouldTurnOffWhenBothSetAway', shouldTurnOffWhenBothSetAwayText);
 
 	}
 
@@ -421,8 +420,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			messenger.sendGenericIfttt(`Guest is home until someone arrives home NOT shutting off lights when home owners are away`);
 		}
 
-		const shouldTurnOffWhenBothSetAway = this.shouldTurnOffWhenBothSetAway() ? "Yes" : "No";
-		io.sockets.emit('shouldTurnOffWhenBothSetAway', shouldTurnOffWhenBothSetAway);
+		this.shouldTurnOffWhenBothSetAway();
+
 
 		return getTemporaryGuestIsHomeTillSomeoneHomeStatus();
 	}
