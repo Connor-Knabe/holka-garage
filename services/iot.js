@@ -404,7 +404,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			},options.guestIsHomeEnableForHours*60*60*1000)
 		}
 
-		const shouldTurnOffWhenBothSetAway = iot.shouldTurnOffWhenBothSetAway() ? "Yes" : "No";
+		const shouldTurnOffWhenBothSetAway = shouldTurnOffWhenBothSetAway() ? "Yes" : "No";
 		io.sockets.emit('shouldTurnOffWhenBothSetAway', shouldTurnOffWhenBothSetAway);
 
 		return getTemporaryGuestIsHomeStatus();
@@ -419,7 +419,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			messenger.sendGenericIfttt(`Guest is home until someone arrives home NOT shutting off lights when home owners are away`);
 		}
 
-		const shouldTurnOffWhenBothSetAway = iot.shouldTurnOffWhenBothSetAway() ? "Yes" : "No";
+		const shouldTurnOffWhenBothSetAway = shouldTurnOffWhenBothSetAway() ? "Yes" : "No";
 		io.sockets.emit('shouldTurnOffWhenBothSetAway', shouldTurnOffWhenBothSetAway);
 
 		return getTemporaryGuestIsHomeTillSomeoneHomeStatus();
