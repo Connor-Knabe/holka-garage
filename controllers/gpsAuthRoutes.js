@@ -16,6 +16,7 @@ module.exports = function(app, logger, messenger, homeAway, bodyParser, iot) {
 			iot.activateGarageGpsOpenAwayTimer(isSecondPerson);
 			openViaGps(res, req, false);
 			homeAway.setPersonOneHome();
+			homeAway.set
 		} else {
 			logger.info('garage gps open is disabled for person one!');
 			res.status(200);

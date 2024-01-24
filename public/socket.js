@@ -235,7 +235,6 @@ socket.on('toggleGuestIsHomeTillSomeoneHome', function (status) {
 });
 
 
-
 socket.on('garageStatus', function (status) {
     if (status) {
         $("#garageStatus").text(status);
