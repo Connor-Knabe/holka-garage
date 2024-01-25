@@ -6,7 +6,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 		personOneTime: new Date(),
 		personTwoTime: new Date(),
 		temporaryEnableGuestIsHome: options.defaultGuestIsHome,
-		temporaryEnableGuestIsHomeTillSomeoneHome: false,
+		temporaryEnableGuestIsHomeTillSomeoneHome: true,
 		isAway: ()=>{return Status.personOneAway && Status.personTwoAway},
 		isOnlyOnePersonHome: ()=>{
 			var personName = null;
