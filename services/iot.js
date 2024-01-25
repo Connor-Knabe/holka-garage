@@ -393,6 +393,15 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		return garageLastClosedTime;
 	}
 
+
+	function getGarageRecentOpenedTime() {
+		return garageRecentOpenedTime;
+	}
+
+	function getGarageRecentClosedTime() {
+		return garageRecentClosedTime;
+	}
+
 	//clean up these two functions 
 	function getTemporaryGuestIsHomeStatus(){
 
@@ -533,6 +542,8 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 		openCloseGarageDoor: openCloseGarageDoor,
 		getGarageLastOpenedTime: getGarageLastOpenedTime,
 		getGarageLastClosedTime:getGarageLastClosedTime,
+		getGarageRecentOpenedTime:getGarageRecentOpenedTime,
+		getGarageRecentClosedTime:getGarageRecentClosedTime,
 		toggleTemporaryDisableGarageStillOpenAlert:toggleTemporaryDisableGarageStillOpenAlert,
 		getTemporaryDisableGarageStillOpenAlertStatus:getTemporaryDisableGarageStillOpenAlertStatus,
 		toggleTemporaryEnableGuestIsHome:toggleTemporaryEnableGuestIsHome,
