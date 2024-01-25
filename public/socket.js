@@ -363,8 +363,8 @@ socket.on('garageRecentClosedTime', function (status) {
     if (status) {
         $("#garageRecentClosedTime").text(new Date(status).toLocaleString());
 
-        if($("#garageRecentOpenedTime").text() != "Unknown"){
-            var garageLastOpened = new Date($("#garageRecentOpenedTime").text());
+        if($("#garageRecentClosedTime").text() != "Unknown"){
+            var garageLastOpened = new Date($("#garageRecentClosedTime").text());
             var garageLastClosed = new Date(status);
 
             var diff = (garageLastClosed - garageLastOpened); 
