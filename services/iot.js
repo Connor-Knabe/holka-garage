@@ -26,6 +26,8 @@ var motionSensorTimeoutOne = null,
 	personTwoShouldOpenTimerTimeout = null,
 	garageLastOpenedTime = null,
 	garageLastClosedTime = null,
+	garageRecentOpenedTime = null,
+	garageRecentClosedTime = null,
 	temporaryDisableGarageStillOpenAlert = false,
 	tempGarageDisableStillOpenAlertTimeout = null,
 	temporaryDisableGarageStillOpenAlertTime = new Date(),
@@ -61,8 +63,22 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 				await writeToGarageTrackingFile();
 	
 				hasBeenOpened = true;
-				garageLastOpenedTime = new Date();
+
+				const currentTime = new Date(); // Current time
+				if (garageRecentOpenedTime === null) {
+					// First time closing
+					garageRecentOpenedTime = currentTime;
+				} else {
+					// Not the first time
+					garageLastOpenedTime = garageRecentOpenedTime;
+					garageRecentOpenedTime = currentTime;
+				}
+				
+				io.sockets.emit('garageRecentOpenedTime', garageRecentOpenedTime);
 				io.sockets.emit('garageLastOpenedTime', garageLastOpenedTime);
+
+				// garageLastOpenedTime = new Date();
+				// io.sockets.emit('garageLastOpenedTime', garageLastOpenedTime);
 	
 				var msg = 'Garage door opened';
 	
@@ -91,11 +107,21 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 				clearTimeout(tempGarageDisableStillOpenAlertTimeout);
 				temporaryDisableGarageStillOpenAlert = false;
 				io.sockets.emit('garageStatus', 'closed');
-	
 				hasBeenOpened = false;
-				garageLastClosedTime = new Date();
+				
+				const currentTime = new Date(); // Current time
+				if (garageRecentClosedTime === null) {
+					// First time closing
+					garageRecentClosedTime = currentTime;
+				} else {
+					// Not the first time
+					garageLastClosedTime = garageRecentClosedTime;
+					garageRecentClosedTime = currentTime;
+				}
+				
+				io.sockets.emit('garageRecentClosedTime', garageRecentClosedTime);
 				io.sockets.emit('garageLastClosedTime', garageLastClosedTime);
-	
+
 				var msg = 'Garage door closed';
 				clearTimeout(garageOpenAlertOneTimeout);
 				clearTimeout(garageOpenAlertTwoTimeout);

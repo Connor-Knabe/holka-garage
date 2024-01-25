@@ -72,6 +72,8 @@ module.exports = function(app, logger, io, video, authService, homeAway, bodyPar
 		io.sockets.emit('guestIsHome', `${options.guestIsHomeEnableForHours} hours`);
 		io.sockets.emit('garageLastOpenedTime', iot.getGarageLastOpenedTime());
 		io.sockets.emit('garageLastClosedTime', iot.getGarageLastClosedTime());
+		io.sockets.emit('garageRecentOpenedTime', iot.getGarageRecentOpenedTime());
+		io.sockets.emit('garageRecentClosedTime', iot.getGarageRecentClosedTime());
 		var shouldOpenGarageBaesdOnRules = iot.shouldOpenGarageBaesdOnRules() ? "Yes" : "No";
 		io.sockets.emit('shouldOpenGarageBaesdOnRules', shouldOpenGarageBaesdOnRules);
 		iot.shouldTurnOffWhenBothSetAway();

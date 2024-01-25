@@ -271,6 +271,15 @@ socket.on('garageLastOpenedTime', function (status) {
     }
 });
 
+
+socket.on('garageRecentOpenedTime', function (status) {
+    if (status) {
+        $("#garageRecentOpenedTime").text(new Date(status).toLocaleString());
+    } else {
+        $("#garageRecentOpenedTime").text("Unknown");
+    }
+});
+
 socket.on('whoOpenedGarageLast', function (status) {
     if (status) {
         $("#whoOpenedGarageLast").text(status);
@@ -347,6 +356,26 @@ socket.on('garageLastClosedTime', function (status) {
         }
     } else {
         $("#garageLastClosedTime").text("Unknown");
+    }
+});
+
+socket.on('garageRecentClosedTime', function (status) {
+    if (status) {
+        $("#garageRecentClosedTime").text(new Date(status).toLocaleString());
+
+        if($("#garageRecentOpenedTime").text() != "Unknown"){
+            var garageLastOpened = new Date($("#garageRecentOpenedTime").text());
+            var garageLastClosed = new Date(status);
+
+            var diff = (garageLastClosed - garageLastOpened); 
+            var timeOpened = Math.round((diff/1000)/60); 
+            if(timeOpened<0){
+                timeOpened = "Unknown"
+            }
+            $("#garageRecentTimeOpened").text(timeOpened + " mins");
+        }
+    } else {
+        $("#garageRecentClosedTime").text("Unknown");
     }
 });
 
