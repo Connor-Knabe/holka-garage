@@ -200,12 +200,18 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 				video
 					?.streamVideo()
 					.then(() => {
-						var garageAlertMsg = `The garage has been ${status} but the homeowners are not home!`;
+						var garageAlertMsg = `The garage has been ${status} | homeowners are not home!`;
+						if(homeAway.isGuestHome()){
+							garageAlertMsg = `The garage has been ${status} | homeowners are not home! Guest might be`;
+						}
 						messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, sendPictureText, true);
 						video?.stopStreaming();
 					})
 					.catch(() => {
-						var garageAlertMsg = `The garage has been ${status} but the homeowners are not home! Error taking new video.`;
+						var garageAlertMsg = `The garage has been ${status} | homeowners are not home! Err vid`;
+						if(homeAway.isGuestHome()){
+							garageAlertMsg = `The garage has been ${status} | homeowners are not home! Guest might be | Err vid `;
+						}
 						sendPictureText = false;
 						messenger.send(true, messengerInfo.toNumbers, garageAlertMsg, sendPictureText, true);
 						video?.stopStreaming();
