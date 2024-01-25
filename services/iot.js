@@ -196,7 +196,9 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 			var garageIsCurrentlyOpen = garageIsOpen();
 			if (homeAway.Status.personOneAway && homeAway.Status.personTwoAway && options.shouldAlertIfBothOwnersAwayAndOpen && garageIsCurrentlyOpen) {
 				var sendPictureText = true;
-				messenger.sendCallAlert();
+				if(!homeAway.isGuestHome() || !homeAway.Status.personHasBeenHome){
+					messenger.sendCallAlert();
+				}
 				video
 					?.streamVideo()
 					.then(() => {
