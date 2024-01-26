@@ -121,7 +121,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 
     //need to refactor these into one function 
 	function setPersonOneHome() {
-		personHasBeenHome = true;
+		Status.personHasBeenHome = true;
 		Status.temporaryEnableGuestIsHomeTillSomeoneHome = false;
 		Status.personOneAway = false;
 		Status.personOneTime = new Date();
@@ -132,7 +132,7 @@ module.exports = function(logger, login, messenger, messengerInfo, io, options) 
 	}
 
 	function setPersonTwoHome() {
-		personHasBeenHome = true;
+		Status.personHasBeenHome = true;
 		Status.temporaryEnableGuestIsHomeTillSomeoneHome = false;
 		Status.personTwoAway = false;
 		Status.personTwoTime = new Date();
