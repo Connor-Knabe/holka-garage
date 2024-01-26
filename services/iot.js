@@ -92,7 +92,7 @@ module.exports = function(app, debugMode, io, logger, video, messenger, hue, cro
 				clearTimeout(shouldAlertTimeoutTwo)
 				shouldAlertTimeoutOne = setTimeout(() => {
 					shouldAlertHomeOwners('opened');
-				}, 30 * 1000);
+				}, 10 * 1000);
 	
 				logger.debug(msg);
 				io.sockets.emit('garageErrorStatus', null);
